@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Express 2012 for Web
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "MOOCore", "MOOLGOSS\MOOCore.fsproj", "{40EA4BCF-E6E0-4DAD-ADE0-55AB522A1529}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MOOService", "MOOService\MOOService.csproj", "{8B55C096-80B0-4FF9-9CD0-7FED50EC3750}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -13,6 +15,10 @@ Global
 		{40EA4BCF-E6E0-4DAD-ADE0-55AB522A1529}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{40EA4BCF-E6E0-4DAD-ADE0-55AB522A1529}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{40EA4BCF-E6E0-4DAD-ADE0-55AB522A1529}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8B55C096-80B0-4FF9-9CD0-7FED50EC3750}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8B55C096-80B0-4FF9-9CD0-7FED50EC3750}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8B55C096-80B0-4FF9-9CD0-7FED50EC3750}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8B55C096-80B0-4FF9-9CD0-7FED50EC3750}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
