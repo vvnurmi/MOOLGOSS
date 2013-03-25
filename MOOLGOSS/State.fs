@@ -1,5 +1,7 @@
 ﻿module MOO.State
 
+open MOO.Types
+
 type StateOp<'s, 'a when 's : equality> =
     StateOp of ('s -> 'a * 's)
 
@@ -57,13 +59,31 @@ let mapState f =
     (), f state
 
 type State = {
-    nextId : int
+    nextID : int
+    planets : Map<ID, Planet>
 }
 
-let stateUnit = {
-    nextId = 1
+let initialState = {
+    nextID = 1
+    planets = Map.empty
 }
 
-let getNewId =
+let getNewID =
     StateOp <| fun state ->
-    state.nextId, { state with nextId = state.nextId + 1 }
+    state.nextID, { state with nextID = state.nextID + 1 }
+
+let getPlanets =
+    getState <| fun state -> state.planets
+let setPlanets planets =
+    mapState <| fun state -> { state with planets = planets }
+let getPlanet id =
+    state {
+        let! planets = getPlanets
+        return Map.find id planets
+    }
+let addPlanet p =
+    state {
+        let! id = getNewID
+        let! planets = getPlanets
+        do! setPlanets <| Map.add id p planets
+    }
