@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ReferenceGroup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="65af16ae-8c39-47cd-89d3-9a1178b0bc81" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
+  <ClientOptions>
+    <GenerateAsynchronousMethods>false</GenerateAsynchronousMethods>
+    <GenerateTaskBasedAsynchronousMethod>true</GenerateTaskBasedAsynchronousMethod>
+    <EnableDataBinding>true</EnableDataBinding>
+    <ExcludedTypes />
+    <ImportXmlTypes>false</ImportXmlTypes>
+    <GenerateInternalTypes>false</GenerateInternalTypes>
+    <GenerateMessageContracts>false</GenerateMessageContracts>
+    <NamespaceMappings />
+    <CollectionMappings />
+    <GenerateSerializableTypes>true</GenerateSerializableTypes>
+    <Serializer>Auto</Serializer>
+    <UseSerializerForFaults>true</UseSerializerForFaults>
+    <ReferenceAllAssemblies>true</ReferenceAllAssemblies>
+    <ReferencedAssemblies />
+    <ReferencedDataContractTypes />
+    <ServiceContractMappings />
+  </ClientOptions>
+  <MetadataSources>
+    <MetadataSource Address="http://localhost:8000/MOO" Protocol="http" SourceId="1" />
+  </MetadataSources>
+  <Metadata>
+    <MetadataFile FileName="MOO.xsd" MetadataType="Schema" ID="27a39f7c-4431-43df-a76b-654bc1d76788" SourceId="1" SourceUrl="http://localhost:8000/MOO?xsd=xsd2" />
+    <MetadataFile FileName="MOO1.xsd" MetadataType="Schema" ID="2e7d3229-5b7e-4e53-85b6-d5c8b25452f0" SourceId="1" SourceUrl="http://localhost:8000/MOO?xsd=xsd0" />
+    <MetadataFile FileName="MOOService.wsdl" MetadataType="Wsdl" ID="610d4e67-aebc-4a61-a7c7-458a04fe4dbe" SourceId="1" SourceUrl="http://localhost:8000/MOO?wsdl" />
+    <MetadataFile FileName="MOO.disco" MetadataType="Disco" ID="95092304-54eb-4b93-92cc-ace1f44f50d9" SourceId="1" SourceUrl="http://localhost:8000/MOO?disco" />
+    <MetadataFile FileName="MOO2.xsd" MetadataType="Schema" ID="bf2f5c72-17a0-4d9a-a44c-502a202b9bcf" SourceId="1" SourceUrl="http://localhost:8000/MOO?xsd=xsd1" />
+  </Metadata>
+  <Extensions>
+    <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />
+    <ExtensionFile FileName="configuration.svcinfo" Name="configuration.svcinfo" />
+  </Extensions>
+</ReferenceGroup>
