@@ -20,7 +20,9 @@ namespace MOO.Client.GUI
     public partial class ClientWindow : Window
     {
         private MOOServiceClient _service;
+        private Canvas _canvas;
         private Planet[] _planets = new Planet[0];
+        private Point _origin = new Point(400, 300);
 
         public ClientWindow(MOOServiceClient service)
         {
@@ -44,23 +46,47 @@ namespace MOO.Client.GUI
             var panel = new DockPanel();
             Content = panel;
 
-            var canvas = new Canvas();
-            DockPanel.SetDock(canvas, Dock.Bottom);
-            panel.Children.Add(canvas);
+            _canvas = new Canvas();
+            DockPanel.SetDock(_canvas, Dock.Bottom);
+            panel.Children.Add(_canvas);
 
-            var star = new Ellipse { Width = 50, Height = 50, Fill = Brushes.Yellow };
-            Canvas.SetLeft(star, 400);
-            Canvas.SetTop(star, 300);
-            canvas.Children.Add(star);
+            var star = CreateStarEllipse();
+            _canvas.Children.Add(star);
+            var planet = new Planet { Name = "Bar", Population = 42, MaxPopulation = 99, Orbit = 1 };
+            _canvas.Children.Add(CreatePlanetEllipse(planet));
+        }
 
-            var planet = new Ellipse { Width = 20, Height = 20, Fill = Brushes.Green };
-            Canvas.SetLeft(planet, 400);
-            Canvas.SetTop(planet, 200);
-            canvas.Children.Add(planet);
+        private Ellipse CreateStarEllipse()
+        {
+            var starRadius = 35;
+            var star = new Ellipse
+            {
+                Width = starRadius * 2,
+                Height = starRadius * 2,
+                Fill = Brushes.Yellow,
+            };
+            Canvas.SetLeft(star, _origin.X - starRadius);
+            Canvas.SetTop(star, _origin.Y - starRadius);
+            return star;
+        }
 
-            var orbitFigure = new PathFigure { StartPoint = new Point(400, 200) };
-            var orbitArc1 = new ArcSegment(new Point(400, 400), new Size(100, 100), 0, false, SweepDirection.Clockwise, false);
-            var orbitArc2 = new ArcSegment(new Point(400, 200), new Size(100, 100), 0, false, SweepDirection.Clockwise, false);
+        private Ellipse CreatePlanetEllipse(Planet planet)
+        {
+            var planetRadius = 20;
+            var orbitRadius = 100;
+            var orbitSize = new Size(orbitRadius, orbitRadius);
+            var startPoint = _origin - new Vector(planetRadius, planetRadius + orbitRadius);
+            var midPoint = _origin - new Vector(planetRadius, planetRadius - orbitRadius);
+            var sphere = new Ellipse
+            {
+                Width = planetRadius * 2,
+                Height = planetRadius * 2,
+                Fill = Brushes.Green,
+            };
+
+            var orbitFigure = new PathFigure { StartPoint = startPoint };
+            var orbitArc1 = new ArcSegment(midPoint, orbitSize, 0, false, SweepDirection.Clockwise, false);
+            var orbitArc2 = new ArcSegment(startPoint, orbitSize, 0, false, SweepDirection.Clockwise, false);
             orbitFigure.Segments.Add(orbitArc1);
             orbitFigure.Segments.Add(orbitArc2);
             var orbitPath = new PathGeometry();
@@ -84,11 +110,12 @@ namespace MOO.Client.GUI
             var storyboard = new Storyboard();
             storyboard.Children.Add(xAnim);
             storyboard.Children.Add(yAnim);
-            Storyboard.SetTarget(xAnim, planet);
-            Storyboard.SetTarget(yAnim, planet);
+            Storyboard.SetTarget(xAnim, sphere);
+            Storyboard.SetTarget(yAnim, sphere);
             Storyboard.SetTargetProperty(xAnim, new PropertyPath(Canvas.LeftProperty));
             Storyboard.SetTargetProperty(yAnim, new PropertyPath(Canvas.TopProperty));
-            planet.Loaded += (sender, args) => storyboard.Begin();
+            sphere.Loaded += (sender, args) => storyboard.Begin();
+            return sphere;
         }
     }
 }
