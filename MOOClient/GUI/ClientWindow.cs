@@ -22,6 +22,7 @@ namespace MOO.Client.GUI
         private MOOServiceClient _service;
         private Canvas _canvas;
         private Planet[] _planets = new Planet[0];
+        private List<Ellipse> _planetEllipses = new List<Ellipse>();
         private Point _origin = new Point(400, 300);
 
         public ClientWindow(MOOServiceClient service)
@@ -33,7 +34,17 @@ namespace MOO.Client.GUI
         protected override void OnKeyDown(KeyEventArgs e)
         {
             if (e.Key == Key.Space)
+            {
                 _planets = _service.GetPlanets();
+                foreach (var ellipse in _planetEllipses) _canvas.Children.Remove(ellipse);
+                _planetEllipses.Clear();
+                foreach (var planet in _planets)
+                {
+                    var ellipse = CreatePlanetEllipse(planet);
+                    _planetEllipses.Add(ellipse);
+                    _canvas.Children.Add(ellipse);
+                }
+            }
             base.OnKeyDown(e);
         }
 
@@ -52,8 +63,6 @@ namespace MOO.Client.GUI
 
             var star = CreateStarEllipse();
             _canvas.Children.Add(star);
-            var planet = new Planet { Name = "Bar", Population = 42, MaxPopulation = 99, Orbit = 1 };
-            _canvas.Children.Add(CreatePlanetEllipse(planet));
         }
 
         private Ellipse CreateStarEllipse()
@@ -73,7 +82,7 @@ namespace MOO.Client.GUI
         private Ellipse CreatePlanetEllipse(Planet planet)
         {
             var planetRadius = 20;
-            var orbitRadius = 100;
+            var orbitRadius = 70 * planet.Orbit;
             var orbitSize = new Size(orbitRadius, orbitRadius);
             var startPoint = _origin - new Vector(planetRadius, planetRadius + orbitRadius);
             var midPoint = _origin - new Vector(planetRadius, planetRadius - orbitRadius);
