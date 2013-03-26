@@ -8,6 +8,7 @@ using System.ServiceModel.Description;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Threading;
 
 namespace MOO.Client
 {
@@ -17,7 +18,19 @@ namespace MOO.Client
         public static void Main(string[] args)
         {
             var service = new MOOServiceClient("NetNamedPipeBinding_IMOOService1");
-            new Application().Run(new ClientWindow(service));
+            var app = new Application();
+            app.DispatcherUnhandledException += ExceptionHandler;
+            app.Run(new ClientWindow(service));
+        }
+
+        private static void ExceptionHandler(object sender, DispatcherUnhandledExceptionEventArgs e)
+        {
+            if (e.Exception is CommunicationException)
+            {
+                MessageBox.Show("There was a communication error. Perhaps the server is offline?\n"
+                    + e.Exception.Message, "MOO Communication Error");
+                e.Handled = true;
+            }
         }
     }
 }
