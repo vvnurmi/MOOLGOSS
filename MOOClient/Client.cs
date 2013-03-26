@@ -11,33 +11,13 @@ using System.Windows;
 
 namespace MOO.Client
 {
-    public class Client : Application
-    {
-        private MOOServiceClient _service;
-        private Planet[] _planets;
-
-        public Client()
-        {
-            _service = new MOOServiceClient("NetNamedPipeBinding_IMOOService1");
-            _planets = new Planet[0];
-        }
-
-        //protected override void Update(GameTime gameTime)
-        //{
-        //    base.Update(gameTime);
-        //    var keyboard = Keyboard.GetState();
-        //    if (!_oldKeyboard.IsKeyDown(Keys.Space) && keyboard.IsKeyDown(Keys.Space))
-        //        _planets = _service.GetPlanets();
-        //    _oldKeyboard = keyboard;
-        //}
-    }
-
     public static class App
     {
         [STAThread]
         public static void Main(string[] args)
         {
-            new Client().Run(new ClientWindow());
+            var service = new MOOServiceClient("NetNamedPipeBinding_IMOOService1");
+            new Application().Run(new ClientWindow(service));
         }
     }
 }
