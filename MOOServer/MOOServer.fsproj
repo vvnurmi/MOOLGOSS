@@ -51,11 +51,6 @@
       <Project>{40ea4bcf-e6e0-4dad-ade0-55ab522a1529}</Project>
       <Private>True</Private>
     </ProjectReference>
-    <ProjectReference Include="..\MOOService\MOOService.csproj">
-      <Name>MOOService</Name>
-      <Project>{8b55c096-80b0-4ff9-9cd0-7fed50ec3750}</Project>
-      <Private>True</Private>
-    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>

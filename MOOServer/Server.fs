@@ -7,6 +7,23 @@ open System
 open System.ServiceModel
 open System.ServiceModel.Description
 
+type ServiceState = {
+    mutable planets : Planet array
+}
+let serviceState = {
+    planets = [||]
+}
+let updateServiceState =
+    state {
+        let! planets = getPlanets
+        serviceState.planets <- Array.map snd <| Map.toArray planets
+    }
+
+[<ServiceBehavior(InstanceContextMode = InstanceContextMode.PerSession)>]
+type MOOService() =
+    interface IMOOService with
+        member x.GetPlanets() = serviceState.planets
+
 let printPlanet p =
     printfn "%s, population %i/%i, orbit %i" p.name p.population p.maxPopulation p.orbit
 let printState =
@@ -17,6 +34,7 @@ let printState =
     }
 let rec uiLoop () =
     state {
+        do! updateServiceState
         do! printState
         let input = Console.ReadLine()
         if input <> "q" then
