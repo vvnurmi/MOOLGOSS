@@ -82,7 +82,7 @@ namespace MOO.Client.GUI
         private Ellipse CreatePlanetEllipse(Planet planet)
         {
             var planetRadius = 20;
-            var orbitRadius = 70 * planet.Orbit;
+            var orbitRadius = 70 * planet.orbit;
             var orbitSize = new Size(orbitRadius, orbitRadius);
             var startPoint = _origin - new Vector(planetRadius, planetRadius + orbitRadius);
             var midPoint = _origin - new Vector(planetRadius, planetRadius - orbitRadius);

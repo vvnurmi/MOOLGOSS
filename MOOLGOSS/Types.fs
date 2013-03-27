@@ -1,11 +1,19 @@
-﻿module MOO.Types
+﻿namespace MOO.Types
+
+open System.Runtime.Serialization
 
 type ID = int
 
+[<DataContract>]
 type Planet = {
-    id : ID
-    name : string
-    population : int
-    maxPopulation : int
-    orbit : int
+    [<DataMember>]
+    mutable id : ID
+    [<DataMember>]
+    mutable name : string
+    [<DataMember>]
+    mutable population : int
+    [<DataMember>]
+    mutable maxPopulation : int
+    [<DataMember>]
+    mutable orbit : int
 }

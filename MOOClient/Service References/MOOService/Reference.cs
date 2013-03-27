@@ -15,7 +15,7 @@ namespace MOO.Client.MOOService {
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="Planet", Namespace="http://schemas.datacontract.org/2004/07/MOO.Service")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="Planet", Namespace="http://schemas.datacontract.org/2004/07/MOO.Types")]
     [System.SerializableAttribute()]
     public partial class Planet : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
         
@@ -23,19 +23,19 @@ namespace MOO.Client.MOOService {
         private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private int IDField;
+        private int idField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private int MaxPopulationField;
+        private int maxPopulationField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private string NameField;
+        private string nameField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private int OrbitField;
+        private int orbitField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private int PopulationField;
+        private int populationField;
         
         [global::System.ComponentModel.BrowsableAttribute(false)]
         public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
@@ -48,66 +48,66 @@ namespace MOO.Client.MOOService {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public int ID {
+        public int id {
             get {
-                return this.IDField;
+                return this.idField;
             }
             set {
-                if ((this.IDField.Equals(value) != true)) {
-                    this.IDField = value;
-                    this.RaisePropertyChanged("ID");
+                if ((this.idField.Equals(value) != true)) {
+                    this.idField = value;
+                    this.RaisePropertyChanged("id");
                 }
             }
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public int MaxPopulation {
+        public int maxPopulation {
             get {
-                return this.MaxPopulationField;
+                return this.maxPopulationField;
             }
             set {
-                if ((this.MaxPopulationField.Equals(value) != true)) {
-                    this.MaxPopulationField = value;
-                    this.RaisePropertyChanged("MaxPopulation");
+                if ((this.maxPopulationField.Equals(value) != true)) {
+                    this.maxPopulationField = value;
+                    this.RaisePropertyChanged("maxPopulation");
                 }
             }
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Name {
+        public string name {
             get {
-                return this.NameField;
+                return this.nameField;
             }
             set {
-                if ((object.ReferenceEquals(this.NameField, value) != true)) {
-                    this.NameField = value;
-                    this.RaisePropertyChanged("Name");
+                if ((object.ReferenceEquals(this.nameField, value) != true)) {
+                    this.nameField = value;
+                    this.RaisePropertyChanged("name");
                 }
             }
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public int Orbit {
+        public int orbit {
             get {
-                return this.OrbitField;
+                return this.orbitField;
             }
             set {
-                if ((this.OrbitField.Equals(value) != true)) {
-                    this.OrbitField = value;
-                    this.RaisePropertyChanged("Orbit");
+                if ((this.orbitField.Equals(value) != true)) {
+                    this.orbitField = value;
+                    this.RaisePropertyChanged("orbit");
                 }
             }
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public int Population {
+        public int population {
             get {
-                return this.PopulationField;
+                return this.populationField;
             }
             set {
-                if ((this.PopulationField.Equals(value) != true)) {
-                    this.PopulationField = value;
-                    this.RaisePropertyChanged("Population");
+                if ((this.populationField.Equals(value) != true)) {
+                    this.populationField = value;
+                    this.RaisePropertyChanged("population");
                 }
             }
         }

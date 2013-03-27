@@ -1,9 +1,8 @@
-﻿using System;
+﻿using MOO.Types;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Serialization;
 using System.ServiceModel;
-using System.ServiceModel.Web;
 using System.Text;
 
 namespace MOO.Service
@@ -15,7 +14,7 @@ namespace MOO.Service
         {
             return new[]
             {
-                new Planet { ID = 42, Name = "Foo", MaxPopulation = 99, Population = 69, Orbit = 3 }
+                new Planet(id : 42, name : "Foo", maxPopulation : 99, population : 69, orbit : 3)
             };
         }
     }
