@@ -8,11 +8,17 @@ using System.Text;
 
 namespace MOO.Service
 {
-    [ServiceContract]
+    [ServiceContract(CallbackContract = typeof(IMOOCallbackContract))]
     public interface IMOOService
     {
         [OperationContract]
         Planet[] GetPlanets();
+    }
+
+    public interface IMOOCallbackContract
+    {
+        [OperationContract(IsOneWay = true)]
+        void Update(DateTime now);
     }
 
     [DataContract]

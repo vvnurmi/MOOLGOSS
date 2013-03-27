@@ -17,7 +17,9 @@ namespace MOO.Client
         [STAThread]
         public static void Main(string[] args)
         {
-            var service = new MOOServiceClient("NetNamedPipeBinding_IMOOService1");
+            var callbackHandler = new MOOCallbackHandler();
+            var instanceContext = new InstanceContext(callbackHandler);
+            var service = new MOOServiceClient(instanceContext, "NetNamedPipeBinding_IMOOService");
             var app = new Application();
             app.DispatcherUnhandledException += ExceptionHandler;
             app.Run(new ClientWindow(service));

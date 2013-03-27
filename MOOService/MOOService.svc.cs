@@ -8,6 +8,7 @@ using System.Text;
 
 namespace MOO.Service
 {
+    [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerSession)]
     public class MOOService : IMOOService
     {
         public Planet[] GetPlanets()

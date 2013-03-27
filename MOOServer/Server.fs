@@ -37,7 +37,7 @@ let main =
     let pipeBaseAddress = new Uri(Uri.UriSchemeNetPipe + "://localhost/MOO")
     use host = new ServiceHost(typeof<MOOService>, httpBaseAddress, pipeBaseAddress)
     try
-        host.AddServiceEndpoint(typeof<IMOOService>, new WSHttpBinding(), "MOOService") |> ignore
+        host.AddServiceEndpoint(typeof<IMOOService>, new WSDualHttpBinding(), "MOOService") |> ignore
         host.AddServiceEndpoint(typeof<IMOOService>, new NetNamedPipeBinding(), "MOOService") |> ignore
         host.Description.Behaviors.Add <| new ServiceMetadataBehavior(HttpGetEnabled = true)
         host.Open()
