@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Express 2012 for Web
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "MOOCore", "MOOLGOSS\MOOCore.fsproj", "{40EA4BCF-E6E0-4DAD-ADE0-55AB522A1529}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "MOOCore", "MOOCore\MOOCore.fsproj", "{40EA4BCF-E6E0-4DAD-ADE0-55AB522A1529}"
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "MOOServer", "MOOServer\MOOServer.fsproj", "{A73CA7A7-94B2-4B4A-A431-872B1C0E137E}"
 EndProject

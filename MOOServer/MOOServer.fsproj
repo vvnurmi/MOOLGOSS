@@ -46,7 +46,7 @@
     <Compile Include="Server.fs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\MOOLGOSS\MOOCore.fsproj">
+    <ProjectReference Include="..\MOOCore\MOOCore.fsproj">
       <Name>MOOCore</Name>
       <Project>{40ea4bcf-e6e0-4dad-ade0-55ab522a1529}</Project>
       <Private>True</Private>

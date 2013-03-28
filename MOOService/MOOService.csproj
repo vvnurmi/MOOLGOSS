@@ -74,7 +74,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\MOOLGOSS\MOOCore.fsproj">
+    <ProjectReference Include="..\MOOCore\MOOCore.fsproj">
       <Project>{40ea4bcf-e6e0-4dad-ade0-55ab522a1529}</Project>
       <Name>MOOCore</Name>
     </ProjectReference>
