@@ -1,5 +1,6 @@
 ﻿module MOO.State
 
+open MOO.Service
 open MOO.Types
 
 type StateOp<'s, 'a when 's : equality> =
@@ -61,11 +62,13 @@ let mapState f =
 type State = {
     nextID : int
     planets : Map<ID, Planet>
+    clients : Client list
 }
 
 let initialState = {
     nextID = 1
     planets = Map.empty
+    clients = []
 }
 
 let getNewID =
@@ -87,3 +90,10 @@ let addPlanet p =
         let! planets = getPlanets
         do! setPlanets <| Map.add id p planets
     }
+
+let getClients =
+    getState <| fun state -> state.clients
+let addClient c =
+    mapState <| fun state -> { state with clients = c :: state.clients |> Set.ofList |> List.ofSeq }
+let removeClient c =
+    mapState <| fun state -> { state with clients = List.filter (fun x -> x <> c) state.clients }
