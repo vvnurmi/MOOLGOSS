@@ -17,12 +17,13 @@ namespace MOO.Client
         [STAThread]
         public static void Main(string[] args)
         {
-            var callbackHandler = new MOOCallbackHandler();
+            var state = new State();
+            var callbackHandler = new MOOCallbackHandler(state);
             var instanceContext = new InstanceContext(callbackHandler);
             var service = new MOOServiceClient(instanceContext, "NetNamedPipeBinding_IMOOService");
             var app = new Application();
             app.DispatcherUnhandledException += ExceptionHandler;
-            app.Run(new ClientWindow(service));
+            app.Run(new ClientWindow(service, state));
         }
 
         private static void ExceptionHandler(object sender, DispatcherUnhandledExceptionEventArgs e)

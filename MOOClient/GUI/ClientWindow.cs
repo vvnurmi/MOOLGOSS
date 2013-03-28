@@ -17,17 +17,20 @@ using System.Windows.Shapes;
 
 namespace MOO.Client.GUI
 {
-    public partial class ClientWindow : Window
+    public class ClientWindow : Window
     {
         private MOOServiceClient _service;
+        private State _state;
+        private TextBox _dateTimeBox;
         private Canvas _canvas;
         private Planet[] _planets = new Planet[0];
         private List<Ellipse> _planetEllipses = new List<Ellipse>();
         private Point _origin = new Point(400, 300);
 
-        public ClientWindow(MOOServiceClient service)
+        public ClientWindow(MOOServiceClient service, State state)
         {
             _service = service;
+            _state = state;
             SetupControls();
         }
 
@@ -56,6 +59,21 @@ namespace MOO.Client.GUI
 
             var panel = new DockPanel();
             Content = panel;
+
+            _dateTimeBox = new TextBox
+            {
+                Background = Brushes.DarkGray,
+                Foreground = Brushes.White,
+                IsReadOnly = true,
+            };
+            var dateTimeBinding = new Binding("Now")
+            {
+                Source = _state,
+            };
+            _dateTimeBox.SetBinding(TextBox.TextProperty, dateTimeBinding);
+
+            DockPanel.SetDock(_dateTimeBox, Dock.Top);
+            panel.Children.Add(_dateTimeBox);
 
             _canvas = new Canvas();
             DockPanel.SetDock(_canvas, Dock.Bottom);

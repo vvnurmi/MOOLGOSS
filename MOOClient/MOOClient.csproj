@@ -61,6 +61,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
+    <Compile Include="State.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

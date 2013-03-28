@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -9,9 +10,16 @@ namespace MOO.Client
 {
     public class MOOCallbackHandler : IMOOServiceCallback
     {
+        private State _state;
+
+        public MOOCallbackHandler(State state)
+        {
+            _state = state;
+        }
+
         public void Update(DateTime now)
         {
-            throw new NotImplementedException();
+            _state.Now = now;
         }
     }
 }
