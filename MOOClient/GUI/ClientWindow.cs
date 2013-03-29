@@ -29,26 +29,23 @@ namespace MOO.Client.GUI
 
         public ClientWindow(MOOServiceClient service, State state)
         {
+            Loaded += (sender, args) => UpdatePlanets();
             _service = service;
             _state = state;
             SetupControls();
         }
 
-        protected override void OnKeyDown(KeyEventArgs e)
+        private void UpdatePlanets()
         {
-            if (e.Key == Key.Space)
+            _planets = _service.GetPlanets();
+            foreach (var ellipse in _planetEllipses) _canvas.Children.Remove(ellipse);
+            _planetEllipses.Clear();
+            foreach (var planet in _planets)
             {
-                _planets = _service.GetPlanets();
-                foreach (var ellipse in _planetEllipses) _canvas.Children.Remove(ellipse);
-                _planetEllipses.Clear();
-                foreach (var planet in _planets)
-                {
-                    var ellipse = CreatePlanetEllipse(planet);
-                    _planetEllipses.Add(ellipse);
-                    _canvas.Children.Add(ellipse);
-                }
+                var ellipse = CreatePlanetEllipse(planet);
+                _planetEllipses.Add(ellipse);
+                _canvas.Children.Add(ellipse);
             }
-            base.OnKeyDown(e);
         }
 
         private void SetupControls()
@@ -56,31 +53,40 @@ namespace MOO.Client.GUI
             Background = Brushes.Black;
             Width = 800;
             Height = 600;
+            Content = CreateMainPanel();
+        }
 
+        private DockPanel CreateMainPanel()
+        {
             var panel = new DockPanel();
-            Content = panel;
+            _dateTimeBox = CreateDateTimeBox();
+            DockPanel.SetDock(_dateTimeBox, Dock.Top);
+            panel.Children.Add(_dateTimeBox);
+            _canvas = CreateCanvas();
+            DockPanel.SetDock(_canvas, Dock.Bottom);
+            panel.Children.Add(_canvas);
+            return panel;
+        }
 
-            _dateTimeBox = new TextBox
+        private TextBox CreateDateTimeBox()
+        {
+            var dateTimeBox = new TextBox
             {
                 Background = Brushes.DarkGray,
                 Foreground = Brushes.White,
                 IsReadOnly = true,
             };
-            var dateTimeBinding = new Binding("Now")
-            {
-                Source = _state,
-            };
-            _dateTimeBox.SetBinding(TextBox.TextProperty, dateTimeBinding);
+            var dateTimeBinding = new Binding("Now") { Source = _state };
+            dateTimeBox.SetBinding(TextBox.TextProperty, dateTimeBinding);
+            return dateTimeBox;
+        }
 
-            DockPanel.SetDock(_dateTimeBox, Dock.Top);
-            panel.Children.Add(_dateTimeBox);
-
-            _canvas = new Canvas();
-            DockPanel.SetDock(_canvas, Dock.Bottom);
-            panel.Children.Add(_canvas);
-
+        private Canvas CreateCanvas()
+        {
+            var canvas = new Canvas();
             var star = CreateStarEllipse();
-            _canvas.Children.Add(star);
+            canvas.Children.Add(star);
+            return canvas;
         }
 
         private Ellipse CreateStarEllipse()
