@@ -8,6 +8,8 @@ open System.Collections.Concurrent
 open System.ServiceModel
 open System.ServiceModel.Description
 
+let sendUpdate (c : Client) = c.channel.Update(DateTime.Now)
+
 type ServiceState = {
     // Read by service threads, written by the main thread.
     mutable planets : Planet array
@@ -42,6 +44,7 @@ type MOOService() =
                 channel = OperationContext.Current.GetCallbackChannel<IMOOCallbackContract>()
             }
             serviceState.newClients.Enqueue(client)
+            sendUpdate client
             serviceState.planets
 
 let runWithService f =

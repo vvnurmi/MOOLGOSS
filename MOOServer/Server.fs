@@ -18,7 +18,6 @@ let rec uiLoop () =
     state {
         do! updateServiceState
         do! printState
-        let sendUpdate (c : Client) = c.channel.Update(DateTime.Now)
         do! sendToClients sendUpdate
         let input = Console.ReadLine()
         if input <> "q" then

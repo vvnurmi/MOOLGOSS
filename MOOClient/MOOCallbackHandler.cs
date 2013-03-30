@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace MOO.Client
 {
+    [CallbackBehavior(ConcurrencyMode = ConcurrencyMode.Single, UseSynchronizationContext = false)]
     public class MOOCallbackHandler : IMOOServiceCallback
     {
         private State _state;
