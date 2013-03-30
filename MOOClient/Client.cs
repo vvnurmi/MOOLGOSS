@@ -12,27 +12,40 @@ using System.Windows.Threading;
 
 namespace MOO.Client
 {
-    public static class App
+    public class App : Application
     {
+        private ClientWindow _window;
+        private State _state;
+
         [STAThread]
         public static void Main(string[] args)
         {
-            var state = new State();
-            var callbackHandler = new MOOCallbackHandler(state);
-            var instanceContext = new InstanceContext(callbackHandler);
-            var service = new MOOServiceClient(instanceContext, "NetNamedPipeBinding_IMOOService");
-            var app = new Application();
-            app.DispatcherUnhandledException += ExceptionHandler;
-            app.Run(new ClientWindow(service, state));
+            var app = new App();
+            app.Run(app._window);
         }
 
-        private static void ExceptionHandler(object sender, DispatcherUnhandledExceptionEventArgs e)
+        private App()
+        {
+            _state = new State();
+            DispatcherUnhandledException += ExceptionHandler;
+            _window = new ClientWindow(CreateService, _state);
+        }
+
+        private MOOServiceClient CreateService()
+        {
+            var callbackHandler = new MOOCallbackHandler(_state);
+            var instanceContext = new InstanceContext(callbackHandler);
+            return new MOOServiceClient(instanceContext, "NetNamedPipeBinding_IMOOService");
+        }
+
+        private void ExceptionHandler(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
             if (e.Exception is CommunicationException)
             {
                 MessageBox.Show("There was a communication error. Perhaps the server is offline?\n"
                     + e.Exception.Message, "MOO Communication Error");
                 e.Handled = true;
+                _window.ServerButton.IsChecked = false;
             }
         }
     }

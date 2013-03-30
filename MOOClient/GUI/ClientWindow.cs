@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -19,20 +20,23 @@ namespace MOO.Client.GUI
 {
     public class ClientWindow : Window
     {
+        private Func<MOOServiceClient> _createService;
         private MOOServiceClient _service;
         private State _state;
         private TextBox _dateTimeBox;
         private Canvas _canvas;
+        public ToggleButton ServerButton { get; private set; }
         private Planet[] _planets = new Planet[0];
         private List<Ellipse> _planetEllipses = new List<Ellipse>();
         private Point _origin = new Point(400, 300);
 
-        public ClientWindow(MOOServiceClient service, State state)
+        public ClientWindow(Func<MOOServiceClient> createService, State state)
         {
-            Loaded += (sender, args) => UpdatePlanets();
-            _service = service;
+            Loaded += (sender, args) => ServerButton.IsChecked = true;
+            _createService = createService;
+            _service = createService();
             _state = state;
-            SetupControls();
+            SetupWindow();
         }
 
         private void UpdatePlanets()
@@ -48,7 +52,15 @@ namespace MOO.Client.GUI
             }
         }
 
-        private void SetupControls()
+        private void ConnectToServer()
+        {
+            ServerButton.Content = "Server OK";
+            ServerButton.IsEnabled = false;
+            _service = _createService();
+            UpdatePlanets();
+        }
+
+        private void SetupWindow()
         {
             Background = Brushes.Black;
             Width = 800;
@@ -59,13 +71,30 @@ namespace MOO.Client.GUI
         private DockPanel CreateMainPanel()
         {
             var panel = new DockPanel();
-            _dateTimeBox = CreateDateTimeBox();
-            DockPanel.SetDock(_dateTimeBox, Dock.Top);
-            panel.Children.Add(_dateTimeBox);
+            var topPanel = CreateTopPanel();
+            DockPanel.SetDock(topPanel, Dock.Top);
+            panel.Children.Add(topPanel);
             _canvas = CreateCanvas();
             DockPanel.SetDock(_canvas, Dock.Bottom);
             panel.Children.Add(_canvas);
             return panel;
+        }
+
+        private DockPanel CreateTopPanel()
+        {
+            var topPanel = new DockPanel();
+
+            ServerButton = new ToggleButton { Background = Brushes.Red };
+            ServerButton.Checked += (sender, args) => ConnectToServer();
+            ServerButton.Unchecked += (sender, args) => { ServerButton.Content = "No server"; ServerButton.IsEnabled = true; };
+            DockPanel.SetDock(ServerButton, Dock.Right);
+            topPanel.Children.Add(ServerButton);
+
+            _dateTimeBox = CreateDateTimeBox();
+            DockPanel.SetDock(_dateTimeBox, Dock.Left);
+            topPanel.Children.Add(_dateTimeBox);
+
+            return topPanel;
         }
 
         private TextBox CreateDateTimeBox()
