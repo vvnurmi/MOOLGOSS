@@ -31,9 +31,8 @@ namespace MOO.Client
             _window = new ClientWindow(CreateService, _state);
         }
 
-        private MOOServiceClient CreateService()
+        private MOOServiceClient CreateService(IMOOServiceCallback callbackHandler)
         {
-            var callbackHandler = new MOOCallbackHandler(_state);
             var instanceContext = new InstanceContext(callbackHandler);
             return new MOOServiceClient(instanceContext, "NetNamedPipeBinding_IMOOService");
         }

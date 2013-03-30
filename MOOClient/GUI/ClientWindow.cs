@@ -30,11 +30,15 @@ namespace MOO.Client.GUI
         private List<Ellipse> _planetEllipses = new List<Ellipse>();
         private Point _origin = new Point(400, 300);
 
-        public ClientWindow(Func<MOOServiceClient> createService, State state)
+        public ClientWindow(Func<IMOOServiceCallback, MOOServiceClient> createService, State state)
         {
             Loaded += (sender, args) => ServerButton.IsChecked = true;
-            _createService = createService;
-            _service = createService();
+            _createService = () =>
+            {
+                var callbackHandler = new MOOCallbackHandler(_state);
+                callbackHandler.Updated += () => Dispatcher.InvokeAsync(UpdatePlanets);
+                return createService(callbackHandler);
+            };
             _state = state;
             SetupWindow();
         }
@@ -58,7 +62,6 @@ namespace MOO.Client.GUI
             ServerButton.IsEnabled = false;
             _service = _createService();
             _service.Authenticate(Environment.UserName);
-            UpdatePlanets();
         }
 
         private void SetupWindow()
@@ -113,7 +116,7 @@ namespace MOO.Client.GUI
 
         private Canvas CreateCanvas()
         {
-            var canvas = new Canvas();
+            var canvas = new Canvas { ClipToBounds = true };
             var star = CreateStarEllipse();
             canvas.Children.Add(star);
             return canvas;

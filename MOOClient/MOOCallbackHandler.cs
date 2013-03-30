@@ -13,6 +13,8 @@ namespace MOO.Client
     {
         private State _state;
 
+        public event Action Updated;
+
         public MOOCallbackHandler(State state)
         {
             _state = state;
@@ -21,6 +23,7 @@ namespace MOO.Client
         public void Update(DateTime now)
         {
             _state.Now = now;
+            if (Updated != null) Updated();
         }
     }
 }
