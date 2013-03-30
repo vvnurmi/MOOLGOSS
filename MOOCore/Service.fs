@@ -12,11 +12,14 @@ type IMOOCallbackContract =
 [<ServiceContract(CallbackContract = typeof<IMOOCallbackContract>)>]
 type IMOOService =
     [<OperationContract>]
+    abstract member Authenticate : name : string -> unit
+    [<OperationContract>]
     abstract member GetPlanets : unit -> Planet[]
 
 [<CustomEquality; CustomComparison>]
 type Client =
     {
+        player : string
         sessionID : string
         channel : IMOOCallbackContract
     }

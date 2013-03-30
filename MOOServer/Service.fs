@@ -18,7 +18,7 @@ type ServiceState = {
 }
 let serviceState = {
     planets = [||]
-    newClients = new ConcurrentQueue<Client>()
+    newClients = new (Client ConcurrentQueue)()
 }
 let updateServiceState =
     let rec addClients () =
@@ -38,13 +38,15 @@ let updateServiceState =
 [<ServiceBehavior(InstanceContextMode = InstanceContextMode.PerSession)>]
 type MOOService() =
     interface IMOOService with
-        member x.GetPlanets() =
+        member x.Authenticate(name) =
             let client = {
+                player = name
                 sessionID = OperationContext.Current.SessionId
                 channel = OperationContext.Current.GetCallbackChannel<IMOOCallbackContract>()
             }
             serviceState.newClients.Enqueue(client)
             sendUpdate client
+        member x.GetPlanets() =
             serviceState.planets
 
 let runWithService f =

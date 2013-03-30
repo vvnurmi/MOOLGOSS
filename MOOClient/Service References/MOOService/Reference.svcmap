@@ -22,7 +22,7 @@
     <MetadataSource Address="http://localhost:8000/MOO" Protocol="http" SourceId="1" />
   </MetadataSources>
   <Metadata>
-    <MetadataFile FileName="MOO.xsd" MetadataType="Schema" ID="27a39f7c-4431-43df-a76b-654bc1d76788" SourceId="1" SourceUrl="http://localhost:8000/MOO?xsd=xsd2" />
+    <MetadataFile FileName="MOO.xsd" MetadataType="Schema" ID="6f341949-8103-4abe-b2a2-a86a7bb82c80" SourceId="1" SourceUrl="http://localhost:8000/MOO?xsd=xsd2" />
     <MetadataFile FileName="MOO1.xsd" MetadataType="Schema" ID="2e7d3229-5b7e-4e53-85b6-d5c8b25452f0" SourceId="1" SourceUrl="http://localhost:8000/MOO?xsd=xsd0" />
     <MetadataFile FileName="MOOService.wsdl" MetadataType="Wsdl" ID="610d4e67-aebc-4a61-a7c7-458a04fe4dbe" SourceId="1" SourceUrl="http://localhost:8000/MOO?wsdl" />
     <MetadataFile FileName="MOO.disco" MetadataType="Disco" ID="95092304-54eb-4b93-92cc-ace1f44f50d9" SourceId="1" SourceUrl="http://localhost:8000/MOO?disco" />

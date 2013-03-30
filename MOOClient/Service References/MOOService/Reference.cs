@@ -126,6 +126,12 @@ namespace MOO.Client.MOOService {
     [System.ServiceModel.ServiceContractAttribute(ConfigurationName="MOOService.IMOOService", CallbackContract=typeof(MOO.Client.MOOService.IMOOServiceCallback))]
     public interface IMOOService {
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IMOOService/Authenticate", ReplyAction="http://tempuri.org/IMOOService/AuthenticateResponse")]
+        void Authenticate(string name);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IMOOService/Authenticate", ReplyAction="http://tempuri.org/IMOOService/AuthenticateResponse")]
+        System.Threading.Tasks.Task AuthenticateAsync(string name);
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IMOOService/GetPlanets", ReplyAction="http://tempuri.org/IMOOService/GetPlanetsResponse")]
         MOO.Client.MOOService.Planet[] GetPlanets();
         
@@ -166,6 +172,14 @@ namespace MOO.Client.MOOService {
         
         public MOOServiceClient(System.ServiceModel.InstanceContext callbackInstance, System.ServiceModel.Channels.Binding binding, System.ServiceModel.EndpointAddress remoteAddress) : 
                 base(callbackInstance, binding, remoteAddress) {
+        }
+        
+        public void Authenticate(string name) {
+            base.Channel.Authenticate(name);
+        }
+        
+        public System.Threading.Tasks.Task AuthenticateAsync(string name) {
+            return base.Channel.AuthenticateAsync(name);
         }
         
         public MOO.Client.MOOService.Planet[] GetPlanets() {

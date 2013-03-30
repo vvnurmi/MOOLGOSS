@@ -57,6 +57,7 @@ namespace MOO.Client.GUI
             ServerButton.Content = "Server OK";
             ServerButton.IsEnabled = false;
             _service = _createService();
+            _service.Authenticate(Environment.UserName);
             UpdatePlanets();
         }
 
