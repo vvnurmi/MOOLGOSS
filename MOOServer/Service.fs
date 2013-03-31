@@ -50,20 +50,38 @@ type MOOService() =
             serviceState.planets
 
 let runWithService f =
+    let core baseAddresses bindings httpGetEnabled =
+        use host = new ServiceHost(typeof<MOOService>, baseAddresses)
+        host.UnknownMessageReceived.Add <| fun args -> printfn "Note: Unknown message received. Skipping it."
+        let openSucceeded =
+            try
+                let addEndpoint binding =
+                    host.AddServiceEndpoint(typeof<IMOOService>, binding, "MOOService") |> ignore
+                List.iter addEndpoint bindings
+                if httpGetEnabled then host.Description.Behaviors.Add <| new ServiceMetadataBehavior(HttpGetEnabled = true)
+                host.Open()
+                true
+            with
+            | :? CommunicationException as ex ->
+                printfn "An exception occurred: %s" ex.Message
+                host.Abort()
+                false
+        if openSucceeded then
+            try
+                f ()
+            with
+            | :? CommunicationException as ex ->
+                printfn "An exception occurred: %s" ex.Message
+                host.Abort()
+            true
+        else false
+
     let httpBaseAddress = new Uri(Uri.UriSchemeHttp + "://localhost:8000/MOO")
     let pipeBaseAddress = new Uri(Uri.UriSchemeNetPipe + "://localhost/MOO")
-    use host = new ServiceHost(typeof<MOOService>, httpBaseAddress, pipeBaseAddress)
-    try
-        host.AddServiceEndpoint(typeof<IMOOService>, new WSDualHttpBinding(), "MOOService") |> ignore
-        host.AddServiceEndpoint(typeof<IMOOService>, new NetNamedPipeBinding(), "MOOService") |> ignore
-        host.Description.Behaviors.Add <| new ServiceMetadataBehavior(HttpGetEnabled = true)
-        host.Open()
-        f ()
-        host.Close()
-    with
-    | :? CommunicationException as ex ->
-        printfn "An exception occurred: %s" ex.Message
-        host.Abort()
+    let bindings = [ new WSDualHttpBinding() :> Channels.Binding; upcast new NetNamedPipeBinding() ]
+    if not <| core [| httpBaseAddress; pipeBaseAddress |] bindings true then
+        printfn "An exception occurred while creating the HTTP endpoint. Try running the server with administrator rights?"
+        core [| pipeBaseAddress |] bindings.Tail false |> ignore
 
 let sendToClients f =
     let safely f c =
