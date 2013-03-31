@@ -86,11 +86,12 @@ let getPlanet id =
         let! planets = getPlanets
         return Map.find id planets
     }
+let setPlanet (p : Planet) =
+    mapState <| fun state -> { state with planets = Map.add p.id p state.planets }
 let addPlanet p =
     state {
         let! id = getNewID
-        let! planets = getPlanets
-        do! setPlanets <| Map.add id p planets
+        do! setPlanet { p with id = id }
     }
 
 let getClients =

@@ -1,5 +1,6 @@
 ﻿module MOO.Server.App
 
+open MOO.Players
 open MOO.Server.Service
 open MOO.Service
 open MOO.State
@@ -14,24 +15,58 @@ let printState =
         printfn "\n%i planets" planets.Count
         Map.iter (fun id p -> printPlanet p) planets
     }
+let createPlanetarySystem =
+    state {
+        do! addPlanet {
+            id = 0
+            player = None
+            name = "Planet 1"
+            maxPopulation = 30
+            population = 0
+            orbit = 1
+        }
+        do! addPlanet {
+            id = 0
+            player = None
+            name = "Planet 2"
+            maxPopulation = 1000
+            population = 0
+            orbit = 2
+        }
+        do! addPlanet {
+            id = 0
+            player = Some "Tellurians"
+            name = "Planet 3"
+            maxPopulation = 400
+            population = 50
+            orbit = 3
+        }
+    }
+let initNewPlayers =
+    state {
+        let! clients = getClients
+        let players = clients |> List.map (fun c -> c.player)
+        let! newPlayers = adapt2 List.filter (fun p -> lift not (hasPlanets p)) players
+        do! adapt2 List.iter initPlayer newPlayers
+    }
+let init =
+    state {
+        do! createPlanetarySystem
+    }
 let rec uiLoop () =
     state {
         do! updateServiceState
+        do! initNewPlayers
         do! printState
         do! sendToClients sendUpdate
         let input = Console.ReadLine()
         if input <> "q" then
-            let! planets = getPlanets
-            let n = planets.Count + 1
-            let planet = {
-                id = 0
-                name = sprintf "Planet %i" n
-                maxPopulation = 99
-                population = 42
-                orbit = n
-            }
-            do! addPlanet planet
             do! uiLoop ()
     }
+let mainCore =
+    state {
+        do! init
+        do! uiLoop ()
+    }
 let main =
-    runWithService <| fun () -> run (uiLoop ()) initialState |> ignore
+    runWithService <| fun () -> run mainCore initialState |> ignore

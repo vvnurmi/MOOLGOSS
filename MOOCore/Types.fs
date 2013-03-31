@@ -9,6 +9,8 @@ type Planet = {
     [<DataMember>]
     mutable id : ID
     [<DataMember>]
+    mutable player : string option
+    [<DataMember>]
     mutable name : string
     [<DataMember>]
     mutable population : int
