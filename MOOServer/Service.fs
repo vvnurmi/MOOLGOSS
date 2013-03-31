@@ -77,3 +77,8 @@ let sendToClients f =
         let badClients = List.filter (safely f) clients
         do! adapt2 List.iter removeClient badClients
     }
+let dropClient c =
+    state {
+        (c.channel :?> System.ServiceModel.IClientChannel).Close()
+        do! removeClient c
+    }

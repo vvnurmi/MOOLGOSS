@@ -67,6 +67,7 @@ let mainCore =
     state {
         do! init
         do! uiLoop ()
+        do! getClients %|> adapt2 List.iter dropClient
     }
 let main =
     runWithService <| fun () -> run mainCore initialState |> ignore
