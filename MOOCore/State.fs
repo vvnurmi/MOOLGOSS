@@ -35,22 +35,24 @@ let bind mf g =
     StateOp <| fun state ->
     let rf, state2 = run mf state
     run (g rf) state2
+let ret a =
+    StateOp <| fun state -> a, state
 
 type StateBuilder() =
     member x.Lift(f, mg) = lift f mg
     member x.Compose(f, g) = compose f g
     member x.Bind(mf, g) = bind mf g
     member x.Combine(mf, mg) = bind mf <| fun _ -> mg
-    member x.Return(a) = StateOp <| fun state -> a, state
+    member x.Return(a) = ret a
     member x.ReturnFrom(mf) = StateOp <| fun state -> run mf state
     member x.Zero() = StateOp <| fun state -> (), state
     member x.For(s, f) = adapt2 Seq.iter f s
     member x.Delay(f) = f ()
 
 let state = StateBuilder()
-let (~%) a = state.Return a
-let (%|>) op opf = state.Bind(op, opf)
-let (%>>) opf1 opf2 = state.Compose(opf1, opf2)
+let (~%) a = ret a
+let (%|>) op opf = bind op opf
+let (%>>) opf1 opf2 = compose opf1 opf2
 
 let getState f =
     StateOp <| fun state ->
