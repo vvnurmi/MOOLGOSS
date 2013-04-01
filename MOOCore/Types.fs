@@ -3,6 +3,8 @@
 open System.Runtime.Serialization
 
 type ID = int
+type Location =
+    | Planet of ID
 
 [<DataContract>]
 type Planet = {
@@ -18,4 +20,16 @@ type Planet = {
     mutable maxPopulation : int
     [<DataMember>]
     mutable orbit : int
+}
+
+[<DataContract>]
+type Formation = {
+    [<DataMember>]
+    mutable id : ID
+    [<DataMember>]
+    mutable player : string
+    [<DataMember>]
+    mutable location : Location
+    [<DataMember>]
+    mutable ships : int
 }

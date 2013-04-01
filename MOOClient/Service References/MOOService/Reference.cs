@@ -35,6 +35,9 @@ namespace MOO.Client.MOOService {
         private int orbitField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private MOO.Client.MOOService.FSharpOptionOfstring playerField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
         private int populationField;
         
         [global::System.ComponentModel.BrowsableAttribute(false)]
@@ -100,6 +103,19 @@ namespace MOO.Client.MOOService {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
+        public MOO.Client.MOOService.FSharpOptionOfstring player {
+            get {
+                return this.playerField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.playerField, value) != true)) {
+                    this.playerField = value;
+                    this.RaisePropertyChanged("player");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
         public int population {
             get {
                 return this.populationField;
@@ -108,6 +124,187 @@ namespace MOO.Client.MOOService {
                 if ((this.populationField.Equals(value) != true)) {
                     this.populationField = value;
                     this.RaisePropertyChanged("population");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="FSharpOptionOfstring", Namespace="http://schemas.datacontract.org/2004/07/Microsoft.FSharp.Core")]
+    [System.SerializableAttribute()]
+    public partial class FSharpOptionOfstring : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        private string valueField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
+        public string value {
+            get {
+                return this.valueField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.valueField, value) != true)) {
+                    this.valueField = value;
+                    this.RaisePropertyChanged("value");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="Formation", Namespace="http://schemas.datacontract.org/2004/07/MOO.Types")]
+    [System.SerializableAttribute()]
+    public partial class Formation : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private int idField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private MOO.Client.MOOService.Location locationField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string playerField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private int shipsField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int id {
+            get {
+                return this.idField;
+            }
+            set {
+                if ((this.idField.Equals(value) != true)) {
+                    this.idField = value;
+                    this.RaisePropertyChanged("id");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public MOO.Client.MOOService.Location location {
+            get {
+                return this.locationField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.locationField, value) != true)) {
+                    this.locationField = value;
+                    this.RaisePropertyChanged("location");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string player {
+            get {
+                return this.playerField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.playerField, value) != true)) {
+                    this.playerField = value;
+                    this.RaisePropertyChanged("player");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int ships {
+            get {
+                return this.shipsField;
+            }
+            set {
+                if ((this.shipsField.Equals(value) != true)) {
+                    this.shipsField = value;
+                    this.RaisePropertyChanged("ships");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="Location", Namespace="http://schemas.datacontract.org/2004/07/MOO.Types")]
+    [System.SerializableAttribute()]
+    public partial class Location : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        private int itemField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
+        public int item {
+            get {
+                return this.itemField;
+            }
+            set {
+                if ((this.itemField.Equals(value) != true)) {
+                    this.itemField = value;
+                    this.RaisePropertyChanged("item");
                 }
             }
         }
@@ -137,6 +334,12 @@ namespace MOO.Client.MOOService {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IMOOService/GetPlanets", ReplyAction="http://tempuri.org/IMOOService/GetPlanetsResponse")]
         System.Threading.Tasks.Task<MOO.Client.MOOService.Planet[]> GetPlanetsAsync();
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IMOOService/GetFormations", ReplyAction="http://tempuri.org/IMOOService/GetFormationsResponse")]
+        MOO.Client.MOOService.Formation[] GetFormations();
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IMOOService/GetFormations", ReplyAction="http://tempuri.org/IMOOService/GetFormationsResponse")]
+        System.Threading.Tasks.Task<MOO.Client.MOOService.Formation[]> GetFormationsAsync();
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -188,6 +391,14 @@ namespace MOO.Client.MOOService {
         
         public System.Threading.Tasks.Task<MOO.Client.MOOService.Planet[]> GetPlanetsAsync() {
             return base.Channel.GetPlanetsAsync();
+        }
+        
+        public MOO.Client.MOOService.Formation[] GetFormations() {
+            return base.Channel.GetFormations();
+        }
+        
+        public System.Threading.Tasks.Task<MOO.Client.MOOService.Formation[]> GetFormationsAsync() {
+            return base.Channel.GetFormationsAsync();
         }
     }
 }

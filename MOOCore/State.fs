@@ -65,12 +65,14 @@ type State = {
     nextID : int
     planets : Map<ID, Planet>
     clients : Client list
+    formations : Map<ID, Formation>
 }
 
 let initialState = {
     nextID = 1
     planets = Map.empty
     clients = []
+    formations = Map.empty
 }
 
 let getNewID =
@@ -100,3 +102,14 @@ let addClient c =
     mapState <| fun state -> { state with clients = c :: state.clients |> Set.ofList |> List.ofSeq }
 let removeClient c =
     mapState <| fun state -> { state with clients = List.filter (fun x -> x <> c) state.clients }
+
+let getFormations =
+    getState <| fun state -> state.formations
+let setFormations formations =
+    mapState <| fun state -> { state with formations = formations }
+let addFormation f =
+    state {
+        let! id = getNewID
+        let! formations = getFormations
+        do! setFormations <| Map.add id { f with id = id } formations
+    }

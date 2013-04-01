@@ -9,11 +9,16 @@ open System
 
 let printPlanet p =
     printfn "%s, population %i/%i, orbit %i" p.name p.population p.maxPopulation p.orbit
+let printFormation f =
+    printfn "%s's formation with %i ships" f.player f.ships
 let printState =
     state {
         let! planets = getPlanets
         printfn "\n%i planets" planets.Count
         Map.iter (fun id p -> printPlanet p) planets
+        let! formations = getFormations
+        printfn "\n%i formations" formations.Count
+        Map.iter (fun id f -> printFormation f) formations
     }
 let createPlanetarySystem =
     state {

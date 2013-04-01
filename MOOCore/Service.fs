@@ -15,6 +15,8 @@ type IMOOService =
     abstract member Authenticate : name : string -> unit
     [<OperationContract>]
     abstract member GetPlanets : unit -> Planet[]
+    [<OperationContract>]
+    abstract member GetFormations : unit -> Formation[]
 
 [<CustomEquality; CustomComparison>]
 type Client =

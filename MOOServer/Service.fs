@@ -13,11 +13,13 @@ let sendUpdate (c : Client) = c.channel.Update(DateTime.Now)
 type ServiceState = {
     // Read by service threads, written by the main thread.
     mutable planets : Planet array
+    mutable formations : Formation array
     // Produced by service threads, consumed by the main thread.
     newClients : Client ConcurrentQueue
 }
 let serviceState = {
     planets = [||]
+    formations = [||]
     newClients = new (Client ConcurrentQueue)()
 }
 let updateServiceState =
@@ -31,8 +33,10 @@ let updateServiceState =
         }
     state {
         let! planets = getPlanets
+        let! formations = getFormations
         serviceState.planets <- Array.map snd <| Map.toArray planets
         do! addClients ()
+        serviceState.formations <- Array.map snd <| Map.toArray formations
     }
 
 [<ServiceBehavior(InstanceContextMode = InstanceContextMode.PerSession)>]
@@ -48,6 +52,8 @@ type MOOService() =
             sendUpdate client
         member x.GetPlanets() =
             serviceState.planets
+        member x.GetFormations() =
+            serviceState.formations
 
 let runWithService f =
     let core baseAddresses bindings httpGetEnabled =

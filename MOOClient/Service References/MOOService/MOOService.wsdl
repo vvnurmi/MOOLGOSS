@@ -195,6 +195,52 @@
       </wsp:All>
     </wsp:ExactlyOne>
   </wsp:Policy>
+  <wsp:Policy wsu:Id="WSDualHttpBinding_IMOOService_GetFormations_Input_policy">
+    <wsp:ExactlyOne>
+      <wsp:All>
+        <sp:SignedParts xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+          <sp:Body />
+          <sp:Header Name="Sequence" Namespace="http://schemas.xmlsoap.org/ws/2005/02/rm" />
+          <sp:Header Name="SequenceAcknowledgement" Namespace="http://schemas.xmlsoap.org/ws/2005/02/rm" />
+          <sp:Header Name="AckRequested" Namespace="http://schemas.xmlsoap.org/ws/2005/02/rm" />
+          <sp:Header Name="ChannelInstance" Namespace="http://schemas.microsoft.com/ws/2005/02/duplex" />
+          <sp:Header Name="To" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="From" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="FaultTo" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="ReplyTo" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="MessageID" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="RelatesTo" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="Action" Namespace="http://www.w3.org/2005/08/addressing" />
+        </sp:SignedParts>
+        <sp:EncryptedParts xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+          <sp:Body />
+        </sp:EncryptedParts>
+      </wsp:All>
+    </wsp:ExactlyOne>
+  </wsp:Policy>
+  <wsp:Policy wsu:Id="WSDualHttpBinding_IMOOService_GetFormations_output_policy">
+    <wsp:ExactlyOne>
+      <wsp:All>
+        <sp:SignedParts xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+          <sp:Body />
+          <sp:Header Name="Sequence" Namespace="http://schemas.xmlsoap.org/ws/2005/02/rm" />
+          <sp:Header Name="SequenceAcknowledgement" Namespace="http://schemas.xmlsoap.org/ws/2005/02/rm" />
+          <sp:Header Name="AckRequested" Namespace="http://schemas.xmlsoap.org/ws/2005/02/rm" />
+          <sp:Header Name="ChannelInstance" Namespace="http://schemas.microsoft.com/ws/2005/02/duplex" />
+          <sp:Header Name="To" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="From" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="FaultTo" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="ReplyTo" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="MessageID" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="RelatesTo" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="Action" Namespace="http://www.w3.org/2005/08/addressing" />
+        </sp:SignedParts>
+        <sp:EncryptedParts xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+          <sp:Body />
+        </sp:EncryptedParts>
+      </wsp:All>
+    </wsp:ExactlyOne>
+  </wsp:Policy>
   <wsp:Policy wsu:Id="WSDualHttpBinding_IMOOService_Update_output_policy">
     <wsp:ExactlyOne>
       <wsp:All>
@@ -252,6 +298,7 @@
       <xsd:import schemaLocation="http://localhost:8000/MOO?xsd=xsd0" namespace="http://tempuri.org/" />
       <xsd:import schemaLocation="http://localhost:8000/MOO?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
       <xsd:import schemaLocation="http://localhost:8000/MOO?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/MOO.Types" />
+      <xsd:import schemaLocation="http://localhost:8000/MOO?xsd=xsd3" namespace="http://schemas.datacontract.org/2004/07/Microsoft.FSharp.Core" />
     </xsd:schema>
   </wsdl:types>
   <wsdl:message name="IMOOService_Authenticate_InputMessage">
@@ -266,6 +313,12 @@
   <wsdl:message name="IMOOService_GetPlanets_OutputMessage">
     <wsdl:part name="parameters" element="tns:GetPlanetsResponse" />
   </wsdl:message>
+  <wsdl:message name="IMOOService_GetFormations_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetFormations" />
+  </wsdl:message>
+  <wsdl:message name="IMOOService_GetFormations_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetFormationsResponse" />
+  </wsdl:message>
   <wsdl:message name="IMOOService_Update_OutputCallbackMessage">
     <wsdl:part name="parameters" element="tns:Update" />
   </wsdl:message>
@@ -277,6 +330,10 @@
     <wsdl:operation name="GetPlanets">
       <wsdl:input wsaw:Action="http://tempuri.org/IMOOService/GetPlanets" message="tns:IMOOService_GetPlanets_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/IMOOService/GetPlanetsResponse" message="tns:IMOOService_GetPlanets_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetFormations">
+      <wsdl:input wsaw:Action="http://tempuri.org/IMOOService/GetFormations" message="tns:IMOOService_GetFormations_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IMOOService/GetFormationsResponse" message="tns:IMOOService_GetFormations_OutputMessage" />
     </wsdl:operation>
     <wsdl:operation name="Update">
       <wsdl:output wsaw:Action="http://tempuri.org/IMOOService/Update" message="tns:IMOOService_Update_OutputCallbackMessage" />
@@ -307,6 +364,17 @@
         <soap12:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
+    <wsdl:operation name="GetFormations">
+      <soap12:operation soapAction="http://tempuri.org/IMOOService/GetFormations" style="document" />
+      <wsdl:input>
+        <wsp:PolicyReference URI="#WSDualHttpBinding_IMOOService_GetFormations_Input_policy" />
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <wsp:PolicyReference URI="#WSDualHttpBinding_IMOOService_GetFormations_output_policy" />
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
     <wsdl:operation name="Update">
       <soap12:operation soapAction="http://tempuri.org/IMOOService/Update" style="document" />
       <wsdl:output>
@@ -329,6 +397,15 @@
     </wsdl:operation>
     <wsdl:operation name="GetPlanets">
       <soap12:operation soapAction="http://tempuri.org/IMOOService/GetPlanets" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetFormations">
+      <soap12:operation soapAction="http://tempuri.org/IMOOService/GetFormations" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>

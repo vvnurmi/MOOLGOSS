@@ -22,11 +22,12 @@
     <MetadataSource Address="http://localhost:8000/MOO" Protocol="http" SourceId="1" />
   </MetadataSources>
   <Metadata>
-    <MetadataFile FileName="MOO.xsd" MetadataType="Schema" ID="6f341949-8103-4abe-b2a2-a86a7bb82c80" SourceId="1" SourceUrl="http://localhost:8000/MOO?xsd=xsd2" />
     <MetadataFile FileName="MOO1.xsd" MetadataType="Schema" ID="2e7d3229-5b7e-4e53-85b6-d5c8b25452f0" SourceId="1" SourceUrl="http://localhost:8000/MOO?xsd=xsd0" />
+    <MetadataFile FileName="MOO2.xsd" MetadataType="Schema" ID="bf2f5c72-17a0-4d9a-a44c-502a202b9bcf" SourceId="1" SourceUrl="http://localhost:8000/MOO?xsd=xsd1" />
+    <MetadataFile FileName="MOO.xsd" MetadataType="Schema" ID="6f341949-8103-4abe-b2a2-a86a7bb82c80" SourceId="1" SourceUrl="http://localhost:8000/MOO?xsd=xsd2" />
+    <MetadataFile FileName="MOO3.xsd" MetadataType="Schema" ID="be26dcd6-69a9-4c5c-bd63-f544e7fb1c37" SourceId="1" SourceUrl="http://localhost:8000/MOO?xsd=xsd3" />
     <MetadataFile FileName="MOOService.wsdl" MetadataType="Wsdl" ID="610d4e67-aebc-4a61-a7c7-458a04fe4dbe" SourceId="1" SourceUrl="http://localhost:8000/MOO?wsdl" />
     <MetadataFile FileName="MOO.disco" MetadataType="Disco" ID="95092304-54eb-4b93-92cc-ace1f44f50d9" SourceId="1" SourceUrl="http://localhost:8000/MOO?disco" />
-    <MetadataFile FileName="MOO2.xsd" MetadataType="Schema" ID="bf2f5c72-17a0-4d9a-a44c-502a202b9bcf" SourceId="1" SourceUrl="http://localhost:8000/MOO?xsd=xsd1" />
   </Metadata>
   <Extensions>
     <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />

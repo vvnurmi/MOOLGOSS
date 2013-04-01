@@ -1,6 +1,7 @@
 ﻿module MOO.Players
 
 open MOO.State
+open MOO.Types
 
 let hasPlanets player =
     state {
@@ -15,4 +16,5 @@ let initPlayer name =
         if not freePlanets.IsEmpty then
             let planet = snd <| (Map.toList freePlanets).[0]
             do! setPlanet { planet with player = Some name; population = 42 }
+            do! addFormation { id = 0; player = name; location = Planet planet.id; ships = 1 }
     }

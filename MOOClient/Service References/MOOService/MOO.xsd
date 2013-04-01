@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xs:schema xmlns:tns="http://schemas.datacontract.org/2004/07/MOO.Types" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/MOO.Types" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import schemaLocation="http://localhost:8000/MOO?xsd=xsd3" namespace="http://schemas.datacontract.org/2004/07/Microsoft.FSharp.Core" />
   <xs:complexType name="ArrayOfPlanet">
     <xs:sequence>
       <xs:element minOccurs="0" maxOccurs="unbounded" name="Planet" nillable="true" type="tns:Planet" />
@@ -12,8 +13,30 @@
       <xs:element minOccurs="0" name="maxPopulation" type="xs:int" />
       <xs:element minOccurs="0" name="name" nillable="true" type="xs:string" />
       <xs:element minOccurs="0" name="orbit" type="xs:int" />
+      <xs:element xmlns:q1="http://schemas.datacontract.org/2004/07/Microsoft.FSharp.Core" minOccurs="0" name="player" nillable="true" type="q1:FSharpOptionOfstring" />
       <xs:element minOccurs="0" name="population" type="xs:int" />
     </xs:sequence>
   </xs:complexType>
   <xs:element name="Planet" nillable="true" type="tns:Planet" />
+  <xs:complexType name="ArrayOfFormation">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="Formation" nillable="true" type="tns:Formation" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfFormation" nillable="true" type="tns:ArrayOfFormation" />
+  <xs:complexType name="Formation">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="id" type="xs:int" />
+      <xs:element minOccurs="0" name="location" nillable="true" type="tns:Location" />
+      <xs:element minOccurs="0" name="player" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="ships" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="Formation" nillable="true" type="tns:Formation" />
+  <xs:complexType name="Location">
+    <xs:sequence>
+      <xs:element name="item" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="Location" nillable="true" type="tns:Location" />
 </xs:schema>
