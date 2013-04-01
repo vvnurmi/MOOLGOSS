@@ -60,9 +60,10 @@ let init =
     }
 let rec uiLoop () =
     state {
-        do! updateServiceState
+        do! addClients ()
         do! initNewPlayers
         do! printState
+        do! updateServiceState ()
         do! sendToClients sendUpdate
         let input = Console.ReadLine()
         if input <> "q" then

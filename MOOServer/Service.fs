@@ -22,20 +22,19 @@ let serviceState = {
     formations = [||]
     newClients = new (Client ConcurrentQueue)()
 }
-let updateServiceState =
-    let rec addClients () =
-        state {
-            match serviceState.newClients.TryDequeue() with
-            | true, c ->
-                do! addClient c
-                do! addClients ()
-            | false, _ -> ()
-        }
+let rec addClients () =
+    state {
+        match serviceState.newClients.TryDequeue() with
+        | true, c ->
+            do! addClient c
+            do! addClients ()
+        | false, _ -> ()
+    }
+let updateServiceState () =
     state {
         let! planets = getPlanets
         let! formations = getFormations
         serviceState.planets <- Array.map snd <| Map.toArray planets
-        do! addClients ()
         serviceState.formations <- Array.map snd <| Map.toArray formations
     }
 
