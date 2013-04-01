@@ -7,7 +7,7 @@ open System.ServiceModel.Web
 
 type IMOOCallbackContract =
     [<OperationContract(IsOneWay = true)>]
-    abstract member Update : now : DateTime -> unit
+    abstract member Update : stardate : DateTime -> unit
 
 [<ServiceContract(CallbackContract = typeof<IMOOCallbackContract>)>]
 type IMOOService =

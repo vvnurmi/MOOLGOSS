@@ -10,9 +10,9 @@ namespace MOO.Client
 {
     public class State : INotifyPropertyChanged
     {
-        private DateTime _now;
+        private DateTime _stardate;
 
-        public DateTime Now { get { return _now; } set { _now = value; OnPropertyChanged("Now"); } }
+        public DateTime Stardate { get { return _stardate; } set { _stardate = value; OnPropertyChanged("Stardate"); } }
         public List<Planet> Planets { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;

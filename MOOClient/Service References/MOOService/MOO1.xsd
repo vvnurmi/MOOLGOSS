@@ -40,7 +40,7 @@
   <xs:element name="Update">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" name="now" type="xs:dateTime" />
+        <xs:element minOccurs="0" name="stardate" type="xs:dateTime" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>

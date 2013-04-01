@@ -346,7 +346,7 @@ namespace MOO.Client.MOOService {
     public interface IMOOServiceCallback {
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IMOOService/Update")]
-        void Update(System.DateTime now);
+        void Update(System.DateTime stardate);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]

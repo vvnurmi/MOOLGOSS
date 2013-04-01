@@ -63,6 +63,7 @@ let mapState f =
 
 type State = {
     nextID : int
+    stardate : System.DateTime
     planets : Map<ID, Planet>
     clients : Client list
     formations : Map<ID, Formation>
@@ -70,6 +71,7 @@ type State = {
 
 let initialState = {
     nextID = 1
+    stardate = new System.DateTime(2215, 3, 23)
     planets = Map.empty
     clients = []
     formations = Map.empty
@@ -78,6 +80,11 @@ let initialState = {
 let getNewID =
     StateOp <| fun state ->
     state.nextID, { state with nextID = state.nextID + 1 }
+
+let getStardate =
+    getState <| fun state -> state.stardate
+let setStardate sd =
+    mapState <| fun state -> { state with stardate = sd }
 
 let getPlanets =
     getState <| fun state -> state.planets

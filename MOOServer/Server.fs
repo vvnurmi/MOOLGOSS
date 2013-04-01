@@ -47,6 +47,11 @@ let createPlanetarySystem =
             orbit = 3
         }
     }
+let updateUniverse =
+    state {
+        let! stardate = getStardate
+        do! setStardate <| stardate + TimeSpan.FromHours(1.0)
+    }
 let initNewPlayers =
     state {
         let! clients = getClients
@@ -61,6 +66,7 @@ let init =
 let rec uiLoop () =
     state {
         do! addClients ()
+        do! updateUniverse
         do! initNewPlayers
         do! printState
         do! updateServiceState ()

@@ -20,9 +20,9 @@ namespace MOO.Client
             _state = state;
         }
 
-        public void Update(DateTime now)
+        public void Update(DateTime stardate)
         {
-            _state.Now = now;
+            _state.Stardate = stardate;
             if (Updated != null) Updated();
         }
     }

@@ -8,20 +8,21 @@ open System.Collections.Concurrent
 open System.ServiceModel
 open System.ServiceModel.Description
 
-let sendUpdate (c : Client) = c.channel.Update(DateTime.Now)
-
 type ServiceState = {
     // Read by service threads, written by the main thread.
+    mutable stardate : DateTime
     mutable planets : Planet array
     mutable formations : Formation array
     // Produced by service threads, consumed by the main thread.
     newClients : Client ConcurrentQueue
 }
 let serviceState = {
+    stardate = new DateTime(2013, 3, 23)
     planets = [||]
     formations = [||]
     newClients = new (Client ConcurrentQueue)()
 }
+let sendUpdate (c : Client) = c.channel.Update(serviceState.stardate)
 let rec addClients () =
     state {
         match serviceState.newClients.TryDequeue() with
@@ -32,8 +33,10 @@ let rec addClients () =
     }
 let updateServiceState () =
     state {
+        let! stardate = getStardate
         let! planets = getPlanets
         let! formations = getFormations
+        serviceState.stardate <- stardate
         serviceState.planets <- Array.map snd <| Map.toArray planets
         serviceState.formations <- Array.map snd <| Map.toArray formations
     }

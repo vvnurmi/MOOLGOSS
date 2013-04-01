@@ -23,7 +23,7 @@ namespace MOO.Client.GUI
         private Func<MOOServiceClient> _createService;
         private MOOServiceClient _service;
         private State _state;
-        private TextBox _dateTimeBox;
+        private TextBox _stardateBox;
         private Canvas _canvas;
         public ToggleButton ServerButton { get; private set; }
         private Dictionary<int, Planet> _planets = new Dictionary<int, Planet>();
@@ -123,9 +123,9 @@ namespace MOO.Client.GUI
             DockPanel.SetDock(ServerButton, Dock.Right);
             topPanel.Children.Add(ServerButton);
 
-            _dateTimeBox = CreateDateTimeBox();
-            DockPanel.SetDock(_dateTimeBox, Dock.Left);
-            topPanel.Children.Add(_dateTimeBox);
+            _stardateBox = CreateDateTimeBox();
+            DockPanel.SetDock(_stardateBox, Dock.Left);
+            topPanel.Children.Add(_stardateBox);
 
             return topPanel;
         }
@@ -138,7 +138,7 @@ namespace MOO.Client.GUI
                 Foreground = Brushes.White,
                 IsReadOnly = true,
             };
-            var dateTimeBinding = new Binding("Now") { Source = _state };
+            var dateTimeBinding = new Binding("Stardate") { Source = _state, StringFormat = "yyyy-MM-dd HH:mm" };
             dateTimeBox.SetBinding(TextBox.TextProperty, dateTimeBinding);
             return dateTimeBox;
         }
