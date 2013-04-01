@@ -29,7 +29,7 @@ namespace MOO.Client.GUI
         private Dictionary<int, Planet> _planets = new Dictionary<int, Planet>();
         private Dictionary<int, Formation> _formations = new Dictionary<int, Formation>();
         private List<Canvas> _planetCanvases = new List<Canvas>();
-        private Dictionary<int, Shape> _formationShapes = new Dictionary<int, Shape>();
+        private Dictionary<int, Canvas> _formationCanvases = new Dictionary<int, Canvas>();
         private Point _origin = new Point(400, 300);
 
         public ClientWindow(Func<IMOOServiceCallback, MOOServiceClient> createService, State state)
@@ -59,15 +59,15 @@ namespace MOO.Client.GUI
             foreach (var formation in changedFormations)
             {
                 var planetCanvas = _planetCanvases[formation.location.item];
-                planetCanvas.Children.Remove(_formationShapes[formation.id]);
-                _formationShapes.Remove(formation.id);
+                planetCanvas.Children.Remove(_formationCanvases[formation.id]);
+                _formationCanvases.Remove(formation.id);
                 _formations.Remove(formation.id);
             }
             foreach (var formation in missingFormations.Union(changedFormations))
             {
-                var shape = CreateFormationShape(formation);
-                _planetCanvases[formation.location.item].Children.Add(shape);
-                _formationShapes[formation.id] = shape;
+                var formationCanvas = CreateFormationCanvas(formation);
+                _planetCanvases[formation.location.item].Children.Add(formationCanvas);
+                _formationCanvases[formation.id] = formationCanvas;
                 _formations[formation.id] = formation;
             }
         }
@@ -179,7 +179,7 @@ namespace MOO.Client.GUI
             return shape;
         }
 
-        private Shape CreateFormationShape(Formation formation)
+        private Canvas CreateFormationCanvas(Formation formation)
         {
             var planet = _planets[formation.location.item];
             var polygon = new Polygon { Fill = Brushes.Gray };
@@ -188,7 +188,13 @@ namespace MOO.Client.GUI
             polygon.Points.Add(new Point(20, -10));
             Canvas.SetLeft(polygon, 10);
             Canvas.SetTop(polygon, -25);
-            return polygon;
+            var text = new TextBlock(new Run(formation.ships.ToString())) { Foreground = Brushes.White };
+            Canvas.SetLeft(text, 20);
+            Canvas.SetTop(text, -34);
+            var canvas = new Canvas { Width = 0, Height = 0, ClipToBounds = false };
+            canvas.Children.Add(polygon);
+            canvas.Children.Add(text);
+            return canvas;
         }
 
         private Canvas CreatePlanetCanvas(Planet planet)
