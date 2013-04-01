@@ -26,8 +26,10 @@ namespace MOO.Client.GUI
         private TextBox _dateTimeBox;
         private Canvas _canvas;
         public ToggleButton ServerButton { get; private set; }
-        private Planet[] _planets = new Planet[0];
-        private List<Ellipse> _planetEllipses = new List<Ellipse>();
+        private Dictionary<int, Planet> _planets = new Dictionary<int, Planet>();
+        private Dictionary<int, Formation> _formations = new Dictionary<int, Formation>();
+        private List<Canvas> _planetCanvases = new List<Canvas>();
+        private Dictionary<int, Shape> _formationShapes = new Dictionary<int, Shape>();
         private Point _origin = new Point(400, 300);
 
         public ClientWindow(Func<IMOOServiceCallback, MOOServiceClient> createService, State state)
@@ -36,23 +38,50 @@ namespace MOO.Client.GUI
             _createService = () =>
             {
                 var callbackHandler = new MOOCallbackHandler(_state);
-                callbackHandler.Updated += () => Dispatcher.InvokeAsync(UpdatePlanets);
+                callbackHandler.Updated += () => Dispatcher.InvokeAsync(UpdateState);
                 return createService(callbackHandler);
             };
             _state = state;
             SetupWindow();
         }
 
+        private void UpdateState()
+        {
+            UpdatePlanets();
+            UpdateFormations();
+        }
+
+        private void UpdateFormations()
+        {
+            var newFormations = _service.GetFormations();
+            var missingFormations = newFormations.Where(f => !_formations.ContainsKey(f.id));
+            var changedFormations = newFormations.Where(f => _formations.ContainsKey(f.id) && !_formations[f.id].Equals(f));
+            foreach (var formation in changedFormations)
+            {
+                var planetCanvas = _planetCanvases[formation.location.item];
+                planetCanvas.Children.Remove(_formationShapes[formation.id]);
+                _formationShapes.Remove(formation.id);
+                _formations.Remove(formation.id);
+            }
+            foreach (var formation in missingFormations.Union(changedFormations))
+            {
+                var shape = CreateFormationShape(formation);
+                _planetCanvases[formation.location.item].Children.Add(shape);
+                _formationShapes[formation.id] = shape;
+                _formations[formation.id] = formation;
+            }
+        }
+
         private void UpdatePlanets()
         {
-            _planets = _service.GetPlanets();
-            foreach (var ellipse in _planetEllipses) _canvas.Children.Remove(ellipse);
-            _planetEllipses.Clear();
-            foreach (var planet in _planets)
+            _planets = _service.GetPlanets().ToDictionary(p => p.id);
+            foreach (var c in _planetCanvases) _canvas.Children.Remove(c);
+            _planetCanvases.Clear();
+            foreach (var planet in _planets.Values)
             {
-                var ellipse = CreatePlanetEllipse(planet);
-                _planetEllipses.Add(ellipse);
-                _canvas.Children.Add(ellipse);
+                var canvas = CreatePlanetCanvas(planet);
+                _planetCanvases.Add(canvas);
+                _canvas.Children.Add(canvas);
             }
         }
 
@@ -136,20 +165,54 @@ namespace MOO.Client.GUI
             return star;
         }
 
-        private Ellipse CreatePlanetEllipse(Planet planet)
+        private Shape CreatePlanetShape(Planet planet)
         {
             var planetRadius = 20;
-            var orbitRadius = 70 * planet.orbit;
-            var orbitSize = new Size(orbitRadius, orbitRadius);
-            var startPoint = _origin - new Vector(planetRadius, planetRadius + orbitRadius);
-            var midPoint = _origin - new Vector(planetRadius, planetRadius - orbitRadius);
-            var sphere = new Ellipse
+            var shape = new Ellipse
             {
                 Width = planetRadius * 2,
                 Height = planetRadius * 2,
                 Fill = Brushes.Green,
             };
+            Canvas.SetTop(shape, -planetRadius);
+            Canvas.SetLeft(shape, -planetRadius);
+            return shape;
+        }
 
+        private Shape CreateFormationShape(Formation formation)
+        {
+            var planet = _planets[formation.location.item];
+            var polygon = new Polygon { Fill = Brushes.Gray };
+            polygon.Points.Add(new Point(0, 0));
+            polygon.Points.Add(new Point(20, 10));
+            polygon.Points.Add(new Point(20, -10));
+            Canvas.SetLeft(polygon, 10);
+            Canvas.SetTop(polygon, -25);
+            return polygon;
+        }
+
+        private Canvas CreatePlanetCanvas(Planet planet)
+        {
+            var canvas = new Canvas
+            {
+                Width = 0,
+                Height = 0,
+                ClipToBounds = false,
+            };
+            var planetShape = CreatePlanetShape(planet);
+            canvas.Children.Add(planetShape);
+
+            var storyboard = CreatePlanetOrbit(planet, canvas);
+            canvas.Loaded += (sender, args) => storyboard.Begin();
+            return canvas;
+        }
+
+        private Storyboard CreatePlanetOrbit(Planet planet, DependencyObject canvas)
+        {
+            var orbitRadius = 70 * planet.orbit;
+            var orbitSize = new Size(orbitRadius, orbitRadius);
+            var startPoint = _origin - new Vector(0, orbitRadius);
+            var midPoint = _origin + new Vector(0, orbitRadius);
             var orbitFigure = new PathFigure { StartPoint = startPoint };
             var orbitArc1 = new ArcSegment(midPoint, orbitSize, 0, false, SweepDirection.Clockwise, false);
             var orbitArc2 = new ArcSegment(startPoint, orbitSize, 0, false, SweepDirection.Clockwise, false);
@@ -172,16 +235,14 @@ namespace MOO.Client.GUI
                 Source = PathAnimationSource.Y,
                 PathGeometry = orbitPath,
             };
-
             var storyboard = new Storyboard();
             storyboard.Children.Add(xAnim);
             storyboard.Children.Add(yAnim);
-            Storyboard.SetTarget(xAnim, sphere);
-            Storyboard.SetTarget(yAnim, sphere);
+            Storyboard.SetTarget(xAnim, canvas);
+            Storyboard.SetTarget(yAnim, canvas);
             Storyboard.SetTargetProperty(xAnim, new PropertyPath(Canvas.LeftProperty));
             Storyboard.SetTargetProperty(yAnim, new PropertyPath(Canvas.TopProperty));
-            sphere.Loaded += (sender, args) => storyboard.Begin();
-            return sphere;
+            return storyboard;
         }
     }
 }
