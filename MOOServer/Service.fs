@@ -27,6 +27,7 @@ let rec addClients () =
     state {
         match serviceState.newClients.TryDequeue() with
         | true, c ->
+            printfn "Adding client %s" c.player
             do! addClient c
             do! addClients ()
         | false, _ -> ()
@@ -91,6 +92,12 @@ let runWithService f =
         printfn "An exception occurred while creating the HTTP endpoint. Try running the server with administrator rights?"
         core [| pipeBaseAddress |] bindings.Tail false |> ignore
 
+let dropClient (c : Client) =
+    state {
+        printfn "Dropping client %s" c.player
+        (c.channel :?> System.ServiceModel.IClientChannel).Abort()
+        do! removeClient c
+    }
 let sendToClients f =
     let safely f c =
         try
@@ -101,10 +108,5 @@ let sendToClients f =
     state {
         let! clients = getClients
         let badClients = List.filter (safely f) clients
-        do! adapt2 List.iter removeClient badClients
-    }
-let dropClient c =
-    state {
-        (c.channel :?> System.ServiceModel.IClientChannel).Close()
-        do! removeClient c
+        do! adapt2 List.iter dropClient badClients
     }

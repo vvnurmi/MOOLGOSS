@@ -50,7 +50,9 @@ let createPlanetarySystem =
 let updateUniverse =
     state {
         let! stardate = getStardate
-        do! setStardate <| stardate + TimeSpan.FromHours(1.0)
+        let newStardate = stardate + TimeSpan.FromHours(1.0)
+        do! setStardate newStardate
+        printfn "It's %s" <| newStardate.ToString("yyyy-MM-dd HH:mm")
     }
 let initNewPlayers =
     state {
