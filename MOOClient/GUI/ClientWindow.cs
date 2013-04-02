@@ -28,7 +28,7 @@ namespace MOO.Client.GUI
         public ToggleButton ServerButton { get; private set; }
         private Dictionary<int, Planet> _planets = new Dictionary<int, Planet>();
         private Dictionary<int, Formation> _formations = new Dictionary<int, Formation>();
-        private List<Canvas> _planetCanvases = new List<Canvas>();
+        private Dictionary<int, Canvas> _planetCanvases = new Dictionary<int, Canvas>();
         private Dictionary<int, Canvas> _formationCanvases = new Dictionary<int, Canvas>();
         private Point _origin = new Point(400, 300);
 
@@ -75,12 +75,12 @@ namespace MOO.Client.GUI
         private void UpdatePlanets()
         {
             _planets = _service.GetPlanets().ToDictionary(p => p.id);
-            foreach (var c in _planetCanvases) _canvas.Children.Remove(c);
+            foreach (var c in _planetCanvases.Values) _canvas.Children.Remove(c);
             _planetCanvases.Clear();
             foreach (var planet in _planets.Values)
             {
                 var canvas = CreatePlanetCanvas(planet);
-                _planetCanvases.Add(canvas);
+                _planetCanvases[planet.id] = canvas;
                 _canvas.Children.Add(canvas);
             }
         }
