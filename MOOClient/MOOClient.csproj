@@ -55,6 +55,7 @@
     <Compile Include="Client.cs" />
     <Compile Include="GUI\ClientWindow.cs" />
     <Compile Include="MOOCallbackHandler.cs" />
+    <Compile Include="Planet.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Service References\MOOService\Reference.cs">
       <AutoGen>True</AutoGen>

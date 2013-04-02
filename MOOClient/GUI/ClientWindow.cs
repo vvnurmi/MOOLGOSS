@@ -74,14 +74,22 @@ namespace MOO.Client.GUI
 
         private void UpdatePlanets()
         {
-            _planets = _service.GetPlanets().ToDictionary(p => p.id);
-            foreach (var c in _planetCanvases.Values) _canvas.Children.Remove(c);
-            _planetCanvases.Clear();
-            foreach (var planet in _planets.Values)
+            var newPlanets = _service.GetPlanets();
+            var missingPlanets = newPlanets.Where(p => !_planets.ContainsKey(p.id));
+            var changedPlanets = newPlanets.Where(p => _planets.ContainsKey(p.id) && !_planets[p.id].Equals(p));
+            foreach (var planet in changedPlanets)
             {
-                var canvas = CreatePlanetCanvas(planet);
-                _planetCanvases[planet.id] = canvas;
-                _canvas.Children.Add(canvas);
+                var planetCanvas = _planetCanvases[planet.id];
+                _canvas.Children.Remove(planetCanvas);
+                _planetCanvases.Remove(planet.id);
+                _planets.Remove(planet.id);
+            }
+            foreach (var planet in missingPlanets.Union(changedPlanets))
+            {
+                var planetCanvas = CreatePlanetCanvas(planet);
+                _planetCanvases[planet.id] = planetCanvas;
+                _canvas.Children.Add(planetCanvas);
+                _planets[planet.id] = planet;
             }
         }
 
