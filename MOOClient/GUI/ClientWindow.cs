@@ -20,6 +20,11 @@ namespace MOO.Client.GUI
 {
     public class ClientWindow : Window
     {
+        private class PlanetCanvas : Canvas
+        {
+            public Storyboard Storyboard { get; set; }
+        }
+
         private Func<MOOServiceClient> _createService;
         private MOOServiceClient _service;
         private State _state;
@@ -28,7 +33,7 @@ namespace MOO.Client.GUI
         public ToggleButton ServerButton { get; private set; }
         private Dictionary<int, Planet> _planets = new Dictionary<int, Planet>();
         private Dictionary<int, Formation> _formations = new Dictionary<int, Formation>();
-        private Dictionary<int, Canvas> _planetCanvases = new Dictionary<int, Canvas>();
+        private Dictionary<int, PlanetCanvas> _planetCanvases = new Dictionary<int, PlanetCanvas>();
         private Dictionary<int, Canvas> _formationCanvases = new Dictionary<int, Canvas>();
         private Point _origin = new Point(400, 300);
 
@@ -77,6 +82,8 @@ namespace MOO.Client.GUI
             var newPlanets = _service.GetPlanets();
             var missingPlanets = newPlanets.Where(p => !_planets.ContainsKey(p.ID));
             var changedPlanets = newPlanets.Where(p => _planets.ContainsKey(p.ID) && !_planets[p.ID].Equals(p));
+            var animationTimes = changedPlanets.ToDictionary(p => p.ID,
+                p => _planetCanvases[p.ID].Storyboard.GetCurrentTime(_planetCanvases[p.ID]));
             foreach (var planet in changedPlanets)
             {
                 var planetCanvas = _planetCanvases[planet.ID];
@@ -87,6 +94,9 @@ namespace MOO.Client.GUI
             foreach (var planet in missingPlanets.Union(changedPlanets))
             {
                 var planetCanvas = CreatePlanetCanvas(planet);
+                if (animationTimes.ContainsKey(planet.ID))
+                    planetCanvas.Loaded += (sender, args) =>
+                        planetCanvas.Storyboard.Seek(planetCanvas, animationTimes[planet.ID].Value, TimeSeekOrigin.BeginTime);
                 _planetCanvases[planet.ID] = planetCanvas;
                 _canvas.Children.Add(planetCanvas);
                 _planets[planet.ID] = planet;
@@ -205,9 +215,9 @@ namespace MOO.Client.GUI
             return canvas;
         }
 
-        private Canvas CreatePlanetCanvas(Planet planet)
+        private PlanetCanvas CreatePlanetCanvas(Planet planet)
         {
-            var canvas = new Canvas
+            var canvas = new PlanetCanvas
             {
                 Width = 0,
                 Height = 0,
@@ -216,12 +226,13 @@ namespace MOO.Client.GUI
             var planetShape = CreatePlanetShape(planet);
             canvas.Children.Add(planetShape);
 
-            var storyboard = CreatePlanetOrbit(planet, canvas);
-            canvas.Loaded += (sender, args) => storyboard.Begin();
+            var storyboard = CreatePlanetOrbit(planet);
+            canvas.Storyboard = storyboard;
+            canvas.Loaded += (sender, args) => storyboard.Begin(canvas, true);
             return canvas;
         }
 
-        private Storyboard CreatePlanetOrbit(Planet planet, DependencyObject canvas)
+        private Storyboard CreatePlanetOrbit(Planet planet)
         {
             var orbitRadius = 70 * planet.Orbit;
             var orbitSize = new Size(orbitRadius, orbitRadius);
@@ -237,23 +248,23 @@ namespace MOO.Client.GUI
             orbitPath.Freeze();
             var xAnim = new DoubleAnimationUsingPath()
             {
+                Name = "X",
                 RepeatBehavior = RepeatBehavior.Forever,
-                Duration = TimeSpan.FromSeconds(5),
+                Duration = TimeSpan.FromSeconds(15),
                 Source = PathAnimationSource.X,
                 PathGeometry = orbitPath,
             };
             var yAnim = new DoubleAnimationUsingPath()
             {
+                Name = "Y",
                 RepeatBehavior = RepeatBehavior.Forever,
-                Duration = TimeSpan.FromSeconds(5),
+                Duration = TimeSpan.FromSeconds(15),
                 Source = PathAnimationSource.Y,
                 PathGeometry = orbitPath,
             };
             var storyboard = new Storyboard();
             storyboard.Children.Add(xAnim);
             storyboard.Children.Add(yAnim);
-            Storyboard.SetTarget(xAnim, canvas);
-            Storyboard.SetTarget(yAnim, canvas);
             Storyboard.SetTargetProperty(xAnim, new PropertyPath(Canvas.LeftProperty));
             Storyboard.SetTargetProperty(yAnim, new PropertyPath(Canvas.TopProperty));
             return storyboard;
