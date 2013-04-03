@@ -23,22 +23,22 @@ namespace MOO.Client.MOOService {
         private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private int idField;
+        private int IDField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private int maxPopulationField;
+        private int MaxPopulationField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private string nameField;
+        private string NameField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private int orbitField;
+        private int OrbitField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private MOO.Client.MOOService.FSharpOptionOfstring playerField;
+        private string PlayerField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private int populationField;
+        private int PopulationField;
         
         [global::System.ComponentModel.BrowsableAttribute(false)]
         public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
@@ -51,123 +51,79 @@ namespace MOO.Client.MOOService {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public int id {
+        public int ID {
             get {
-                return this.idField;
+                return this.IDField;
             }
             set {
-                if ((this.idField.Equals(value) != true)) {
-                    this.idField = value;
-                    this.RaisePropertyChanged("id");
+                if ((this.IDField.Equals(value) != true)) {
+                    this.IDField = value;
+                    this.RaisePropertyChanged("ID");
                 }
             }
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public int maxPopulation {
+        public int MaxPopulation {
             get {
-                return this.maxPopulationField;
+                return this.MaxPopulationField;
             }
             set {
-                if ((this.maxPopulationField.Equals(value) != true)) {
-                    this.maxPopulationField = value;
-                    this.RaisePropertyChanged("maxPopulation");
+                if ((this.MaxPopulationField.Equals(value) != true)) {
+                    this.MaxPopulationField = value;
+                    this.RaisePropertyChanged("MaxPopulation");
                 }
             }
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string name {
+        public string Name {
             get {
-                return this.nameField;
+                return this.NameField;
             }
             set {
-                if ((object.ReferenceEquals(this.nameField, value) != true)) {
-                    this.nameField = value;
-                    this.RaisePropertyChanged("name");
+                if ((object.ReferenceEquals(this.NameField, value) != true)) {
+                    this.NameField = value;
+                    this.RaisePropertyChanged("Name");
                 }
             }
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public int orbit {
+        public int Orbit {
             get {
-                return this.orbitField;
+                return this.OrbitField;
             }
             set {
-                if ((this.orbitField.Equals(value) != true)) {
-                    this.orbitField = value;
-                    this.RaisePropertyChanged("orbit");
+                if ((this.OrbitField.Equals(value) != true)) {
+                    this.OrbitField = value;
+                    this.RaisePropertyChanged("Orbit");
                 }
             }
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public MOO.Client.MOOService.FSharpOptionOfstring player {
+        public string Player {
             get {
-                return this.playerField;
+                return this.PlayerField;
             }
             set {
-                if ((object.ReferenceEquals(this.playerField, value) != true)) {
-                    this.playerField = value;
-                    this.RaisePropertyChanged("player");
+                if ((object.ReferenceEquals(this.PlayerField, value) != true)) {
+                    this.PlayerField = value;
+                    this.RaisePropertyChanged("Player");
                 }
             }
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public int population {
+        public int Population {
             get {
-                return this.populationField;
+                return this.PopulationField;
             }
             set {
-                if ((this.populationField.Equals(value) != true)) {
-                    this.populationField = value;
-                    this.RaisePropertyChanged("population");
-                }
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="FSharpOptionOfstring", Namespace="http://schemas.datacontract.org/2004/07/Microsoft.FSharp.Core")]
-    [System.SerializableAttribute()]
-    public partial class FSharpOptionOfstring : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
-        
-        [System.NonSerializedAttribute()]
-        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
-        
-        private string valueField;
-        
-        [global::System.ComponentModel.BrowsableAttribute(false)]
-        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
-            get {
-                return this.extensionDataField;
-            }
-            set {
-                this.extensionDataField = value;
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
-        public string value {
-            get {
-                return this.valueField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.valueField, value) != true)) {
-                    this.valueField = value;
-                    this.RaisePropertyChanged("value");
+                if ((this.PopulationField.Equals(value) != true)) {
+                    this.PopulationField = value;
+                    this.RaisePropertyChanged("Population");
                 }
             }
         }
@@ -192,16 +148,16 @@ namespace MOO.Client.MOOService {
         private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private int idField;
+        private int IDField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private MOO.Client.MOOService.Location locationField;
+        private MOO.Client.MOOService.Location LocationField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private string playerField;
+        private string PlayerField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private int shipsField;
+        private int ShipsField;
         
         [global::System.ComponentModel.BrowsableAttribute(false)]
         public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
@@ -214,53 +170,53 @@ namespace MOO.Client.MOOService {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public int id {
+        public int ID {
             get {
-                return this.idField;
+                return this.IDField;
             }
             set {
-                if ((this.idField.Equals(value) != true)) {
-                    this.idField = value;
-                    this.RaisePropertyChanged("id");
+                if ((this.IDField.Equals(value) != true)) {
+                    this.IDField = value;
+                    this.RaisePropertyChanged("ID");
                 }
             }
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public MOO.Client.MOOService.Location location {
+        public MOO.Client.MOOService.Location Location {
             get {
-                return this.locationField;
+                return this.LocationField;
             }
             set {
-                if ((object.ReferenceEquals(this.locationField, value) != true)) {
-                    this.locationField = value;
-                    this.RaisePropertyChanged("location");
+                if ((object.ReferenceEquals(this.LocationField, value) != true)) {
+                    this.LocationField = value;
+                    this.RaisePropertyChanged("Location");
                 }
             }
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string player {
+        public string Player {
             get {
-                return this.playerField;
+                return this.PlayerField;
             }
             set {
-                if ((object.ReferenceEquals(this.playerField, value) != true)) {
-                    this.playerField = value;
-                    this.RaisePropertyChanged("player");
+                if ((object.ReferenceEquals(this.PlayerField, value) != true)) {
+                    this.PlayerField = value;
+                    this.RaisePropertyChanged("Player");
                 }
             }
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public int ships {
+        public int Ships {
             get {
-                return this.shipsField;
+                return this.ShipsField;
             }
             set {
-                if ((this.shipsField.Equals(value) != true)) {
-                    this.shipsField = value;
-                    this.RaisePropertyChanged("ships");
+                if ((this.ShipsField.Equals(value) != true)) {
+                    this.ShipsField = value;
+                    this.RaisePropertyChanged("Ships");
                 }
             }
         }

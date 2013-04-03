@@ -7,29 +7,46 @@ type Location =
     | Planet of ID
 
 [<DataContract>]
-type Planet = {
+type Planet =
+    {
+    id : ID
+    player : string option
+    name : string
+    population : int
+    maxPopulation : int
+    orbit : int
+    }
     [<DataMember>]
-    mutable id : ID
+    member x.ID with get() = x.id and set (_ : ID) = ()
     [<DataMember>]
-    mutable player : string option
+    member x.Player
+        with get() =
+            match x.player with
+            | None -> null
+            | Some s -> s
+        and set (_ : string) = ()
     [<DataMember>]
-    mutable name : string
+    member x.Name with get() = x.name and set (_ : string) = ()
     [<DataMember>]
-    mutable population : int
+    member x.Population with get() = x.population and set (_ : int) = ()
     [<DataMember>]
-    mutable maxPopulation : int
+    member x.MaxPopulation with get() = x.maxPopulation and set (_ : int) = ()
     [<DataMember>]
-    mutable orbit : int
-}
+    member x.Orbit with get() = x.orbit and set (_ : int) = ()
 
 [<DataContract>]
-type Formation = {
+type Formation =
+    {
+    id : ID
+    player : string
+    location : Location
+    ships : int
+    }
     [<DataMember>]
-    mutable id : ID
+    member x.ID with get() = x.id and set (_ : ID) = ()
     [<DataMember>]
-    mutable player : string
+    member x.Player with get() = x.player and set (_ : string) = ()
     [<DataMember>]
-    mutable location : Location
+    member x.Location with get() = x.location and set (_ : Location) = ()
     [<DataMember>]
-    mutable ships : int
-}
+    member x.Ships with get() = x.ships and set (_ : int) = ()
