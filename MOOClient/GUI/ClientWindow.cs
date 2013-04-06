@@ -206,6 +206,20 @@ namespace MOO.Client.GUI
             return shape;
         }
 
+        private TextBlock CreatePlanetText(Planet planet)
+        {
+            var textBlock = new TextBlock
+            {
+                Text = string.Format("{0}\n{1}/{2}", planet.Player, planet.Population, planet.MaxPopulation),
+                Foreground = Brushes.White,
+                IsHitTestVisible = false,
+            };
+            var textSize = textBlock.MeasureString(textBlock.Text);
+            Canvas.SetLeft(textBlock, -textSize.Width / 2);
+            Canvas.SetTop(textBlock, -textSize.Height / 2);
+            return textBlock;
+        }
+
         private Canvas CreateFormationCanvas(Formation formation)
         {
             var planet = _planets[formation.Location.item];
@@ -239,6 +253,8 @@ namespace MOO.Client.GUI
             };
             var planetShape = CreatePlanetShape(planet);
             canvas.Children.Add(planetShape);
+            var planetText = CreatePlanetText(planet);
+            canvas.Children.Add(planetText);
 
             var storyboard = CreatePlanetOrbit(planet);
             canvas.Storyboard = storyboard;
