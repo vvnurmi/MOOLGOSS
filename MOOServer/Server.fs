@@ -52,7 +52,27 @@ let carryOutCommand c =
         match c with
         | MoveFormation(id, location) ->
             let! formation = getFormation id
-            do! mapFormation id <| fun f -> { f with location = location }
+            do! id |> mapFormation (fun f -> { f with location = location })
+    }
+let updateFormation f =
+    state {
+        match f.location with
+        | Planet id ->
+            let! planet = getPlanet id
+            match planet.player with
+            | Some p when p = f.player -> ()
+            | _ ->
+                let bodyCount = 15
+                if planet.population <= bodyCount
+                then do! id |> mapPlanet (fun p -> { p with player = Some f.player; population = 2 })
+                else do! id |> mapPlanet (fun p -> { p with population = planet.population - bodyCount })
+    }
+let updatePlanet p =
+    state {
+        match p.population with
+        | n when n > p.maxPopulation -> do! p.id |> mapPlanet (fun p -> { p with population = max p.maxPopulation <| p.population - 2 })
+        | n when n > 0 -> do! p.id |> mapPlanet (fun p -> { p with population = min p.maxPopulation <| (p.population * 103) / 100 + 1 })
+        | _ -> ()
     }
 let updateUniverse =
     state {
@@ -62,6 +82,10 @@ let updateUniverse =
         printfn "It's %s" <| newStardate.ToString("yyyy-MM-dd HH:mm")
         do! getCommands %|> adapt2 List.iter carryOutCommand
         do! clearCommands
+        let! formations = lift (Map.toList >> List.map snd) getFormations
+        do! adapt2 List.iter updateFormation formations
+        let! planets = lift (Map.toList >> List.map snd) getPlanets
+        do! adapt2 List.iter updatePlanet planets
     }
 let initNewPlayers =
     state {

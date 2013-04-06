@@ -93,17 +93,13 @@ let getPlanets =
 let setPlanets planets =
     mapState <| fun state -> { state with planets = planets }
 let getPlanet id =
-    state {
-        let! planets = getPlanets
-        return Map.find id planets
-    }
+    getState <| fun state -> Map.find id state.planets
 let setPlanet (p : Planet) =
     mapState <| fun state -> { state with planets = Map.add p.id p state.planets }
 let addPlanet p =
-    state {
-        let! id = getNewID
-        do! setPlanet { p with id = id }
-    }
+    getNewID %|> fun id -> setPlanet { p with id = id }
+let mapPlanet f id =
+    bind (getPlanet id |> lift f) setPlanet
 
 let getClients =
     getState <| fun state -> state.clients
@@ -120,12 +116,8 @@ let getFormation id =
 let setFormation f =
     mapState <| fun state -> { state with formations = Map.add f.id f state.formations }
 let addFormation f =
-    state {
-        let! id = getNewID
-        let! formations = getFormations
-        do! setFormation { f with id = id }
-    }
-let mapFormation id f =
+    getNewID %|> fun id -> setFormation { f with id = id }
+let mapFormation f id =
     bind (getFormation id |> lift f) setFormation
 
 let getCommands =
