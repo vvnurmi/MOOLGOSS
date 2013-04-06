@@ -15,23 +15,26 @@ type ServiceState = {
     mutable formations : Formation array
     // Produced by service threads, consumed by the main thread.
     newClients : Client ConcurrentQueue
+    newCommands : Command ConcurrentQueue
 }
 let serviceState = {
     stardate = new DateTime(2013, 3, 23)
     planets = [||]
     formations = [||]
     newClients = new (Client ConcurrentQueue)()
+    newCommands = new (Command ConcurrentQueue)()
 }
 let sendUpdate (c : Client) = c.channel.Update(serviceState.stardate)
-let rec addClients () =
+let rec processQueue<'a> (queue : 'a ConcurrentQueue) f =
     state {
-        match serviceState.newClients.TryDequeue() with
-        | true, c ->
-            printfn "Adding client %s" c.player
-            do! addClient c
-            do! addClients ()
+        match queue.TryDequeue() with
+        | true, x ->
+            do! f x
+            do! processQueue queue f
         | false, _ -> ()
     }
+let addClients () = processQueue serviceState.newClients addClient
+let addCommands () = processQueue serviceState.newCommands addCommand
 let updateServiceState () =
     state {
         let! stardate = getStardate
@@ -45,7 +48,7 @@ let updateServiceState () =
 [<ServiceBehavior(InstanceContextMode = InstanceContextMode.PerSession)>]
 type MOOService() =
     interface IMOOService with
-        member x.Authenticate(name) =
+        member x.Authenticate name =
             let client = {
                 player = name
                 sessionID = OperationContext.Current.SessionId
@@ -57,6 +60,8 @@ type MOOService() =
             serviceState.planets
         member x.GetFormations() =
             serviceState.formations
+        member x.IssueCommand command =
+            serviceState.newCommands.Enqueue(CommandC.toCommand command)
 
 let runWithService f =
     let core baseAddresses bindings httpGetEnabled =

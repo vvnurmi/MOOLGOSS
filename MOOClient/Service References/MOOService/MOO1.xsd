@@ -37,6 +37,18 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+  <xs:element name="IssueCommand">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q3="http://schemas.datacontract.org/2004/07/MOO.Types" minOccurs="0" name="command" nillable="true" type="q3:CommandC.Base" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="IssueCommandResponse">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
   <xs:element name="Update">
     <xs:complexType>
       <xs:sequence>

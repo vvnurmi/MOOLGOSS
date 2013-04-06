@@ -59,11 +59,11 @@ namespace MOO.Client.GUI
         private void UpdateFormations()
         {
             var newFormations = _service.GetFormations();
-            var missingFormations = newFormations.Where(f => !_formations.ContainsKey(f.ID));
-            var changedFormations = newFormations.Where(f => _formations.ContainsKey(f.ID) && !_formations[f.ID].Equals(f));
+            var missingFormations = newFormations.Where(f => !_formations.ContainsKey(f.ID)).ToArray();
+            var changedFormations = newFormations.Where(f => _formations.ContainsKey(f.ID) && !_formations[f.ID].Equals(f)).ToArray();
             foreach (var formation in changedFormations)
             {
-                var planetCanvas = _planetCanvases[formation.Location.item];
+                var planetCanvas = _planetCanvases[_formations[formation.ID].Location.item];
                 planetCanvas.Children.Remove(_formationCanvases[formation.ID]);
                 _formationCanvases.Remove(formation.ID);
                 _formations.Remove(formation.ID);
@@ -71,7 +71,8 @@ namespace MOO.Client.GUI
             foreach (var formation in missingFormations.Union(changedFormations))
             {
                 var formationCanvas = CreateFormationCanvas(formation);
-                _planetCanvases[formation.Location.item].Children.Add(formationCanvas);
+                var planetCanvas = _planetCanvases[formation.Location.item];
+                planetCanvas.Children.Add(formationCanvas);
                 _formationCanvases[formation.ID] = formationCanvas;
                 _formations[formation.ID] = formation;
             }
@@ -191,6 +192,14 @@ namespace MOO.Client.GUI
                 Width = planetRadius * 2,
                 Height = planetRadius * 2,
                 Fill = Brushes.Green,
+                AllowDrop = true,
+            };
+            shape.Drop += (sender, args) =>
+            {
+                if (!args.Data.GetDataPresent(typeof(Formation))) return;
+                var formation = (Formation)args.Data.GetData(typeof(Formation));
+                var command = new CommandCMoveFormation { ID = formation.ID, Location = new Location { item = planet.ID } };
+                _service.IssueCommand(command);
             };
             Canvas.SetTop(shape, -planetRadius);
             Canvas.SetLeft(shape, -planetRadius);
@@ -204,6 +213,11 @@ namespace MOO.Client.GUI
             polygon.Points.Add(new Point(0, 0));
             polygon.Points.Add(new Point(20, 10));
             polygon.Points.Add(new Point(20, -10));
+            polygon.MouseMove += (sender, args) =>
+            {
+                if (args.LeftButton == MouseButtonState.Pressed)
+                    DragDrop.DoDragDrop(polygon, formation, DragDropEffects.Move);
+            };
             Canvas.SetLeft(polygon, 10);
             Canvas.SetTop(polygon, -25);
             var text = new TextBlock(new Run(formation.Ships.ToString())) { Foreground = Brushes.White };

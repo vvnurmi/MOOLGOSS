@@ -47,12 +47,21 @@ let createPlanetarySystem =
             orbit = 3
         }
     }
+let carryOutCommand c =
+    state {
+        match c with
+        | MoveFormation(id, location) ->
+            let! formation = getFormation id
+            do! mapFormation id <| fun f -> { f with location = location }
+    }
 let updateUniverse =
     state {
         let! stardate = getStardate
         let newStardate = stardate + TimeSpan.FromHours(1.0)
         do! setStardate newStardate
         printfn "It's %s" <| newStardate.ToString("yyyy-MM-dd HH:mm")
+        do! getCommands %|> adapt2 List.iter carryOutCommand
+        do! clearCommands
     }
 let initNewPlayers =
     state {
@@ -68,6 +77,7 @@ let init =
 let rec uiLoop () =
     state {
         do! addClients ()
+        do! addCommands ()
         do! updateUniverse
         do! initNewPlayers
         do! printState

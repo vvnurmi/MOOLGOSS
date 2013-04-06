@@ -5,6 +5,23 @@ open System.Runtime.Serialization
 type ID = int
 type Location =
     | Planet of ID
+type Command =
+    | MoveFormation of ID * Location
+
+module CommandC =
+    [<DataContract>]
+    [<KnownType(typeof<MoveFormation>)>]
+    type Base() = class end
+    and MoveFormation(id, location) =
+        inherit Base()
+        [<DataMember>] member val ID = id
+        [<DataMember>] member val Location = location
+    let fromCommand = function
+        | MoveFormation(id, location) -> MoveFormation(id, location) :> Base
+    let toCommand (c : Base) =
+        match c with
+        | :? MoveFormation as c -> Command.MoveFormation(c.ID, c.Location)
+        | _ -> failwith "Unexpected command"
 
 [<DataContract>]
 type Planet =

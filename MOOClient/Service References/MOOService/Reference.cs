@@ -275,6 +275,73 @@ namespace MOO.Client.MOOService {
         }
     }
     
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="CommandC.Base", Namespace="http://schemas.datacontract.org/2004/07/MOO.Types")]
+    [System.SerializableAttribute()]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(MOO.Client.MOOService.CommandCMoveFormation))]
+    public partial class CommandCBase : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="CommandC.MoveFormation", Namespace="http://schemas.datacontract.org/2004/07/MOO.Types")]
+    [System.SerializableAttribute()]
+    public partial class CommandCMoveFormation : MOO.Client.MOOService.CommandCBase {
+        
+        private int IDField;
+        
+        private MOO.Client.MOOService.Location LocationField;
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Name="ID@", IsRequired=true)]
+        public int ID {
+            get {
+                return this.IDField;
+            }
+            set {
+                if ((this.IDField.Equals(value) != true)) {
+                    this.IDField = value;
+                    this.RaisePropertyChanged("ID");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Name="Location@", IsRequired=true)]
+        public MOO.Client.MOOService.Location Location {
+            get {
+                return this.LocationField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.LocationField, value) != true)) {
+                    this.LocationField = value;
+                    this.RaisePropertyChanged("Location");
+                }
+            }
+        }
+    }
+    
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ServiceModel.ServiceContractAttribute(ConfigurationName="MOOService.IMOOService", CallbackContract=typeof(MOO.Client.MOOService.IMOOServiceCallback))]
     public interface IMOOService {
@@ -296,6 +363,12 @@ namespace MOO.Client.MOOService {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IMOOService/GetFormations", ReplyAction="http://tempuri.org/IMOOService/GetFormationsResponse")]
         System.Threading.Tasks.Task<MOO.Client.MOOService.Formation[]> GetFormationsAsync();
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IMOOService/IssueCommand", ReplyAction="http://tempuri.org/IMOOService/IssueCommandResponse")]
+        void IssueCommand(MOO.Client.MOOService.CommandCBase command);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IMOOService/IssueCommand", ReplyAction="http://tempuri.org/IMOOService/IssueCommandResponse")]
+        System.Threading.Tasks.Task IssueCommandAsync(MOO.Client.MOOService.CommandCBase command);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -355,6 +428,14 @@ namespace MOO.Client.MOOService {
         
         public System.Threading.Tasks.Task<MOO.Client.MOOService.Formation[]> GetFormationsAsync() {
             return base.Channel.GetFormationsAsync();
+        }
+        
+        public void IssueCommand(MOO.Client.MOOService.CommandCBase command) {
+            base.Channel.IssueCommand(command);
+        }
+        
+        public System.Threading.Tasks.Task IssueCommandAsync(MOO.Client.MOOService.CommandCBase command) {
+            return base.Channel.IssueCommandAsync(command);
         }
     }
 }

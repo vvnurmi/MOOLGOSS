@@ -38,4 +38,19 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="Location" nillable="true" type="tns:Location" />
+  <xs:complexType name="CommandC.Base">
+    <xs:sequence />
+  </xs:complexType>
+  <xs:element name="CommandC.Base" nillable="true" type="tns:CommandC.Base" />
+  <xs:complexType name="CommandC.MoveFormation">
+    <xs:complexContent mixed="false">
+      <xs:extension base="tns:CommandC.Base">
+        <xs:sequence>
+          <xs:element name="ID_x0040_" type="xs:int" />
+          <xs:element name="Location_x0040_" nillable="true" type="tns:Location" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="CommandC.MoveFormation" nillable="true" type="tns:CommandC.MoveFormation" />
 </xs:schema>

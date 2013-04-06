@@ -67,6 +67,7 @@ type State = {
     planets : Map<ID, Planet>
     clients : Client list
     formations : Map<ID, Formation>
+    commands : Command list
 }
 
 let initialState = {
@@ -75,6 +76,7 @@ let initialState = {
     planets = Map.empty
     clients = []
     formations = Map.empty
+    commands = []
 }
 
 let getNewID =
@@ -105,18 +107,30 @@ let addPlanet p =
 
 let getClients =
     getState <| fun state -> state.clients
-let addClient c =
+let addClient (c : Client) =
+    printfn "Adding client %s" c.player
     mapState <| fun state -> { state with clients = c :: state.clients |> Set.ofList |> List.ofSeq }
 let removeClient c =
     mapState <| fun state -> { state with clients = List.filter (fun x -> x <> c) state.clients }
 
 let getFormations =
     getState <| fun state -> state.formations
-let setFormations formations =
-    mapState <| fun state -> { state with formations = formations }
+let getFormation id =
+    getState <| fun state -> Map.find id state.formations
+let setFormation f =
+    mapState <| fun state -> { state with formations = Map.add f.id f state.formations }
 let addFormation f =
     state {
         let! id = getNewID
         let! formations = getFormations
-        do! setFormations <| Map.add id { f with id = id } formations
+        do! setFormation { f with id = id }
     }
+let mapFormation id f =
+    bind (getFormation id |> lift f) setFormation
+
+let getCommands =
+    getState <| fun state -> state.commands
+let addCommand c =
+    mapState <| fun state -> { state with commands = c :: state.commands }
+let clearCommands =
+    mapState <| fun state -> { state with commands = [] }

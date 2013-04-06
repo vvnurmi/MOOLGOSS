@@ -17,6 +17,8 @@ type IMOOService =
     abstract member GetPlanets : unit -> Planet[]
     [<OperationContract>]
     abstract member GetFormations : unit -> Formation[]
+    [<OperationContract>]
+    abstract member IssueCommand : command : CommandC.Base -> unit
 
 [<CustomEquality; CustomComparison>]
 type Client =
