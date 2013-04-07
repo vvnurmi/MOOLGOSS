@@ -28,6 +28,7 @@ namespace MOO.Client.GUI
         private Func<MOOServiceClient> _createService;
         private MOOServiceClient _service;
         private State _state;
+        private Func<bool> _dragAllowed;
         private TextBox _stardateBox;
         private Canvas _canvas;
         public ToggleButton ServerButton { get; private set; }
@@ -48,6 +49,7 @@ namespace MOO.Client.GUI
             };
             _state = state;
             SetupWindow();
+            _dragAllowed = this.PrepareForDragDrop();
         }
 
         private void UpdateState()
@@ -229,12 +231,16 @@ namespace MOO.Client.GUI
             polygon.Points.Add(new Point(20, -10));
             polygon.MouseMove += (sender, args) =>
             {
-                if (args.LeftButton == MouseButtonState.Pressed)
-                    DragDrop.DoDragDrop(polygon, formation, DragDropEffects.Move);
+                if (_dragAllowed()) DragDrop.DoDragDrop(polygon, formation, DragDropEffects.Move);
             };
             Canvas.SetLeft(polygon, 10);
             Canvas.SetTop(polygon, -25);
-            var text = new TextBlock(new Run(formation.Ships.ToString())) { Foreground = Brushes.White };
+            var text = new TextBlock
+            {
+                Text = formation.Ships.ToString(),
+                Foreground = Brushes.White,
+                IsHitTestVisible = false,
+            };
             Canvas.SetLeft(text, 20);
             Canvas.SetTop(text, -34);
             var canvas = new Canvas { Width = 0, Height = 0, ClipToBounds = false };
