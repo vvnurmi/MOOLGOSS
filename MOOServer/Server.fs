@@ -98,7 +98,7 @@ let init =
     state {
         do! createPlanetarySystem
     }
-let rec uiLoop () =
+let rec updateLoop () =
     state {
         do! addClients ()
         do! addCommands ()
@@ -107,14 +107,13 @@ let rec uiLoop () =
         do! printState
         do! updateServiceState ()
         do! sendToClients sendUpdate
-        let input = Console.ReadLine()
-        if input <> "q" then
-            return! uiLoop ()
+        System.Threading.Thread.Sleep(TimeSpan.FromSeconds(10.0))
+        return! updateLoop ()
     }
 let mainCore =
     state {
         do! init
-        do! uiLoop ()
+        do! updateLoop ()
         do! getClients %|> adapt2 List.iter dropClient
     }
 let main =
