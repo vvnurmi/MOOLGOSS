@@ -20,26 +20,33 @@ namespace MOO.Client.GUI
 {
     public class ClientWindow : Window
     {
-        private class PlanetCanvas : Canvas
+        public class GraphicsData
+        {
+            public Canvas Canvas;
+            public Point Origin = new Point(400, 300);
+            public Dictionary<int, PlanetCanvas> Planets = new Dictionary<int, PlanetCanvas>();
+            public Dictionary<int, Canvas> Formations = new Dictionary<int, Canvas>();
+        }
+
+        public class PlanetCanvas : Canvas
         {
             public Storyboard Storyboard { get; set; }
         }
 
         private Func<MOOServiceClient> _createService;
         private MOOServiceClient _service;
+        private GraphicsData _gfx = new GraphicsData();
+        private CommandGraphics _commandGraphics;
         private State _state;
         private Func<bool> _dragAllowed;
         private TextBox _stardateBox;
-        private Canvas _canvas;
         public ToggleButton ServerButton { get; private set; }
         private Dictionary<int, Planet> _planets = new Dictionary<int, Planet>();
         private Dictionary<int, Formation> _formations = new Dictionary<int, Formation>();
-        private Dictionary<int, PlanetCanvas> _planetCanvases = new Dictionary<int, PlanetCanvas>();
-        private Dictionary<int, Canvas> _formationCanvases = new Dictionary<int, Canvas>();
-        private Point _origin = new Point(400, 300);
 
         public ClientWindow(Func<IMOOServiceCallback, MOOServiceClient> createService, State state)
         {
+            _commandGraphics = new CommandGraphics(_gfx);
             Loaded += (sender, args) => ServerButton.IsChecked = true;
             _createService = () =>
             {
@@ -54,6 +61,7 @@ namespace MOO.Client.GUI
 
         private void UpdateState()
         {
+            _commandGraphics.Clear();
             UpdatePlanets();
             UpdateFormations();
         }
@@ -65,17 +73,17 @@ namespace MOO.Client.GUI
             var changedFormations = newFormations.Where(f => _formations.ContainsKey(f.ID) && !_formations[f.ID].Equals(f)).ToArray();
             foreach (var formation in changedFormations)
             {
-                var planetCanvas = _planetCanvases[_formations[formation.ID].Location.item];
-                planetCanvas.Children.Remove(_formationCanvases[formation.ID]);
-                _formationCanvases.Remove(formation.ID);
+                var planetCanvas = _gfx.Planets[_formations[formation.ID].Location.item];
+                planetCanvas.Children.Remove(_gfx.Formations[formation.ID]);
+                _gfx.Formations.Remove(formation.ID);
                 _formations.Remove(formation.ID);
             }
             foreach (var formation in missingFormations.Union(changedFormations))
             {
                 var formationCanvas = CreateFormationCanvas(formation);
-                var planetCanvas = _planetCanvases[formation.Location.item];
+                var planetCanvas = _gfx.Planets[formation.Location.item];
                 planetCanvas.Children.Add(formationCanvas);
-                _formationCanvases[formation.ID] = formationCanvas;
+                _gfx.Formations[formation.ID] = formationCanvas;
                 _formations[formation.ID] = formation;
             }
         }
@@ -86,12 +94,12 @@ namespace MOO.Client.GUI
             var missingPlanets = newPlanets.Where(p => !_planets.ContainsKey(p.ID));
             var changedPlanets = newPlanets.Where(p => _planets.ContainsKey(p.ID) && !_planets[p.ID].Equals(p));
             var animationTimes = changedPlanets.ToDictionary(p => p.ID,
-                p => _planetCanvases[p.ID].Storyboard.GetCurrentTime(_planetCanvases[p.ID]));
+                p => _gfx.Planets[p.ID].Storyboard.GetCurrentTime(_gfx.Planets[p.ID]));
             foreach (var planet in changedPlanets)
             {
-                var planetCanvas = _planetCanvases[planet.ID];
-                _canvas.Children.Remove(planetCanvas);
-                _planetCanvases.Remove(planet.ID);
+                var planetCanvas = _gfx.Planets[planet.ID];
+                _gfx.Canvas.Children.Remove(planetCanvas);
+                _gfx.Planets.Remove(planet.ID);
                 _planets.Remove(planet.ID);
             }
             foreach (var planet in missingPlanets.Union(changedPlanets))
@@ -100,8 +108,8 @@ namespace MOO.Client.GUI
                 if (animationTimes.ContainsKey(planet.ID))
                     planetCanvas.Loaded += (sender, args) =>
                         planetCanvas.Storyboard.Seek(planetCanvas, animationTimes[planet.ID].Value, TimeSeekOrigin.BeginTime);
-                _planetCanvases[planet.ID] = planetCanvas;
-                _canvas.Children.Add(planetCanvas);
+                _gfx.Planets[planet.ID] = planetCanvas;
+                _gfx.Canvas.Children.Add(planetCanvas);
                 _planets[planet.ID] = planet;
             }
         }
@@ -128,9 +136,9 @@ namespace MOO.Client.GUI
             var topPanel = CreateTopPanel();
             DockPanel.SetDock(topPanel, Dock.Top);
             panel.Children.Add(topPanel);
-            _canvas = CreateCanvas();
-            DockPanel.SetDock(_canvas, Dock.Bottom);
-            panel.Children.Add(_canvas);
+            _gfx.Canvas = CreateCanvas();
+            DockPanel.SetDock(_gfx.Canvas, Dock.Bottom);
+            panel.Children.Add(_gfx.Canvas);
             return panel;
         }
 
@@ -181,8 +189,8 @@ namespace MOO.Client.GUI
                 Height = starRadius * 2,
                 Fill = Brushes.Yellow,
             };
-            Canvas.SetLeft(star, _origin.X - starRadius);
-            Canvas.SetTop(star, _origin.Y - starRadius);
+            Canvas.SetLeft(star, _gfx.Origin.X - starRadius);
+            Canvas.SetTop(star, _gfx.Origin.Y - starRadius);
             return star;
         }
 
@@ -200,12 +208,22 @@ namespace MOO.Client.GUI
             {
                 if (!args.Data.GetDataPresent(typeof(Formation))) return;
                 var formation = (Formation)args.Data.GetData(typeof(Formation));
-                var command = new CommandCMoveFormation { ID = formation.ID, Location = new Location { item = planet.ID } };
-                _service.IssueCommand(command);
+                Command_MoveFormation(formation, planet);
             };
             Canvas.SetTop(shape, -planetRadius);
             Canvas.SetLeft(shape, -planetRadius);
             return shape;
+        }
+
+        private void Command_MoveFormation(Formation formation, Planet target)
+        {
+            var command = new CommandCMoveFormation
+            {
+                ID = formation.ID,
+                Location = new Location { item = target.ID }
+            };
+            _service.IssueCommand(command);
+            _commandGraphics.Add(command);
         }
 
         private TextBlock CreatePlanetText(Planet planet)
@@ -272,8 +290,8 @@ namespace MOO.Client.GUI
         {
             var orbitRadius = 70 * planet.Orbit;
             var orbitSize = new Size(orbitRadius, orbitRadius);
-            var startPoint = _origin - new Vector(0, orbitRadius);
-            var midPoint = _origin + new Vector(0, orbitRadius);
+            var startPoint = _gfx.Origin - new Vector(0, orbitRadius);
+            var midPoint = _gfx.Origin + new Vector(0, orbitRadius);
             var orbitFigure = new PathFigure { StartPoint = startPoint };
             var orbitArc1 = new ArcSegment(midPoint, orbitSize, 0, false, SweepDirection.Clockwise, false);
             var orbitArc2 = new ArcSegment(startPoint, orbitSize, 0, false, SweepDirection.Clockwise, false);
