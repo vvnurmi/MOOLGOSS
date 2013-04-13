@@ -7,6 +7,13 @@ open MOO.State
 open MOO.Types
 open System
 
+let printWelcome =
+    printfn @"
+    MOOLGOSS  Copyright (C) 2013  Ville Nurmi
+    This program comes with ABSOLUTELY NO WARRANTY.
+    This is free software, and you are welcome to redistribute it
+    under certain conditions; see LICENSE.txt for details."
+    printfn ""
 let printPlanet p =
     printfn "%s, population %i/%i, orbit %i" p.name p.population p.maxPopulation p.orbit
 let printFormation f =
@@ -112,6 +119,7 @@ let rec updateLoop () =
     }
 let mainCore =
     state {
+        printWelcome
         do! init
         do! updateLoop ()
         do! getClients %|> adapt2 List.iter dropClient
