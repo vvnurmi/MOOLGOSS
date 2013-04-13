@@ -226,26 +226,26 @@ namespace MOO.Client.GUI
         {
             var planet = _planets[formation.Location.item];
             var polygon = new Polygon { Fill = Brushes.Gray };
-            polygon.Points.Add(new Point(0, 0));
-            polygon.Points.Add(new Point(20, 10));
-            polygon.Points.Add(new Point(20, -10));
+            polygon.Points.Add(new Point(-10, 0));
+            polygon.Points.Add(new Point(10, 10));
+            polygon.Points.Add(new Point(10, -10));
             polygon.MouseMove += (sender, args) =>
             {
                 if (_dragAllowed()) DragDrop.DoDragDrop(polygon, formation, DragDropEffects.Move);
             };
-            Canvas.SetLeft(polygon, 10);
-            Canvas.SetTop(polygon, -25);
             var text = new TextBlock
             {
                 Text = formation.Ships.ToString(),
                 Foreground = Brushes.White,
                 IsHitTestVisible = false,
             };
-            Canvas.SetLeft(text, 20);
-            Canvas.SetTop(text, -34);
+            Canvas.SetLeft(text, 0);
+            Canvas.SetTop(text, -9);
             var canvas = new Canvas { Width = 0, Height = 0, ClipToBounds = false };
             canvas.Children.Add(polygon);
             canvas.Children.Add(text);
+            Canvas.SetLeft(canvas, 20);
+            Canvas.SetTop(canvas, -25);
             return canvas;
         }
 
