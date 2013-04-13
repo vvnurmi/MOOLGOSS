@@ -30,7 +30,7 @@ let rec processQueue<'a> (queue : 'a ConcurrentQueue) f =
         match queue.TryDequeue() with
         | true, x ->
             do! f x
-            do! processQueue queue f
+            return! processQueue queue f
         | false, _ -> ()
     }
 let addClients () = processQueue serviceState.newClients addClient

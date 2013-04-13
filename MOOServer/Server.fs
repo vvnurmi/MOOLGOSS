@@ -109,7 +109,7 @@ let rec uiLoop () =
         do! sendToClients sendUpdate
         let input = Console.ReadLine()
         if input <> "q" then
-            do! uiLoop ()
+            return! uiLoop ()
     }
 let mainCore =
     state {
