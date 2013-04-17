@@ -343,7 +343,7 @@ namespace MOO.Client.MOOService {
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ServiceModel.ServiceContractAttribute(ConfigurationName="MOOService.IMOOService", CallbackContract=typeof(MOO.Client.MOOService.IMOOServiceCallback))]
+    [System.ServiceModel.ServiceContractAttribute(ConfigurationName="MOOService.IMOOService")]
     public interface IMOOService {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IMOOService/Authenticate", ReplyAction="http://tempuri.org/IMOOService/AuthenticateResponse")]
@@ -351,6 +351,12 @@ namespace MOO.Client.MOOService {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IMOOService/Authenticate", ReplyAction="http://tempuri.org/IMOOService/AuthenticateResponse")]
         System.Threading.Tasks.Task AuthenticateAsync(string name);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IMOOService/GetUpdate", ReplyAction="http://tempuri.org/IMOOService/GetUpdateResponse")]
+        System.DateTime GetUpdate();
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IMOOService/GetUpdate", ReplyAction="http://tempuri.org/IMOOService/GetUpdateResponse")]
+        System.Threading.Tasks.Task<System.DateTime> GetUpdateAsync();
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IMOOService/GetPlanets", ReplyAction="http://tempuri.org/IMOOService/GetPlanetsResponse")]
         MOO.Client.MOOService.Planet[] GetPlanets();
@@ -372,38 +378,30 @@ namespace MOO.Client.MOOService {
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    public interface IMOOServiceCallback {
-        
-        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IMOOService/Update")]
-        void Update(System.DateTime stardate);
-    }
-    
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     public interface IMOOServiceChannel : MOO.Client.MOOService.IMOOService, System.ServiceModel.IClientChannel {
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    public partial class MOOServiceClient : System.ServiceModel.DuplexClientBase<MOO.Client.MOOService.IMOOService>, MOO.Client.MOOService.IMOOService {
+    public partial class MOOServiceClient : System.ServiceModel.ClientBase<MOO.Client.MOOService.IMOOService>, MOO.Client.MOOService.IMOOService {
         
-        public MOOServiceClient(System.ServiceModel.InstanceContext callbackInstance) : 
-                base(callbackInstance) {
+        public MOOServiceClient() {
         }
         
-        public MOOServiceClient(System.ServiceModel.InstanceContext callbackInstance, string endpointConfigurationName) : 
-                base(callbackInstance, endpointConfigurationName) {
+        public MOOServiceClient(string endpointConfigurationName) : 
+                base(endpointConfigurationName) {
         }
         
-        public MOOServiceClient(System.ServiceModel.InstanceContext callbackInstance, string endpointConfigurationName, string remoteAddress) : 
-                base(callbackInstance, endpointConfigurationName, remoteAddress) {
+        public MOOServiceClient(string endpointConfigurationName, string remoteAddress) : 
+                base(endpointConfigurationName, remoteAddress) {
         }
         
-        public MOOServiceClient(System.ServiceModel.InstanceContext callbackInstance, string endpointConfigurationName, System.ServiceModel.EndpointAddress remoteAddress) : 
-                base(callbackInstance, endpointConfigurationName, remoteAddress) {
+        public MOOServiceClient(string endpointConfigurationName, System.ServiceModel.EndpointAddress remoteAddress) : 
+                base(endpointConfigurationName, remoteAddress) {
         }
         
-        public MOOServiceClient(System.ServiceModel.InstanceContext callbackInstance, System.ServiceModel.Channels.Binding binding, System.ServiceModel.EndpointAddress remoteAddress) : 
-                base(callbackInstance, binding, remoteAddress) {
+        public MOOServiceClient(System.ServiceModel.Channels.Binding binding, System.ServiceModel.EndpointAddress remoteAddress) : 
+                base(binding, remoteAddress) {
         }
         
         public void Authenticate(string name) {
@@ -412,6 +410,14 @@ namespace MOO.Client.MOOService {
         
         public System.Threading.Tasks.Task AuthenticateAsync(string name) {
             return base.Channel.AuthenticateAsync(name);
+        }
+        
+        public System.DateTime GetUpdate() {
+            return base.Channel.GetUpdate();
+        }
+        
+        public System.Threading.Tasks.Task<System.DateTime> GetUpdateAsync() {
+            return base.Channel.GetUpdateAsync();
         }
         
         public MOO.Client.MOOService.Planet[] GetPlanets() {

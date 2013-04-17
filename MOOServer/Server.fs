@@ -113,7 +113,6 @@ let rec updateLoop () =
         do! initNewPlayers
         do! printState
         do! updateServiceState ()
-        do! sendToClients sendUpdate
         System.Threading.Thread.Sleep(TimeSpan.FromSeconds(10.0))
         return! updateLoop ()
     }

@@ -24,7 +24,6 @@ let serviceState = {
     newClients = new (Client ConcurrentQueue)()
     newCommands = new (Command ConcurrentQueue)()
 }
-let sendUpdate (c : Client) = c.channel.Update(serviceState.stardate)
 let rec processQueue<'a> (queue : 'a ConcurrentQueue) f =
     state {
         match queue.TryDequeue() with
@@ -52,10 +51,10 @@ type MOOService() =
             let client = {
                 player = name
                 sessionID = OperationContext.Current.SessionId
-                channel = OperationContext.Current.GetCallbackChannel<IMOOCallbackContract>()
             }
             serviceState.newClients.Enqueue(client)
-            sendUpdate client
+        member x.GetUpdate() =
+            serviceState.stardate
         member x.GetPlanets() =
             serviceState.planets
         member x.GetFormations() =
@@ -92,7 +91,7 @@ let runWithService f =
 
     let httpBaseAddress = new Uri(Uri.UriSchemeHttp + "://localhost:8000/MOO")
     let pipeBaseAddress = new Uri(Uri.UriSchemeNetPipe + "://localhost/MOO")
-    let bindings = [ new WSDualHttpBinding() :> Channels.Binding; upcast new NetNamedPipeBinding() ]
+    let bindings = [ new BasicHttpBinding() :> Channels.Binding; upcast new NetNamedPipeBinding() ]
     if not <| core [| httpBaseAddress; pipeBaseAddress |] bindings true then
         printfn "An exception occurred while creating the HTTP endpoint. Try running the server with administrator rights?"
         core [| pipeBaseAddress |] bindings.Tail false |> ignore
@@ -100,18 +99,5 @@ let runWithService f =
 let dropClient (c : Client) =
     state {
         printfn "Dropping client %s" c.player
-        (c.channel :?> System.ServiceModel.IClientChannel).Abort()
         do! removeClient c
-    }
-let sendToClients f =
-    let safely f c =
-        try
-            f c
-            false
-        with
-        | :? CommunicationException -> true
-    state {
-        let! clients = getClients
-        let badClients = List.filter (safely f) clients
-        do! adapt2 List.iter dropClient badClients
     }

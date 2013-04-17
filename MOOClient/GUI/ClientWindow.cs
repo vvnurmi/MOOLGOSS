@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -43,27 +44,31 @@ namespace MOO.Client.GUI
         public ToggleButton ServerButton { get; private set; }
         private Dictionary<int, Planet> _planets = new Dictionary<int, Planet>();
         private Dictionary<int, Formation> _formations = new Dictionary<int, Formation>();
+        private Timer _updateTimer;
 
-        public ClientWindow(Func<IMOOServiceCallback, MOOServiceClient> createService, State state)
+        public ClientWindow(Func<MOOServiceClient> createService, State state)
         {
             _commandGraphics = new CommandGraphics(_gfx);
             Loaded += (sender, args) => ServerButton.IsChecked = true;
-            _createService = () =>
-            {
-                var callbackHandler = new MOOCallbackHandler(_state);
-                callbackHandler.Updated += () => Dispatcher.InvokeAsync(UpdateState);
-                return createService(callbackHandler);
-            };
+            _createService = createService;
             _state = state;
             SetupWindow();
             _dragAllowed = this.PrepareForDragDrop();
+            _updateTimer = new Timer(1000);
+            _updateTimer.Elapsed += (sender, args) => Dispatcher.Invoke(UpdateState);
+            _updateTimer.Start();
         }
 
         private void UpdateState()
         {
-            _commandGraphics.Clear();
-            UpdatePlanets();
-            UpdateFormations();
+            var stardate = _service.GetUpdate();
+            if (stardate != _state.Stardate)
+            {
+                _state.Stardate = stardate;
+                _commandGraphics.Clear();
+                UpdatePlanets();
+                UpdateFormations();
+            }
         }
 
         private void UpdateFormations()

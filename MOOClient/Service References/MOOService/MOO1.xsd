@@ -13,6 +13,18 @@
       <xs:sequence />
     </xs:complexType>
   </xs:element>
+  <xs:element name="GetUpdate">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetUpdateResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="GetUpdateResult" type="xs:dateTime" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
   <xs:element name="GetPlanets">
     <xs:complexType>
       <xs:sequence />
@@ -47,13 +59,6 @@
   <xs:element name="IssueCommandResponse">
     <xs:complexType>
       <xs:sequence />
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="Update">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="stardate" type="xs:dateTime" />
-      </xs:sequence>
     </xs:complexType>
   </xs:element>
 </xs:schema>

@@ -5,14 +5,12 @@ open System
 open System.ServiceModel
 open System.ServiceModel.Web
 
-type IMOOCallbackContract =
-    [<OperationContract(IsOneWay = true)>]
-    abstract member Update : stardate : DateTime -> unit
-
-[<ServiceContract(CallbackContract = typeof<IMOOCallbackContract>)>]
+[<ServiceContract>]
 type IMOOService =
     [<OperationContract>]
     abstract member Authenticate : name : string -> unit
+    [<OperationContract>]
+    abstract member GetUpdate : unit -> DateTime
     [<OperationContract>]
     abstract member GetPlanets : unit -> Planet[]
     [<OperationContract>]
@@ -25,7 +23,6 @@ type Client =
     {
         player : string
         sessionID : string
-        channel : IMOOCallbackContract
     }
     override x.Equals(yobj) = 
         match yobj with

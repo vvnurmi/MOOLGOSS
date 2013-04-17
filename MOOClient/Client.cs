@@ -31,10 +31,9 @@ namespace MOO.Client
             _window = new ClientWindow(CreateService, _state);
         }
 
-        private MOOServiceClient CreateService(IMOOServiceCallback callbackHandler)
+        private MOOServiceClient CreateService()
         {
-            var instanceContext = new InstanceContext(callbackHandler);
-            return new MOOServiceClient(instanceContext, "NetNamedPipeBinding_IMOOService");
+            return new MOOServiceClient("NetNamedPipeBinding_IMOOService");
         }
 
         private void ExceptionHandler(object sender, DispatcherUnhandledExceptionEventArgs e)
