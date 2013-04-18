@@ -27,7 +27,6 @@ namespace MOO.Client
         private App()
         {
             _state = new State();
-            DispatcherUnhandledException += ExceptionHandler;
             _window = new ClientWindow(CreateService, _state);
         }
 
@@ -48,15 +47,6 @@ namespace MOO.Client
             catch (CommunicationException)
             {
                 return null;
-            }
-        }
-
-        private void ExceptionHandler(object sender, DispatcherUnhandledExceptionEventArgs e)
-        {
-            if (e.Exception is CommunicationException)
-            {
-                e.Handled = true;
-                _window.AbandonServer();
             }
         }
     }

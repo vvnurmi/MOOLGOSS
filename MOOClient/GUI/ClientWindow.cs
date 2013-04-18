@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
@@ -59,9 +60,28 @@ namespace MOO.Client.GUI
             _updateTimer.Start();
         }
 
+        /// <summary>
+        /// Returns true on success.
+        /// </summary>
+        private bool TryUseService(Action<IMOOService> action)
+        {
+            if (_service == null) return false;
+            try
+            {
+                action(_service);
+            }
+            catch (CommunicationException)
+            {
+                AbandonServer();
+            }
+            if (_service == null) return false;
+            return true;
+        }
+
         private void UpdateState()
         {
-            var update = _service.GetUpdate();
+            UpdateData update = null;
+            if (!TryUseService(s => update = s.GetUpdate())) return;
             if (update.Stardate != _state.Stardate)
             {
                 _updateTimer.Interval = (update.NextUpdate + TimeSpan.FromSeconds(1)).TotalMilliseconds;
@@ -74,7 +94,8 @@ namespace MOO.Client.GUI
 
         private void UpdateFormations()
         {
-            var newFormations = _service.GetFormations();
+            Formation[] newFormations = null;
+            if (!TryUseService(s => newFormations = s.GetFormations())) return;
             var missingFormations = newFormations.Where(f => !_formations.ContainsKey(f.ID)).ToArray();
             var changedFormations = newFormations.Where(f => _formations.ContainsKey(f.ID) && !_formations[f.ID].Equals(f)).ToArray();
             foreach (var formation in changedFormations)
@@ -96,7 +117,8 @@ namespace MOO.Client.GUI
 
         private void UpdatePlanets()
         {
-            var newPlanets = _service.GetPlanets();
+            Planet[] newPlanets = null;
+            if (!TryUseService(s => newPlanets = s.GetPlanets())) return;
             var missingPlanets = newPlanets.Where(p => !_planets.ContainsKey(p.ID));
             var changedPlanets = newPlanets.Where(p => _planets.ContainsKey(p.ID) && !_planets[p.ID].Equals(p));
             var animationTimes = changedPlanets.ToDictionary(p => p.ID,
@@ -132,6 +154,7 @@ namespace MOO.Client.GUI
         {
             _service = null;
             ServerButton.Content = "No server";
+            ServerButton.IsChecked = false;
             ServerButton.IsEnabled = true;
             MessageBox.Show("There was a communication error. Perhaps the server is offline?", "MOO Communication Error");
         }
@@ -162,7 +185,6 @@ namespace MOO.Client.GUI
 
             ServerButton = new ToggleButton { Background = Brushes.Red };
             ServerButton.Checked += (sender, args) => ConnectToServer();
-            ServerButton.Unchecked += (sender, args) => AbandonServer();
             DockPanel.SetDock(ServerButton, Dock.Right);
             topPanel.Children.Add(ServerButton);
 
@@ -236,7 +258,7 @@ namespace MOO.Client.GUI
                 ID = formation.ID,
                 Location = new Location { item = target.ID }
             };
-            _service.IssueCommand(command);
+            if (!TryUseService(s => s.IssueCommand(command))) return;
             _commandGraphics.Add(command);
         }
 
