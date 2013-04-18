@@ -1,56 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xs:schema xmlns:tns="http://schemas.datacontract.org/2004/07/MOO.Types" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/MOO.Types" xmlns:xs="http://www.w3.org/2001/XMLSchema">
-  <xs:complexType name="ArrayOfPlanet">
+<xs:schema xmlns:ser="http://schemas.microsoft.com/2003/10/Serialization/" xmlns:tns="http://schemas.datacontract.org/2004/07/MOO.Service" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/MOO.Service" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import schemaLocation="http://localhost:8000/MOO?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+  <xs:complexType name="UpdateData">
     <xs:sequence>
-      <xs:element minOccurs="0" maxOccurs="unbounded" name="Planet" nillable="true" type="tns:Planet" />
+      <xs:element minOccurs="0" name="NextUpdate" type="ser:duration" />
+      <xs:element minOccurs="0" name="Stardate" type="xs:dateTime" />
+      <xs:element minOccurs="0" name="UpdateInterval" type="ser:duration" />
     </xs:sequence>
   </xs:complexType>
-  <xs:element name="ArrayOfPlanet" nillable="true" type="tns:ArrayOfPlanet" />
-  <xs:complexType name="Planet">
-    <xs:sequence>
-      <xs:element minOccurs="0" name="ID" type="xs:int" />
-      <xs:element minOccurs="0" name="MaxPopulation" type="xs:int" />
-      <xs:element minOccurs="0" name="Name" nillable="true" type="xs:string" />
-      <xs:element minOccurs="0" name="Orbit" type="xs:int" />
-      <xs:element minOccurs="0" name="Player" nillable="true" type="xs:string" />
-      <xs:element minOccurs="0" name="Population" type="xs:int" />
-    </xs:sequence>
-  </xs:complexType>
-  <xs:element name="Planet" nillable="true" type="tns:Planet" />
-  <xs:complexType name="ArrayOfFormation">
-    <xs:sequence>
-      <xs:element minOccurs="0" maxOccurs="unbounded" name="Formation" nillable="true" type="tns:Formation" />
-    </xs:sequence>
-  </xs:complexType>
-  <xs:element name="ArrayOfFormation" nillable="true" type="tns:ArrayOfFormation" />
-  <xs:complexType name="Formation">
-    <xs:sequence>
-      <xs:element minOccurs="0" name="ID" type="xs:int" />
-      <xs:element minOccurs="0" name="Location" nillable="true" type="tns:Location" />
-      <xs:element minOccurs="0" name="Player" nillable="true" type="xs:string" />
-      <xs:element minOccurs="0" name="Ships" type="xs:int" />
-    </xs:sequence>
-  </xs:complexType>
-  <xs:element name="Formation" nillable="true" type="tns:Formation" />
-  <xs:complexType name="Location">
-    <xs:sequence>
-      <xs:element name="item" type="xs:int" />
-    </xs:sequence>
-  </xs:complexType>
-  <xs:element name="Location" nillable="true" type="tns:Location" />
-  <xs:complexType name="CommandC.Base">
-    <xs:sequence />
-  </xs:complexType>
-  <xs:element name="CommandC.Base" nillable="true" type="tns:CommandC.Base" />
-  <xs:complexType name="CommandC.MoveFormation">
-    <xs:complexContent mixed="false">
-      <xs:extension base="tns:CommandC.Base">
-        <xs:sequence>
-          <xs:element name="ID_x0040_" type="xs:int" />
-          <xs:element name="Location_x0040_" nillable="true" type="tns:Location" />
-        </xs:sequence>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:element name="CommandC.MoveFormation" nillable="true" type="tns:CommandC.MoveFormation" />
+  <xs:element name="UpdateData" nillable="true" type="tns:UpdateData" />
 </xs:schema>

@@ -113,7 +113,8 @@ let rec updateLoop () =
         do! initNewPlayers
         do! printState
         do! updateServiceState ()
-        System.Threading.Thread.Sleep(TimeSpan.FromSeconds(10.0))
+        let! updateInterval = getUpdateInterval
+        System.Threading.Thread.Sleep(updateInterval)
         return! updateLoop ()
     }
 let mainCore =

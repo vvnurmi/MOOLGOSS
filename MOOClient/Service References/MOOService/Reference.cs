@@ -15,6 +15,83 @@ namespace MOO.Client.MOOService {
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="UpdateData", Namespace="http://schemas.datacontract.org/2004/07/MOO.Service")]
+    [System.SerializableAttribute()]
+    public partial class UpdateData : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private System.TimeSpan NextUpdateField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private System.DateTime StardateField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private System.TimeSpan UpdateIntervalField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public System.TimeSpan NextUpdate {
+            get {
+                return this.NextUpdateField;
+            }
+            set {
+                if ((this.NextUpdateField.Equals(value) != true)) {
+                    this.NextUpdateField = value;
+                    this.RaisePropertyChanged("NextUpdate");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public System.DateTime Stardate {
+            get {
+                return this.StardateField;
+            }
+            set {
+                if ((this.StardateField.Equals(value) != true)) {
+                    this.StardateField = value;
+                    this.RaisePropertyChanged("Stardate");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public System.TimeSpan UpdateInterval {
+            get {
+                return this.UpdateIntervalField;
+            }
+            set {
+                if ((this.UpdateIntervalField.Equals(value) != true)) {
+                    this.UpdateIntervalField = value;
+                    this.RaisePropertyChanged("UpdateInterval");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
     [System.Runtime.Serialization.DataContractAttribute(Name="Planet", Namespace="http://schemas.datacontract.org/2004/07/MOO.Types")]
     [System.SerializableAttribute()]
     public partial class Planet : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
@@ -353,10 +430,10 @@ namespace MOO.Client.MOOService {
         System.Threading.Tasks.Task AuthenticateAsync(string name);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IMOOService/GetUpdate", ReplyAction="http://tempuri.org/IMOOService/GetUpdateResponse")]
-        System.DateTime GetUpdate();
+        MOO.Client.MOOService.UpdateData GetUpdate();
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IMOOService/GetUpdate", ReplyAction="http://tempuri.org/IMOOService/GetUpdateResponse")]
-        System.Threading.Tasks.Task<System.DateTime> GetUpdateAsync();
+        System.Threading.Tasks.Task<MOO.Client.MOOService.UpdateData> GetUpdateAsync();
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IMOOService/GetPlanets", ReplyAction="http://tempuri.org/IMOOService/GetPlanetsResponse")]
         MOO.Client.MOOService.Planet[] GetPlanets();
@@ -412,11 +489,11 @@ namespace MOO.Client.MOOService {
             return base.Channel.AuthenticateAsync(name);
         }
         
-        public System.DateTime GetUpdate() {
+        public MOO.Client.MOOService.UpdateData GetUpdate() {
             return base.Channel.GetUpdate();
         }
         
-        public System.Threading.Tasks.Task<System.DateTime> GetUpdateAsync() {
+        public System.Threading.Tasks.Task<MOO.Client.MOOService.UpdateData> GetUpdateAsync() {
             return base.Channel.GetUpdateAsync();
         }
         

@@ -11,6 +11,8 @@ open System.ServiceModel.Description
 type ServiceState = {
     // Read by service threads, written by the main thread.
     mutable stardate : DateTime
+    mutable updateInterval : TimeSpan
+    mutable nextUpdateWallTime : DateTime
     mutable planets : Planet array
     mutable formations : Formation array
     // Produced by service threads, consumed by the main thread.
@@ -19,6 +21,8 @@ type ServiceState = {
 }
 let serviceState = {
     stardate = new DateTime(2013, 3, 23)
+    updateInterval = TimeSpan.FromSeconds(10.0)
+    nextUpdateWallTime = DateTime.Now
     planets = [||]
     formations = [||]
     newClients = new (Client ConcurrentQueue)()
@@ -37,9 +41,12 @@ let addCommands () = processQueue serviceState.newCommands addCommand
 let updateServiceState () =
     state {
         let! stardate = getStardate
+        let! updateInterval = getUpdateInterval
         let! planets = getPlanets
         let! formations = getFormations
         serviceState.stardate <- stardate
+        serviceState.updateInterval <- updateInterval
+        serviceState.nextUpdateWallTime <- DateTime.Now + updateInterval
         serviceState.planets <- Array.map snd <| Map.toArray planets
         serviceState.formations <- Array.map snd <| Map.toArray formations
     }
@@ -54,7 +61,11 @@ type MOOService() =
             }
             serviceState.newClients.Enqueue(client)
         member x.GetUpdate() =
-            serviceState.stardate
+            {
+                stardate = serviceState.stardate
+                updateInterval = serviceState.updateInterval
+                nextUpdate = serviceState.nextUpdateWallTime - DateTime.Now
+            }
         member x.GetPlanets() =
             serviceState.planets
         member x.GetFormations() =

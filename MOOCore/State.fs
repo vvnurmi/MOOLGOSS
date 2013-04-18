@@ -64,6 +64,8 @@ let mapState f =
 type State = {
     nextID : int
     stardate : System.DateTime
+    updateInterval : System.TimeSpan
+    nextUpdateWallTime : System.DateTime
     planets : Map<ID, Planet>
     clients : Client list
     formations : Map<ID, Formation>
@@ -73,6 +75,8 @@ type State = {
 let initialState = {
     nextID = 1
     stardate = new System.DateTime(2215, 3, 23)
+    updateInterval = System.TimeSpan.FromSeconds(10.0)
+    nextUpdateWallTime = System.DateTime.Now
     planets = Map.empty
     clients = []
     formations = Map.empty
@@ -86,7 +90,17 @@ let getNewID =
 let getStardate =
     getState <| fun state -> state.stardate
 let setStardate sd =
-    mapState <| fun state -> { state with stardate = sd }
+    mapState <| fun (state : State) -> { state with stardate = sd }
+
+let getUpdateInterval =
+    getState <| fun state -> state.updateInterval
+let setUpdateInterval interval =
+    mapState <| fun (state : State) -> { state with updateInterval = interval }
+
+let getNextUpdateWallTime =
+    getState <| fun state -> state.nextUpdateWallTime
+let setNextUpdateWallTime t =
+    mapState <| fun state -> { state with nextUpdateWallTime = t }
 
 let getPlanets =
     getState <| fun state -> state.planets

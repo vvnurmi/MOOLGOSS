@@ -34,7 +34,7 @@ namespace MOO.Client.GUI
             public Storyboard Storyboard { get; set; }
         }
 
-        private Func<MOOServiceClient> _createService;
+        private Func<string, MOOServiceClient> _createService;
         private MOOServiceClient _service;
         private GraphicsData _gfx = new GraphicsData();
         private CommandGraphics _commandGraphics;
@@ -46,7 +46,7 @@ namespace MOO.Client.GUI
         private Dictionary<int, Formation> _formations = new Dictionary<int, Formation>();
         private Timer _updateTimer;
 
-        public ClientWindow(Func<MOOServiceClient> createService, State state)
+        public ClientWindow(Func<string, MOOServiceClient> createService, State state)
         {
             _commandGraphics = new CommandGraphics(_gfx);
             Loaded += (sender, args) => ServerButton.IsChecked = true;
@@ -61,10 +61,11 @@ namespace MOO.Client.GUI
 
         private void UpdateState()
         {
-            var stardate = _service.GetUpdate();
-            if (stardate != _state.Stardate)
+            var update = _service.GetUpdate();
+            if (update.Stardate != _state.Stardate)
             {
-                _state.Stardate = stardate;
+                _updateTimer.Interval = (update.NextUpdate + TimeSpan.FromSeconds(1)).TotalMilliseconds;
+                _state.Stardate = update.Stardate;
                 _commandGraphics.Clear();
                 UpdatePlanets();
                 UpdateFormations();
@@ -123,8 +124,16 @@ namespace MOO.Client.GUI
         {
             ServerButton.Content = "Server OK";
             ServerButton.IsEnabled = false;
-            _service = _createService();
-            _service.Authenticate(Environment.UserName);
+            _service = _createService(Environment.UserName);
+            if (_service == null) AbandonServer();
+        }
+
+        public void AbandonServer()
+        {
+            _service = null;
+            ServerButton.Content = "No server";
+            ServerButton.IsEnabled = true;
+            MessageBox.Show("There was a communication error. Perhaps the server is offline?", "MOO Communication Error");
         }
 
         private void SetupWindow()
@@ -153,7 +162,7 @@ namespace MOO.Client.GUI
 
             ServerButton = new ToggleButton { Background = Brushes.Red };
             ServerButton.Checked += (sender, args) => ConnectToServer();
-            ServerButton.Unchecked += (sender, args) => { ServerButton.Content = "No server"; ServerButton.IsEnabled = true; };
+            ServerButton.Unchecked += (sender, args) => AbandonServer();
             DockPanel.SetDock(ServerButton, Dock.Right);
             topPanel.Children.Add(ServerButton);
 

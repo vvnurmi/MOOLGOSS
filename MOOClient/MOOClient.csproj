@@ -74,9 +74,13 @@
     <None Include="Service References\MOOService\MOO.Client.MOOService.Planet.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
+    <None Include="Service References\MOOService\MOO.Client.MOOService.UpdateData.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
     <None Include="Service References\MOOService\MOO.xsd" />
     <None Include="Service References\MOOService\MOO1.xsd" />
     <None Include="Service References\MOOService\MOO2.xsd" />
+    <None Include="Service References\MOOService\MOO3.xsd" />
     <None Include="Service References\MOOService\MOOService.wsdl" />
   </ItemGroup>
   <ItemGroup>

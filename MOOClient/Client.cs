@@ -31,19 +31,32 @@ namespace MOO.Client
             _window = new ClientWindow(CreateService, _state);
         }
 
-        private MOOServiceClient CreateService()
+        private MOOServiceClient CreateService(string player)
         {
-            return new MOOServiceClient("NetNamedPipeBinding_IMOOService");
+            return TryCreateService(player, "BasicHttpBinding_IMOOService")
+                ?? TryCreateService(player, "NetNamedPipeBinding_IMOOService");
+        }
+
+        private MOOServiceClient TryCreateService(string player, string configuration)
+        {
+            var client = new MOOServiceClient(configuration);
+            try
+            {
+                client.Authenticate(player);
+                return client;
+            }
+            catch (CommunicationException)
+            {
+                return null;
+            }
         }
 
         private void ExceptionHandler(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
             if (e.Exception is CommunicationException)
             {
-                MessageBox.Show("There was a communication error. Perhaps the server is offline?\n"
-                    + e.Exception.Message, "MOO Communication Error");
                 e.Handled = true;
-                _window.ServerButton.IsChecked = false;
+                _window.AbandonServer();
             }
         }
     }
