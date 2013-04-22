@@ -1,8 +1,7 @@
-﻿using MOO.Client.MOOService;
+﻿using MOO.Service;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
@@ -17,6 +16,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using MOOClient = MOO.Service.MOOService.Client;
 
 namespace MOO.Client.GUI
 {
@@ -35,8 +35,8 @@ namespace MOO.Client.GUI
             public Storyboard Storyboard { get; set; }
         }
 
-        private Func<string, MOOServiceClient> _createService;
-        private MOOServiceClient _service;
+        private Func<string, MOOClient> _createService;
+        private MOOClient _service;
         private GraphicsData _gfx = new GraphicsData();
         private CommandGraphics _commandGraphics;
         private State _state;
@@ -47,7 +47,7 @@ namespace MOO.Client.GUI
         private Dictionary<int, Formation> _formations = new Dictionary<int, Formation>();
         private Timer _updateTimer;
 
-        public ClientWindow(Func<string, MOOServiceClient> createService, State state)
+        public ClientWindow(Func<string, MOOClient> createService, State state)
         {
             _commandGraphics = new CommandGraphics(_gfx);
             Loaded += (sender, args) => ServerButton.IsChecked = true;
@@ -63,14 +63,14 @@ namespace MOO.Client.GUI
         /// <summary>
         /// Returns true on success.
         /// </summary>
-        private bool TryUseService(Action<IMOOService> action)
+        private bool TryUseService(Action<MOOClient> action)
         {
             if (_service == null) return false;
             try
             {
                 action(_service);
             }
-            catch (CommunicationException)
+            catch (Exception)
             {
                 AbandonServer();
             }
@@ -82,10 +82,12 @@ namespace MOO.Client.GUI
         {
             UpdateData update = null;
             if (!TryUseService(s => update = s.GetUpdate())) return;
-            if (update.Stardate != _state.Stardate)
+            var stardate = update.Stardate.ToDateTime();
+            var nextUpdate = update.NextUpdate.ToTimeSpan();
+            if (stardate != _state.Stardate)
             {
-                _updateTimer.Interval = (update.NextUpdate + TimeSpan.FromSeconds(1)).TotalMilliseconds;
-                _state.Stardate = update.Stardate;
+                _updateTimer.Interval = (nextUpdate + System.TimeSpan.FromSeconds(1)).TotalMilliseconds;
+                _state.Stardate = stardate;
                 _commandGraphics.Clear();
                 UpdatePlanets();
                 UpdateFormations();
@@ -95,12 +97,12 @@ namespace MOO.Client.GUI
         private void UpdateFormations()
         {
             Formation[] newFormations = null;
-            if (!TryUseService(s => newFormations = s.GetFormations())) return;
+            if (!TryUseService(s => newFormations = s.GetFormations().ToArray())) return;
             var missingFormations = newFormations.Where(f => !_formations.ContainsKey(f.ID)).ToArray();
             var changedFormations = newFormations.Where(f => _formations.ContainsKey(f.ID) && !_formations[f.ID].Equals(f)).ToArray();
             foreach (var formation in changedFormations)
             {
-                var planetCanvas = _gfx.Planets[_formations[formation.ID].Location.item];
+                var planetCanvas = _gfx.Planets[_formations[formation.ID].Location.Planet];
                 planetCanvas.Children.Remove(_gfx.Formations[formation.ID]);
                 _gfx.Formations.Remove(formation.ID);
                 _formations.Remove(formation.ID);
@@ -108,7 +110,7 @@ namespace MOO.Client.GUI
             foreach (var formation in missingFormations.Union(changedFormations))
             {
                 var formationCanvas = CreateFormationCanvas(formation);
-                var planetCanvas = _gfx.Planets[formation.Location.item];
+                var planetCanvas = _gfx.Planets[formation.Location.Planet];
                 planetCanvas.Children.Add(formationCanvas);
                 _gfx.Formations[formation.ID] = formationCanvas;
                 _formations[formation.ID] = formation;
@@ -118,7 +120,7 @@ namespace MOO.Client.GUI
         private void UpdatePlanets()
         {
             Planet[] newPlanets = null;
-            if (!TryUseService(s => newPlanets = s.GetPlanets())) return;
+            if (!TryUseService(s => newPlanets = s.GetPlanets().ToArray())) return;
             var missingPlanets = newPlanets.Where(p => !_planets.ContainsKey(p.ID));
             var changedPlanets = newPlanets.Where(p => _planets.ContainsKey(p.ID) && !_planets[p.ID].Equals(p));
             var animationTimes = changedPlanets.ToDictionary(p => p.ID,
@@ -253,13 +255,17 @@ namespace MOO.Client.GUI
 
         private void Command_MoveFormation(Formation formation, Planet target)
         {
-            var command = new CommandCMoveFormation
+            var command = new Command
             {
-                ID = formation.ID,
-                Location = new Location { item = target.ID }
+                Type = CommandType.MoveFormation,
+                MoveFormationData = new MoveFormationData
+                {
+                    Formation = formation.ID,
+                    Destination = new Location { Planet = target.ID },
+                },
             };
             if (!TryUseService(s => s.IssueCommand(command))) return;
-            _commandGraphics.Add(command);
+            _commandGraphics.Add(command.MoveFormationData);
         }
 
         private TextBlock CreatePlanetText(Planet planet)
@@ -278,7 +284,7 @@ namespace MOO.Client.GUI
 
         private Canvas CreateFormationCanvas(Formation formation)
         {
-            var planet = _planets[formation.Location.item];
+            var planet = _planets[formation.Location.Planet];
             var polygon = new Polygon { Fill = Brushes.Gray };
             polygon.Points.Add(new Point(-10, 0));
             polygon.Points.Add(new Point(10, 10));
@@ -340,7 +346,7 @@ namespace MOO.Client.GUI
             {
                 Name = "X",
                 RepeatBehavior = RepeatBehavior.Forever,
-                Duration = TimeSpan.FromSeconds(15),
+                Duration = System.TimeSpan.FromSeconds(15),
                 Source = PathAnimationSource.X,
                 PathGeometry = orbitPath,
             };
@@ -348,7 +354,7 @@ namespace MOO.Client.GUI
             {
                 Name = "Y",
                 RepeatBehavior = RepeatBehavior.Forever,
-                Duration = TimeSpan.FromSeconds(15),
+                Duration = System.TimeSpan.FromSeconds(15),
                 Source = PathAnimationSource.Y,
                 PathGeometry = orbitPath,
             };

@@ -1,10 +1,10 @@
 ﻿module MOO.Server.App
 
-open MOO.Players
+open MOO.Core.Players
 open MOO.Server.Service
 open MOO.Service
-open MOO.State
-open MOO.Types
+open MOO.Core.State
+open MOO.Core.Types
 open System
 
 let printWelcome =
@@ -97,8 +97,7 @@ let updateUniverse =
 let initNewPlayers =
     state {
         let! clients = getClients
-        let players = clients |> List.map (fun c -> c.player)
-        let! newPlayers = adapt2 List.filter (fun p -> lift not (hasPlanets p)) players
+        let! newPlayers = adapt2 List.filter (fun p -> lift not (hasPlanets p)) clients
         do! adapt2 List.iter initPlayer newPlayers
     }
 let init =
@@ -125,4 +124,6 @@ let mainCore =
         do! getClients %|> adapt2 List.iter dropClient
     }
 let main =
-    runWithService <| fun () -> run mainCore initialState |> ignore
+    let stopService = startService
+    run mainCore initialState |> ignore
+    stopService ()

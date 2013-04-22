@@ -1,12 +1,9 @@
 ﻿module MOO.Server.Service
 
-open MOO.Service
-open MOO.State
-open MOO.Types
+open MOO.Core.State
+open MOO.Core.Types
 open System
 open System.Collections.Concurrent
-open System.ServiceModel
-open System.ServiceModel.Description
 
 type ServiceState = {
     // Read by service threads, written by the main thread.
@@ -16,7 +13,7 @@ type ServiceState = {
     mutable planets : Planet array
     mutable formations : Formation array
     // Produced by service threads, consumed by the main thread.
-    newClients : Client ConcurrentQueue
+    newClients : string ConcurrentQueue
     newCommands : Command ConcurrentQueue
 }
 let serviceState = {
@@ -25,7 +22,7 @@ let serviceState = {
     nextUpdateWallTime = DateTime.Now
     planets = [||]
     formations = [||]
-    newClients = new (Client ConcurrentQueue)()
+    newClients = new (string ConcurrentQueue)()
     newCommands = new (Command ConcurrentQueue)()
 }
 let rec processQueue<'a> (queue : 'a ConcurrentQueue) f =
@@ -51,64 +48,33 @@ let updateServiceState () =
         serviceState.formations <- Array.map snd <| Map.toArray formations
     }
 
-[<ServiceBehavior(InstanceContextMode = InstanceContextMode.PerSession)>]
-type MOOService() =
-    interface IMOOService with
+type MOOServiceHandler() =
+    interface MOO.Service.MOOService.Iface with
         member x.Authenticate name =
-            let client = {
-                player = name
-                sessionID = OperationContext.Current.SessionId
-            }
-            serviceState.newClients.Enqueue(client)
+            serviceState.newClients.Enqueue(name)
         member x.GetUpdate() =
-            {
+            Conversion.fromUpdateData {
                 stardate = serviceState.stardate
                 updateInterval = serviceState.updateInterval
-                nextUpdate = serviceState.nextUpdateWallTime - DateTime.Now
-            }
+                nextUpdate = serviceState.nextUpdateWallTime - DateTime.Now }
         member x.GetPlanets() =
-            serviceState.planets
+            Conversion.fromEnumerable <| Array.map Conversion.fromPlanet serviceState.planets
         member x.GetFormations() =
-            serviceState.formations
+            Conversion.fromEnumerable <| Array.map Conversion.fromFormation serviceState.formations
         member x.IssueCommand command =
-            serviceState.newCommands.Enqueue(CommandC.toCommand command)
+            serviceState.newCommands.Enqueue(Conversion.toCommand command)
 
-let runWithService f =
-    let core baseAddresses bindings httpGetEnabled =
-        use host = new ServiceHost(typeof<MOOService>, baseAddresses)
-        host.UnknownMessageReceived.Add <| fun args -> printfn "Note: Unknown message received. Skipping it."
-        let openSucceeded =
-            try
-                let addEndpoint binding =
-                    host.AddServiceEndpoint(typeof<IMOOService>, binding, "MOOService") |> ignore
-                List.iter addEndpoint bindings
-                if httpGetEnabled then host.Description.Behaviors.Add <| new ServiceMetadataBehavior(HttpGetEnabled = true)
-                host.Open()
-                true
-            with
-            | :? CommunicationException as ex ->
-                printfn "An exception occurred: %s" ex.Message
-                host.Abort()
-                false
-        if openSucceeded then
-            try
-                f ()
-            with
-            | :? CommunicationException as ex ->
-                printfn "An exception occurred: %s" ex.Message
-                host.Abort()
-            true
-        else false
+// Returns a function that stops the service.
+let startService =
+    let handler = new MOOServiceHandler()
+    let processor = new MOO.Service.MOOService.Processor(handler)
+    let serverTransport = new Thrift.Transport.TServerSocket(8000)
+    let server = new Thrift.Server.TSimpleServer(processor, serverTransport)
+    Async.Start(async { server.Serve() })
+    server.Stop
 
-    let httpBaseAddress = new Uri(Uri.UriSchemeHttp + "://localhost:8000/MOO")
-    let pipeBaseAddress = new Uri(Uri.UriSchemeNetPipe + "://localhost/MOO")
-    let bindings = [ new BasicHttpBinding() :> Channels.Binding; upcast new NetNamedPipeBinding() ]
-    if not <| core [| httpBaseAddress; pipeBaseAddress |] bindings true then
-        printfn "An exception occurred while creating the HTTP endpoint. Try running the server with administrator rights?"
-        core [| pipeBaseAddress |] bindings.Tail false |> ignore
-
-let dropClient (c : Client) =
+let dropClient c =
     state {
-        printfn "Dropping client %s" c.player
+        printfn "Dropping client %s" c
         do! removeClient c
     }

@@ -1,7 +1,6 @@
-﻿module MOO.State
+﻿module MOO.Core.State
 
-open MOO.Service
-open MOO.Types
+open MOO.Core.Types
 
 type StateOp<'s, 'a when 's : equality> =
     StateOp of ('s -> 'a * 's)
@@ -67,7 +66,7 @@ type State = {
     updateInterval : System.TimeSpan
     nextUpdateWallTime : System.DateTime
     planets : Map<ID, Planet>
-    clients : Client list
+    clients : string list
     formations : Map<ID, Formation>
     commands : Command list
 }
@@ -117,8 +116,8 @@ let mapPlanet f id =
 
 let getClients =
     getState <| fun state -> state.clients
-let addClient (c : Client) =
-    printfn "Adding client %s" c.player
+let addClient c =
+    printfn "Adding client %s" c
     mapState <| fun state -> { state with clients = c :: state.clients |> Set.ofList |> List.ofSeq }
 let removeClient c =
     mapState <| fun state -> { state with clients = List.filter (fun x -> x <> c) state.clients }

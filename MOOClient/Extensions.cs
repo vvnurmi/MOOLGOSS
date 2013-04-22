@@ -8,6 +8,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using MOO.Service;
 
 namespace MOO.Client
 {
@@ -52,6 +53,26 @@ namespace MOO.Client
                     state = DragFilter.MustClick;
             };
             return () => state == DragFilter.Ok;
+        }
+
+        public static bool Equals(this Planet p1, Planet p2)
+        {
+            if (p2 == null) return false;
+            return
+                p1.ID == p2.ID &&
+                p1.Population == p2.Population &&
+                p1.MaxPopulation == p2.MaxPopulation &&
+                p1.Player == p2.Player;
+        }
+
+        public static System.TimeSpan ToTimeSpan(this Service.TimeSpan t)
+        {
+            return System.TimeSpan.FromMilliseconds(t.Milliseconds);
+        }
+
+        public static System.DateTime ToDateTime(this Service.DateTime t)
+        {
+            return new System.DateTime(t.Year, t.Month, t.Day, t.Hour, t.Minute, 0);
         }
     }
 }

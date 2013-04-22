@@ -1,4 +1,4 @@
-﻿using MOO.Client.MOOService;
+﻿using MOO.Service;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +15,7 @@ namespace MOO.Client.GUI
     public class CommandGraphics
     {
         private ClientWindow.GraphicsData _gfx;
-        private List<CommandCBase> _issuedCommands = new List<CommandCBase>();
+        private List<Command> _issuedCommands = new List<Command>();
 
         public CommandGraphics(ClientWindow.GraphicsData gfx)
         {
@@ -24,13 +24,13 @@ namespace MOO.Client.GUI
 
         public void Clear()
         {
-            RemoveAll<CommandCBase>(c => true);
+            RemoveAll(c => true);
         }
 
-        public void Add(CommandCMoveFormation command)
+        public void Add(MoveFormationData command)
         {
-            RemoveAll<CommandCMoveFormation>(c => c.ID == command.ID);
-            _issuedCommands.Add(command);
+            RemoveAll(c => c.Type == CommandType.MoveFormation && c.MoveFormationData.Formation == command.Formation);
+            _issuedCommands.Add(new Command { Type = CommandType.MoveFormation, MoveFormationData = command });
             var line = new Line
             {
                 Name = "Move",
@@ -42,38 +42,41 @@ namespace MOO.Client.GUI
             };
             var x2Binding = new GenericBinding<double>(() =>
                 {
-                    var transform = _gfx.Formations[command.ID].TransformToVisual(_gfx.Canvas);
+                    var transform = _gfx.Formations[command.Formation].TransformToVisual(_gfx.Canvas);
                     var formationPos = transform.Transform(new Point(0, 0));
-                    return Canvas.GetLeft(_gfx.Planets[command.Location.item]) - formationPos.X;
+                    return Canvas.GetLeft(_gfx.Planets[command.Destination.Planet]) - formationPos.X;
                 },
-                new Binding("(Canvas.Left)") { Source = _gfx.Planets[command.Location.item] },
-                new Binding("(Canvas.Left)") { Source = _gfx.Formations[command.ID] });
+                new Binding("(Canvas.Left)") { Source = _gfx.Planets[command.Destination.Planet] },
+                new Binding("(Canvas.Left)") { Source = _gfx.Formations[command.Formation] });
             var y2Binding = new GenericBinding<double>(() =>
                 {
-                    var transform = _gfx.Formations[command.ID].TransformToVisual(_gfx.Canvas);
+                    var transform = _gfx.Formations[command.Formation].TransformToVisual(_gfx.Canvas);
                     var formationPos = transform.Transform(new Point(0, 0));
-                    return Canvas.GetTop(_gfx.Planets[command.Location.item]) - formationPos.Y;
+                    return Canvas.GetTop(_gfx.Planets[command.Destination.Planet]) - formationPos.Y;
                 },
-                new Binding("(Canvas.Top)") { Source = _gfx.Planets[command.Location.item] },
-                new Binding("(Canvas.Top)") { Source = _gfx.Formations[command.ID] });
+                new Binding("(Canvas.Top)") { Source = _gfx.Planets[command.Destination.Planet] },
+                new Binding("(Canvas.Top)") { Source = _gfx.Formations[command.Formation] });
             line.SetBinding(Line.X2Property, x2Binding);
             line.SetBinding(Line.Y2Property, y2Binding);
-            _gfx.Formations[command.ID].Children.Add(line);
+            _gfx.Formations[command.Formation].Children.Add(line);
         }
 
-        private void RemoveAll<T>(Func<T, bool> filter) where T : CommandCBase
+        private void RemoveAll(Func<Command, bool> filter)
         {
-            foreach (var command in _issuedCommands.OfType<T>().Where(filter).ToArray())
+            foreach (var command in _issuedCommands.Where(filter).ToArray())
             {
                 _issuedCommands.Remove(command);
-                var moveFormation = command as CommandCMoveFormation;
-                if (moveFormation != null) Remove(moveFormation);
+                switch (command.Type)
+                {
+                    case CommandType.MoveFormation: Remove(command.MoveFormationData); break;
+                    default: throw new InvalidOperationException();
+                }
             }
         }
 
-        private void Remove(CommandCMoveFormation command)
+        private void Remove(MoveFormationData command)
         {
-            var canvas = _gfx.Formations[command.ID];
+            var canvas = _gfx.Formations[command.Formation];
             var oldLine = canvas.Children.OfType<Line>().First(l => l.Name == "Move");
             canvas.Children.Remove(oldLine);
         }

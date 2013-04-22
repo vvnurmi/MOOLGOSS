@@ -1,7 +1,7 @@
-﻿module MOO.Players
+﻿module MOO.Core.Players
 
-open MOO.State
-open MOO.Types
+open MOO.Core.State
+open MOO.Core.Types
 
 let hasPlanets player =
     state {
