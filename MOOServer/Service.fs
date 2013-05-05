@@ -69,7 +69,7 @@ let startService =
     let handler = new MOOServiceHandler()
     let processor = new MOO.Service.MOOService.Processor(handler)
     let serverTransport = new Thrift.Transport.TServerSocket(8000)
-    let server = new Thrift.Server.TSimpleServer(processor, serverTransport)
+    let server = new Thrift.Server.TThreadPoolServer(processor, serverTransport)
     Async.Start(async { server.Serve() })
     server.Stop
 
