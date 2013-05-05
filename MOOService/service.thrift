@@ -1,59 +1,60 @@
 # Thrift service definition for MOOLGOSS.
 
 namespace csharp MOO.Service
+namespace as3 com.moolgoss.service
 
 typedef i32 ID
 
 struct DateTime {
-	1: i32 Year
-	2: byte Month
-	3: byte Day
-	4: byte Hour
-	5: byte Minute
+    1: i32 year
+    2: byte month
+    3: byte day
+    4: byte hour
+    5: byte minute
 }
 
 struct TimeSpan {
-    1: i32 Milliseconds
+    1: i32 milliseconds
 }
 
 struct Location {
-	1: ID Planet
+    1: ID planet
 }
 
 struct UpdateData {
-    1: DateTime Stardate
-    2: TimeSpan UpdateInterval
-    3: TimeSpan NextUpdate
+    1: DateTime stardate
+    2: TimeSpan updateInterval
+    3: TimeSpan nextUpdate
 }
 
 struct Planet {
-    1: ID ID
-    2: optional string Player
-    3: string Name
-    4: i32 Population
-    5: i32 MaxPopulation
-    6: i32 Orbit
+    1: ID id
+    2: optional string player
+    3: string name
+    4: i32 population
+    5: i32 maxPopulation
+    6: i32 orbit
 }
 
 struct Formation {
-    1: ID ID
-    2: string Player
-    3: Location Location
-    4: i32 Ships
+    1: ID id
+    2: string player
+    3: Location location
+    4: i32 ships
 }
 
 enum CommandType {
-	MoveFormation = 1
+    MoveFormation = 1
 }
 
 struct MoveFormationData {
-	1: ID Formation
-	2: Location Destination
+    1: ID formation
+    2: Location destination
 }
 
 struct Command {
-	1: CommandType Type
-	2: optional MoveFormationData MoveFormationData
+    1: CommandType type
+    2: optional MoveFormationData moveFormationData
 }
 
 service MOOService {

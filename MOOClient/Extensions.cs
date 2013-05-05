@@ -59,7 +59,7 @@ namespace MOO.Client
         {
             if (p2 == null) return false;
             return
-                p1.ID == p2.ID &&
+                p1.Id == p2.Id &&
                 p1.Population == p2.Population &&
                 p1.MaxPopulation == p2.MaxPopulation &&
                 p1.Player == p2.Player;

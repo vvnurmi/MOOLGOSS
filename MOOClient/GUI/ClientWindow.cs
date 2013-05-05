@@ -98,22 +98,22 @@ namespace MOO.Client.GUI
         {
             Formation[] newFormations = null;
             if (!TryUseService(s => newFormations = s.GetFormations().ToArray())) return;
-            var missingFormations = newFormations.Where(f => !_formations.ContainsKey(f.ID)).ToArray();
-            var changedFormations = newFormations.Where(f => _formations.ContainsKey(f.ID) && !_formations[f.ID].Equals(f)).ToArray();
+            var missingFormations = newFormations.Where(f => !_formations.ContainsKey(f.Id)).ToArray();
+            var changedFormations = newFormations.Where(f => _formations.ContainsKey(f.Id) && !_formations[f.Id].Equals(f)).ToArray();
             foreach (var formation in changedFormations)
             {
-                var planetCanvas = _gfx.Planets[_formations[formation.ID].Location.Planet];
-                planetCanvas.Children.Remove(_gfx.Formations[formation.ID]);
-                _gfx.Formations.Remove(formation.ID);
-                _formations.Remove(formation.ID);
+                var planetCanvas = _gfx.Planets[_formations[formation.Id].Location.Planet];
+                planetCanvas.Children.Remove(_gfx.Formations[formation.Id]);
+                _gfx.Formations.Remove(formation.Id);
+                _formations.Remove(formation.Id);
             }
             foreach (var formation in missingFormations.Union(changedFormations))
             {
                 var formationCanvas = CreateFormationCanvas(formation);
                 var planetCanvas = _gfx.Planets[formation.Location.Planet];
                 planetCanvas.Children.Add(formationCanvas);
-                _gfx.Formations[formation.ID] = formationCanvas;
-                _formations[formation.ID] = formation;
+                _gfx.Formations[formation.Id] = formationCanvas;
+                _formations[formation.Id] = formation;
             }
         }
 
@@ -121,26 +121,26 @@ namespace MOO.Client.GUI
         {
             Planet[] newPlanets = null;
             if (!TryUseService(s => newPlanets = s.GetPlanets().ToArray())) return;
-            var missingPlanets = newPlanets.Where(p => !_planets.ContainsKey(p.ID));
-            var changedPlanets = newPlanets.Where(p => _planets.ContainsKey(p.ID) && !_planets[p.ID].Equals(p));
-            var animationTimes = changedPlanets.ToDictionary(p => p.ID,
-                p => _gfx.Planets[p.ID].Storyboard.GetCurrentTime(_gfx.Planets[p.ID]));
+            var missingPlanets = newPlanets.Where(p => !_planets.ContainsKey(p.Id));
+            var changedPlanets = newPlanets.Where(p => _planets.ContainsKey(p.Id) && !_planets[p.Id].Equals(p));
+            var animationTimes = changedPlanets.ToDictionary(p => p.Id,
+                p => _gfx.Planets[p.Id].Storyboard.GetCurrentTime(_gfx.Planets[p.Id]));
             foreach (var planet in changedPlanets)
             {
-                var planetCanvas = _gfx.Planets[planet.ID];
+                var planetCanvas = _gfx.Planets[planet.Id];
                 _gfx.Canvas.Children.Remove(planetCanvas);
-                _gfx.Planets.Remove(planet.ID);
-                _planets.Remove(planet.ID);
+                _gfx.Planets.Remove(planet.Id);
+                _planets.Remove(planet.Id);
             }
             foreach (var planet in missingPlanets.Union(changedPlanets))
             {
                 var planetCanvas = CreatePlanetCanvas(planet);
-                if (animationTimes.ContainsKey(planet.ID))
+                if (animationTimes.ContainsKey(planet.Id))
                     planetCanvas.Loaded += (sender, args) =>
-                        planetCanvas.Storyboard.Seek(planetCanvas, animationTimes[planet.ID].Value, TimeSeekOrigin.BeginTime);
-                _gfx.Planets[planet.ID] = planetCanvas;
+                        planetCanvas.Storyboard.Seek(planetCanvas, animationTimes[planet.Id].Value, TimeSeekOrigin.BeginTime);
+                _gfx.Planets[planet.Id] = planetCanvas;
                 _gfx.Canvas.Children.Add(planetCanvas);
-                _planets[planet.ID] = planet;
+                _planets[planet.Id] = planet;
             }
         }
 
@@ -260,8 +260,8 @@ namespace MOO.Client.GUI
                 Type = CommandType.MoveFormation,
                 MoveFormationData = new MoveFormationData
                 {
-                    Formation = formation.ID,
-                    Destination = new Location { Planet = target.ID },
+                    Formation = formation.Id,
+                    Destination = new Location { Planet = target.Id },
                 },
             };
             if (!TryUseService(s => s.IssueCommand(command))) return;

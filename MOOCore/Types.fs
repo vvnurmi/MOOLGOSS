@@ -48,13 +48,13 @@ module Conversion =
         Planet(loc.Planet)
     let fromFormation f =
         new MOO.Service.Formation(
-            ID = f.id,
+            Id = f.id,
             Player = f.player,
             Location = fromLocation f.location,
             Ships = f.ships)
     let fromPlanet (p : Planet) =
         new MOO.Service.Planet(
-            ID = p.id,
+            Id = p.id,
             Player = fromOption p.player,
             Name = p.name,
             Population = p.population,
