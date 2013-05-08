@@ -44,12 +44,6 @@
   <ItemGroup>
     <None Include="service.thrift" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\MOOCore\MOOCore.fsproj">
-      <Project>{40ea4bcf-e6e0-4dad-ade0-55ab522a1529}</Project>
-      <Name>MOOCore</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <UsingTask AssemblyFile="ThriftMSBuildTask.dll" TaskName="ThriftMSBuildTask.ThriftBuild" />
   <Target Name="BeforeBuild">

@@ -28,6 +28,7 @@ package org.apache.thrift.transport {
     public static const ALREADY_OPEN:int = 2;
     public static const TIMED_OUT:int = 3;
     public static const END_OF_FILE:int = 4;
+	public static const IO_ERROR:int = 5;
   
     public function TTransportError(error:int = UNKNOWN, message:String = "") {
       super(message, error);

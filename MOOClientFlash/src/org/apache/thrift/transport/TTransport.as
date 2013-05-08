@@ -19,14 +19,16 @@
 
 package org.apache.thrift.transport {
   
-  import flash.utils.ByteArray;
+  import flash.events.EventDispatcher;
+  import flash.utils.ByteArray;  
+  
   import org.apache.thrift.AbstractMethodError;
   
-  public class TTransport {
+  public class TTransport extends EventDispatcher{	  
 
     /**
      * Queries whether the transport is open.
-       *
+     *
      * @return True if the transport is open.
      */
     public function isOpen():Boolean {
@@ -67,9 +69,9 @@ package org.apache.thrift.transport {
      * @return The number of bytes actually read
      * @throws TTransportException if there was an error reading data
      */
-     public function read(buf:ByteArray, off:int, len:int):int {
+    public function read(buf:ByteArray, off:int, len:int):int {
       throw new AbstractMethodError();
-     }
+    }
 
     /**
      * Guarantees that all of len bytes are actually read off the transport.
@@ -82,16 +84,16 @@ package org.apache.thrift.transport {
      */
     public function readAll(buf:ByteArray, off:int, len:int):int {
       var got:int = 0;
-        var ret:int = 0;
-        while (got < len) {
-            ret = read(buf, off+got, len-got);
-            if (ret <= 0) {
-              throw new TTransportError(TTransportError.UNKNOWN, "Cannot read. Remote side has closed. Tried to read " + len + " bytes, but only got " + got + " bytes.");
-            }
-            got += ret;
-          }
-        return got;
+      var ret:int = 0;
+      while (got < len) {
+        ret = read(buf, off+got, len-got);
+        if (ret <= 0) {
+          throw new TTransportError(TTransportError.UNKNOWN, "Cannot read. Remote side has closed. Tried to read " + len + " bytes, but only got " + got + " bytes.");
+        }
+        got += ret;
       }
+      return got;
+    }
 
     /**
      * Writes the buffer to the output
@@ -120,7 +122,7 @@ package org.apache.thrift.transport {
      *
      * @throws TTransportException if there was an error writing out data.
      */
-    public function flush(callback:Function=null):void {
+    public function flush():void {
       throw new AbstractMethodError();
     }
   }
