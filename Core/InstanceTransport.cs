@@ -20,5 +20,10 @@ namespace Core
         {
             return Impromptu.InvokeMember(_target, method, args);
         }
+
+        public void InvokeAction(string method, params object[] args)
+        {
+            Impromptu.InvokeMemberAction(_target, method, args);
+        }
     }
 }
