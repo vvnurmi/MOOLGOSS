@@ -1,11 +1,18 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Express 2012 for Web
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "MOOCore", "MOOCore\MOOCore.fsproj", "{40EA4BCF-E6E0-4DAD-ADE0-55AB522A1529}"
+# Visual Studio Express 2012 for Windows Desktop
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client", "Client\Client.csproj", "{A03EF133-9E67-4AB9-A6CC-5AA37EA887D4}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "MOOServer", "MOOServer\MOOServer.fsproj", "{A73CA7A7-94B2-4B4A-A431-872B1C0E137E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Core\Core.csproj", "{B51364E9-C99A-4A40-A095-C13A18C6595A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MOOClient", "MOOClient\MOOClient.csproj", "{A03EF133-9E67-4AB9-A6CC-5AA37EA887D4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server", "Server\Server.csproj", "{2A5E0784-F836-4B89-9771-C61229522FF6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestCore", "TestCore\TestCore.csproj", "{A76F3CAB-E0E6-4020-A063-C3EB0B9FDA1E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{0C292289-2792-42F0-B418-DEB0679D414F}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\packages.config = .nuget\packages.config
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,18 +20,22 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{40EA4BCF-E6E0-4DAD-ADE0-55AB522A1529}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{40EA4BCF-E6E0-4DAD-ADE0-55AB522A1529}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{40EA4BCF-E6E0-4DAD-ADE0-55AB522A1529}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{40EA4BCF-E6E0-4DAD-ADE0-55AB522A1529}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A73CA7A7-94B2-4B4A-A431-872B1C0E137E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A73CA7A7-94B2-4B4A-A431-872B1C0E137E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A73CA7A7-94B2-4B4A-A431-872B1C0E137E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A73CA7A7-94B2-4B4A-A431-872B1C0E137E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A03EF133-9E67-4AB9-A6CC-5AA37EA887D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A03EF133-9E67-4AB9-A6CC-5AA37EA887D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A03EF133-9E67-4AB9-A6CC-5AA37EA887D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A03EF133-9E67-4AB9-A6CC-5AA37EA887D4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B51364E9-C99A-4A40-A095-C13A18C6595A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B51364E9-C99A-4A40-A095-C13A18C6595A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B51364E9-C99A-4A40-A095-C13A18C6595A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B51364E9-C99A-4A40-A095-C13A18C6595A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2A5E0784-F836-4B89-9771-C61229522FF6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2A5E0784-F836-4B89-9771-C61229522FF6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2A5E0784-F836-4B89-9771-C61229522FF6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2A5E0784-F836-4B89-9771-C61229522FF6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A76F3CAB-E0E6-4020-A063-C3EB0B9FDA1E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A76F3CAB-E0E6-4020-A063-C3EB0B9FDA1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A76F3CAB-E0E6-4020-A063-C3EB0B9FDA1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A76F3CAB-E0E6-4020-A063-C3EB0B9FDA1E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
