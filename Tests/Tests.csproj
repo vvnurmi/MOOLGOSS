@@ -49,6 +49,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PropertyTest.cs" />
+    <Compile Include="UniverseTest.cs" />
     <Compile Include="ServiceTest.cs" />
   </ItemGroup>
   <ItemGroup>
