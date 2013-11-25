@@ -15,25 +15,20 @@ namespace Core
     {
     }
 
-    public interface IProp
-    {
-        string Name { get; }
-        Type Type { get; }
-    }
-
-    public class Property<T> : IProp
+    public class Prop
     {
         public string Name { get; private set; }
-        public Type Type { get { return typeof(T); } }
+        public Type Type { get; private set; }
 
-        public Property(string name)
+        public Prop(string name, Type type)
         {
             Name = name;
+            Type = type;
         }
 
         public override bool Equals(object obj)
         {
-            var prop = obj as Property<T>;
+            var prop = obj as Prop;
             if (prop == null) return false;
             return prop.Name == Name && prop.Type == Type;
         }
@@ -45,7 +40,7 @@ namespace Core
 
         public override string ToString()
         {
-            return string.Format("{0}[{1}]", Name, Type.Name);
+            return string.Format("[{0}:{1}]", Name, Type.Name);
         }
     }
 }

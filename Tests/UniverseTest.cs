@@ -16,7 +16,7 @@ namespace Tests
         public void TestEntity()
         {
             IEntity planet = new Planet("Earth");
-            var nameProp = new Property<string>("Name");
+            var nameProp = new Prop("Name", typeof(string));
             CollectionAssert.AreEqual(new[] { nameProp }, planet.GetProps());
             Assert.AreEqual("Earth", planet.GetValue(nameProp));
         }

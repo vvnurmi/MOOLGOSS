@@ -25,10 +25,10 @@ namespace Tests
         [Test]
         public void TestPropertyEquality()
         {
-            var nameString1 = new Property<string>("name");
-            var nameString2 = new Property<string>("name");
-            var nameInt = new Property<int>("name");
-            var sizeInt = new Property<int>("size");
+            var nameString1 = new Prop("name", typeof(string));
+            var nameString2 = new Prop("name", typeof(string));
+            var nameInt = new Prop("name", typeof(int));
+            var sizeInt = new Prop("size", typeof(int));
             Assert.AreEqual(nameString1, nameString2);
             Assert.AreNotEqual(nameString1, nameInt);
             Assert.AreNotEqual(nameInt, sizeInt);
@@ -37,7 +37,7 @@ namespace Tests
         [Test]
         public void TestMissingProperty()
         {
-            var prop = new Property<string>("foo");
+            var prop = new Prop("foo", typeof(string));
             var entity = new TestEntity("shenanigan");
             Assert.Throws<PropertyException>(() => entity.GetValue(prop));
         }
@@ -45,7 +45,7 @@ namespace Tests
         [Test]
         public void TestGetValue()
         {
-            var prop = new Property<string>("Name");
+            var prop = new Prop("Name", typeof(string));
             var entity = new TestEntity("shenanigan");
             Assert.AreEqual("shenanigan", entity.GetValue(prop));
         }

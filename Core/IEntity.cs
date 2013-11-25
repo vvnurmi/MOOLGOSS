@@ -14,22 +14,22 @@ namespace Core
 
     public static class EntityExtensions
     {
-        public static T GetValue<T>(this IEntity entity, Property<T> prop)
+        public static object GetValue(this IEntity entity, Prop prop)
         {
             var property = entity.GetProperties()
                 .FirstOrDefault(p => p.Name == prop.Name && p.PropertyType == prop.Type);
             if (property == null) throw new PropertyException();
-            return (T)property.GetValue(entity);
+            return property.GetValue(entity);
         }
 
-        public static IEnumerable<IProp> GetProps(this IEntity entity)
+        public static T GetValue<T>(this IEntity entity, Prop prop)
         {
-            return entity.GetProperties()
-                .Select(p =>
-                {
-                    var propertyType = typeof(Property<>).MakeGenericType(p.PropertyType);
-                    return (IProp)Activator.CreateInstance(propertyType, p.Name);
-                });
+            return (T)entity.GetValue(prop);
+        }
+
+        public static IEnumerable<Prop> GetProps(this IEntity entity)
+        {
+            return entity.GetProperties().Select(p => new Prop(p.Name, p.PropertyType));
         }
 
         private static IEnumerable<PropertyInfo> GetProperties(this IEntity entity)
