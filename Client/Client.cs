@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MOO.Client
+namespace Client
 {
-    internal class Client
+    public class Client
     {
     }
 }

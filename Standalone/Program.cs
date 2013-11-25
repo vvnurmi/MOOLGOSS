@@ -4,13 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Server
+namespace Standalone
 {
     public static class Program
     {
         public static void Main(string[] args)
         {
-            var server = new Server();
         }
     }
 }
