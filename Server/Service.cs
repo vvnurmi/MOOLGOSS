@@ -9,9 +9,9 @@ namespace Server
 {
     internal class Service : IService
     {
-        public string HelloWorld()
+        public Planet[] GetPlanets()
         {
-            return "Hello world!";
+            return new[] { new Planet("Earth") };
         }
     }
 }

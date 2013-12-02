@@ -8,6 +8,6 @@ namespace Core
 {
     public interface IService
     {
-        string HelloWorld();
+        Planet[] GetPlanets();
     }
 }
