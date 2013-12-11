@@ -25,16 +25,16 @@ namespace Tests
         }
 
         private MockService _actualService;
-        private IMockService _marshalledOnServer;
+        private IMarshalled _marshalledOnServer;
         private IMockService _marshalledOnClient;
 
         [SetUp]
         public void Setup()
         {
             _actualService = new MockService();
-            _marshalledOnServer = Marshal.Get<IMockService>(_actualService);
+            _marshalledOnServer = Marshal.Get(_actualService);
             _marshalledOnClient = Marshal.Get<IMockService>((Func<string, object[], object>)
-                ((name, args) => ((IMarshalled)_marshalledOnServer).Invoke(name, args)));
+                ((name, args) => _marshalledOnServer.Invoke(name, args)));
         }
 
         [Test]

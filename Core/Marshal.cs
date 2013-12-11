@@ -68,10 +68,10 @@ namespace Core
 
     public static class Marshal
     {
-        public static T Get<T>(object obj) where T : class
+        public static IMarshalled Get(object obj)
         {
             dynamic marshalled = new Marshalled(obj);
-            return Impromptu.ActLike<T>(marshalled, typeof(IMarshalled));
+            return Impromptu.ActLike<IMarshalled>(marshalled);
         }
 
         public static T Get<T>(Func<string, object[], object> invoke) where T : class
