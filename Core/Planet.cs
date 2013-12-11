@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Core
 {
+    [Serializable]
     public class Planet : IEntity
     {
         [Prop]
