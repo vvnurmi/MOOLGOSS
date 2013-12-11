@@ -34,5 +34,12 @@ namespace Tests
             Assert.AreEqual("Hello", rebuilt.Text);
             Assert.AreEqual(42, rebuilt.Number);
         }
+
+        [Test]
+        public void TestArray()
+        {
+            byte[] data = Serialization.Break(new[] { 42, 69, 99 });
+            CollectionAssert.AreEqual(new[] { 42, 69, 99 }, Serialization.Build<int[]>(data));
+        }
     }
 }
