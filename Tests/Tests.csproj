@@ -62,21 +62,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Client\Client.csproj">
-      <Project>{a03ef133-9e67-4ab9-a6cc-5aa37ea887d4}</Project>
-      <Name>Client</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Core\Core.csproj">
       <Project>{b51364e9-c99a-4a40-a095-c13a18c6595a}</Project>
       <Name>Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Server\Server.csproj">
-      <Project>{2a5e0784-f836-4b89-9771-c61229522ff6}</Project>
-      <Name>Server</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Standalone\Standalone.csproj">
-      <Project>{c33a02a0-44c3-4d58-920b-d4d9a46a1a88}</Project>
-      <Name>Standalone</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -1,4 +1,8 @@
-﻿using Core;
+﻿using Axiom.Core;
+using Axiom.Framework.Configuration;
+using Axiom.Graphics;
+using Axiom.Math;
+using Core;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,6 +16,37 @@ namespace Client
     public static class Program
     {
         public static void Main(string[] args)
+        {
+            IConfigurationManager ConfigurationManager = ConfigurationManagerFactory.CreateDefault();
+            using (var root = new Root("Game1.log"))
+            {
+                if (ConfigurationManager.ShowConfigDialog(root))
+                {
+                    RenderWindow window = root.Initialize(true);
+
+                    ResourceGroupManager.Instance.AddResourceLocation("media", "Folder", true);
+
+                    SceneManager scene = root.CreateSceneManager(SceneType.Generic);
+                    Camera camera = scene.CreateCamera("cam1");
+                    Viewport viewport = window.AddViewport(camera);
+
+                    TextureManager.Instance.DefaultMipmapCount = 5;
+                    ResourceGroupManager.Instance.InitializeAllResourceGroups();
+
+                    Entity penguin = scene.CreateEntity("bob", "teapot.mesh");
+                    SceneNode penguinNode = scene.RootSceneNode.CreateChildSceneNode();
+                    penguinNode.AttachObject(penguin);
+
+                    camera.Move(new Vector3(0, 0, 300));
+                    camera.LookAt(penguin.BoundingBox.Center);
+                    root.RenderOneFrame();
+                }
+                Console.Write("Press [Enter] to exit.");
+                Console.ReadLine();
+            }
+        }
+
+        private static void Connect()
         {
             var service = Marshal.Get<IService>(Invoke);
             var planets = service.GetPlanets();
