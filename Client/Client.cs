@@ -35,11 +35,16 @@ namespace Client
                 ResourceGroupManager.Instance.InitializeAllResourceGroups();
                 Globals.Scene = root.CreateSceneManager(SceneType.Generic);
                 CreateCamera(window);
-                var space = new SpaceVisualization();
-                space.Create();
+                CreateSpace();
                 root.FrameStarted += FrameStartedHandler;
                 root.StartRendering();
             }
+        }
+
+        private void CreateSpace()
+        {
+            var space = new SpaceVisualization();
+            space.Create(_service.GetPlanets());
         }
 
         private void FrameStartedHandler(object sender, FrameEventArgs args)

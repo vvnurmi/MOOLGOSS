@@ -1,5 +1,6 @@
 ﻿using Axiom.Core;
 using Axiom.Math;
+using Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,12 +20,12 @@ namespace Client
                 new Plane(Vector3.UnitY, 0), 50, 50, 5, 5, true, 1, 5, 5, Vector3.UnitZ);
         }
 
-        public void Create()
+        public void Create(IEnumerable<Planet> planets)
         {
             Globals.Scene.SetSkyBox(true, "Skybox/Space", 1000);
-            CreatePlanet(new Vector3(100, 0, 0));
-            CreatePlanet(new Vector3(150, 0, 100));
-            CreatePlanet(new Vector3(200, 0, 50));
+            var z = 0f;
+            foreach (var planet in planets)
+                CreatePlanet(new Vector3(50 * planet.Name.Length, 0, 50 * z++));
         }
 
         private void CreatePlanet(Vector3 pos)
