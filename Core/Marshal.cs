@@ -50,19 +50,13 @@ namespace Core
 
         public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)
         {
-            try
-            {
-                if (_target != null)
-                    result = Impromptu.InvokeMember(_target, binder.Name, args);
-                else
-                    result = _invoke(binder.Name, args);
-                return true;
-            }
-            catch (Exception)
-            {
-                result = null;
-                return false;
-            }
+            if (_target != null)
+                result = Impromptu.InvokeMember(_target, binder.Name + "foo", args);
+            else
+                result = _invoke(binder.Name, args);
+            return true;
+        }
+    }
 
     [Serializable]
     public struct MarshalledCall
