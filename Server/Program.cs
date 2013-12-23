@@ -23,8 +23,8 @@ namespace Server
                 var context = listener.GetContext();
                 var data = new byte[context.Request.ContentLength64];
                 context.Request.InputStream.Read(data, 0, data.Length);
-                var callspec = Serialization.Build<Tuple<string, object[]>>(data);
-                var result = marshalledService.Invoke(callspec.Item1, callspec.Item2);
+                var callspec = Serialization.Build<MarshalledCall>(data);
+                var result = marshalledService.Invoke(callspec.Name, callspec.Args);
                 if (result != null)
                     context.Response.Close(Serialization.Break(result), true);
                 else

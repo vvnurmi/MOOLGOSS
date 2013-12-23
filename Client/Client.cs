@@ -78,7 +78,7 @@ namespace Client
 
         private static object Invoke(string host, string method, object[] args)
         {
-            var data = Serialization.Break(Tuple.Create(method, args));
+            var data = Serialization.Break(new MarshalledCall(method, args));
             var request = WebRequest.Create(string.Format("http://{0}:8080/moolgoss/", host));
             request.Method = "POST";
             request.ContentLength = data.Length;

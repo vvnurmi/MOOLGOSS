@@ -63,6 +63,18 @@ namespace Core
                 result = null;
                 return false;
             }
+
+    [Serializable]
+    public struct MarshalledCall
+    {
+        public string Name { get; private set; }
+        public object[] Args { get; private set; }
+
+        public MarshalledCall(string name, object[] args)
+            : this()
+        {
+            Name = name;
+            Args = args;
         }
     }
 
