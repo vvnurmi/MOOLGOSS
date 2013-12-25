@@ -72,7 +72,7 @@ namespace Client
             Globals.Camera.Near = 1;
             Globals.Camera.Far = 2000;
             Globals.Camera.Position = new Vector3(50, 250, 0);
-            Globals.Camera.LookAt(new Vector3(50, 0, 50));
+            Globals.Camera.LookAt(new Vector3(450, 0, 100));
         }
 
         private void Connect(string host)
