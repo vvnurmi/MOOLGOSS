@@ -26,7 +26,7 @@ namespace Client
             using (Globals.Input = new Axiom.Platforms.Win32.Win32InputReader())
             {
                 root.RenderSystem = root.RenderSystems[0];
-                root.RenderSystem.IsVSync = true;
+                root.RenderSystem.ConfigOptions["VSync"].Value = "Yes";
                 if (userConfigure && !configuration.ShowConfigDialog(root)) return;
                 var window = root.Initialize(true, "MOOLGOSS");
                 Globals.Input.Initialize(window, true, true, false, false);
