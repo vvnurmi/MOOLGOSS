@@ -10,12 +10,19 @@ namespace Core
     [Serializable]
     public class Ship
     {
+        public Guid ID { get; private set; }
         public Vector3 Pos { get; private set; }
         public Vector3 Front { get; private set; }
         public Vector3 Up { get; private set; }
         public Vector3 Right { get { return Front.Cross(Up).ToNormalized(); } }
 
-        public Ship(Vector3 pos, Vector3 front, Vector3 up)
+        public Ship(Guid id, Vector3 pos, Vector3 front, Vector3 up)
+        {
+            ID = id;
+            Set(pos, front, up);
+        }
+
+        public void Set(Vector3 pos, Vector3 front, Vector3 up)
         {
             Pos = pos;
             Front = front;
