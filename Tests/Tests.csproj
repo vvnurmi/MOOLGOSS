@@ -61,6 +61,7 @@
     <Compile Include="PropertyTest.cs" />
     <Compile Include="MarshallingTest.cs" />
     <Compile Include="SerializationTest.cs" />
+    <Compile Include="ShipTest.cs" />
     <Compile Include="UniverseTest.cs" />
     <Compile Include="ServiceTest.cs" />
   </ItemGroup>

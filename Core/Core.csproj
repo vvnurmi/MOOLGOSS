@@ -62,6 +62,7 @@
     <Compile Include="Property.cs" />
     <Compile Include="Serialization.cs" />
     <Compile Include="ServiceFactory.cs" />
+    <Compile Include="Ship.cs" />
     <Compile Include="Universe.cs" />
   </ItemGroup>
   <ItemGroup>
