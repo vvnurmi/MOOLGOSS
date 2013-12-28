@@ -111,7 +111,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <PropertyGroup>
-    <PostBuildEvent>
+    <PostBuildEvent Condition=" '$(OS)' == 'Windows_NT'">
 echo Copying game data to the output folder.
 robocopy "$(SolutionDir)..\moolgoss-boar\Gamedata" "$(TargetDir) " /S /XO /R:0 /NS /NC /NDL /NP /NJH /NJS
 if errorlevel 4 goto :copyfail
@@ -121,6 +121,16 @@ exit 0
 :copyfail
 echo Failed to copy files.
 exit 1
+</PostBuildEvent>
+    <PostBuildEvent Condition=" '$(OS)' == 'Unix'">
+echo Linking game data files to the output path.
+DATA_SOURCE=$(SolutionDir)../moolgoss-boar/Gamedata
+if [ ! -d $DATA_SOURCE ]
+then
+    echo Source directory does not exist: $DATA_SOURCE
+    exit 1
+fi
+ln -sf $DATA_SOURCE/* $(TargetDir)
 </PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
