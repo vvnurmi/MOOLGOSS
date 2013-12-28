@@ -7,9 +7,8 @@ using System.Threading.Tasks;
 namespace Core
 {
     [Serializable]
-    public class Planet : IEntity
+    public class Planet
     {
-        [Prop]
         public string Name { get; private set; }
 
         public Planet(string name)

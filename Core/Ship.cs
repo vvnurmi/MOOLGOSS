@@ -8,17 +8,11 @@ using System.Threading.Tasks;
 namespace Core
 {
     [Serializable]
-    public class Ship : IEntity
+    public class Ship
     {
-        [Prop]
         public Vector3 Pos { get; private set; }
-
-        [Prop]
         public Vector3 Front { get; private set; }
-
-        [Prop]
         public Vector3 Up { get; private set; }
-
         public Vector3 Right { get { return Front.Cross(Up).ToNormalized(); } }
 
         public Ship(Vector3 pos, Vector3 front, Vector3 up)
