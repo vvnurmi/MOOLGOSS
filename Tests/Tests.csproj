@@ -72,6 +72,10 @@
       <Project>{b51364e9-c99a-4a40-a095-c13a18c6595a}</Project>
       <Name>Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Server\Server.csproj">
+      <Project>{2a5e0784-f836-4b89-9771-c61229522ff6}</Project>
+      <Name>Server</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\packages\Axiom.0.8.3376.12322\native\x86\freetype6.dll">

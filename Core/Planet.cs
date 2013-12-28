@@ -15,5 +15,10 @@ namespace Core
         {
             Name = name;
         }
+
+        public override string ToString()
+        {
+            return "Planet " + Name;
+        }
     }
 }
