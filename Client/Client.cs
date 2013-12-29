@@ -18,6 +18,9 @@ namespace Client
     public class Client
     {
         private IService _service;
+        private SpaceVisualization _visualization;
+        private float _timeToUpdate;
+        private Ship _ship;
 
         public void Start(bool userConfigure, string host)
         {
@@ -37,15 +40,10 @@ namespace Client
                 Globals.Scene = root.CreateSceneManager(SceneType.Generic);
                 CreateCamera(window);
                 CreateSpace();
+                _ship = new Ship(new Guid(), Vector3.Zero, Vector3.UnitX, Vector3.UnitY);
                 root.FrameStarted += FrameStartedHandler;
                 root.StartRendering();
             }
-        }
-
-        private void CreateSpace()
-        {
-            var space = new SpaceVisualization();
-            space.Create(_service.GetPlanets());
         }
 
         private void FrameStartedHandler(object sender, FrameEventArgs args)
@@ -53,16 +51,37 @@ namespace Client
             var input = Globals.Input;
             var camera = Globals.Camera;
             input.Capture();
-            var angle = -0.3f * input.RelativeMouseX;
-            camera.Yaw(angle);
-            camera.Pitch(-0.3f * input.RelativeMouseY);
+            _ship.Yaw(-0.3f * input.RelativeMouseX);
+            _ship.Pitch(-0.3f * input.RelativeMouseY);
             var move = Vector3.Zero;
-            if (input.IsKeyPressed(KeyCodes.W)) move -= Vector3.UnitZ;
-            if (input.IsKeyPressed(KeyCodes.S)) move += Vector3.UnitZ;
-            if (input.IsKeyPressed(KeyCodes.A)) move -= Vector3.UnitX;
-            if (input.IsKeyPressed(KeyCodes.D)) move += Vector3.UnitX;
-            camera.MoveRelative(move * 50 * args.TimeSinceLastFrame);
+            if (input.IsKeyPressed(KeyCodes.W)) move += _ship.Front;
+            if (input.IsKeyPressed(KeyCodes.S)) move -= _ship.Front;
+            if (input.IsKeyPressed(KeyCodes.A)) move -= _ship.Right;
+            if (input.IsKeyPressed(KeyCodes.D)) move += _ship.Right;
+            _ship.Move(move * 50 * args.TimeSinceLastFrame);
             if (input.IsKeyPressed(KeyCodes.Escape)) args.StopRendering = true;
+            UpdateCamera();
+            SendShipUpdate(args);
+            _visualization.UpdateShip(_ship);
+        }
+
+        private void UpdateCamera()
+        {
+            float SMOOTHNESS = 0.94f; // To be slightly below one.
+            var cameraTilt = Quaternion.FromAngleAxis(Utility.DegreesToRadians(-10), _ship.Right);
+            var targetOrientation = cameraTilt * _ship.Orientation;
+            Globals.Camera.Orientation = Quaternion.Nlerp(1 - SMOOTHNESS, Globals.Camera.Orientation, targetOrientation, true);
+            var cameraRelativeGoal = -60 * _ship.Front + 20 * _ship.Up;
+            var cameraRelative = Globals.Camera.Position - _ship.Pos;
+            Globals.Camera.Position = _ship.Pos + SMOOTHNESS * cameraRelative + (1 - SMOOTHNESS) * cameraRelativeGoal;
+        }
+
+        private void SendShipUpdate(FrameEventArgs args)
+        {
+            _timeToUpdate -= args.TimeSinceLastFrame;
+            if (_timeToUpdate > 0) return;
+            _timeToUpdate = 1;
+            _service.UpdateShip(_ship.ID, _ship.Pos, _ship.Front, _ship.Up);
         }
 
         private void CreateCamera(RenderWindow window)
@@ -72,8 +91,14 @@ namespace Client
             viewport.BackgroundColor = ColorEx.Black;
             Globals.Camera.Near = 1;
             Globals.Camera.Far = 2000;
-            Globals.Camera.Position = new Vector3(50, 250, 0);
-            Globals.Camera.LookAt(new Vector3(450, 0, 100));
+            Globals.Camera.Position = new Vector3(-100, 100, 0);
+            Globals.Camera.LookAt(Vector3.Zero);
+        }
+
+        private void CreateSpace()
+        {
+            _visualization = new SpaceVisualization();
+            _visualization.Create(_service.GetPlanets());
         }
 
         private void Connect(string host)
@@ -92,6 +117,7 @@ namespace Client
                 requestStream.Write(data, 0, data.Length);
             using (var response = request.GetResponse())
             {
+                if (response.ContentLength == -1) return null;
                 var responseData = new byte[response.ContentLength];
                 response.GetResponseStream().Read(responseData, 0, responseData.Length);
                 return Serialization.Build<object>(responseData);

@@ -15,6 +15,7 @@ namespace Core
         public Vector3 Front { get; private set; }
         public Vector3 Up { get; private set; }
         public Vector3 Right { get { return Front.Cross(Up).ToNormalized(); } }
+        public Quaternion Orientation { get { return Quaternion.FromAxes(Right, Up, -Front); } }
 
         public Ship(Guid id, Vector3 pos, Vector3 front, Vector3 up)
         {
