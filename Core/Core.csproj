@@ -56,7 +56,8 @@
     <Compile Include="Marshal.cs" />
     <Compile Include="Planet.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Serialization.cs" />
+    <Compile Include="Serial\Serialization.cs" />
+    <Compile Include="Serial\Vector3Surrogate.cs" />
     <Compile Include="Ship.cs" />
   </ItemGroup>
   <ItemGroup>
