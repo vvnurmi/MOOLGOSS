@@ -1,4 +1,5 @@
-﻿using Core;
+﻿using Axiom.Math;
+using Core;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -40,6 +41,25 @@ namespace Tests
         {
             byte[] data = Serialization.Break(new[] { 42, 69, 99 });
             CollectionAssert.AreEqual(new[] { 42, 69, 99 }, Serialization.Build<int[]>(data));
+        }
+
+        [Test]
+        public void TestThirdPartyTypes()
+        {
+            byte[] data = Serialization.Break(new Vector3(2, 3, 4));
+            Assert.AreEqual(new Vector3(2, 3, 4), Serialization.Build<Vector3>(data));
+        }
+
+        [Test, Timeout(1000)]
+        public void TestSpeed()
+        {
+            int count = 100000;
+            var start = DateTime.Now;
+            for (int i = 0; i < count; i++)
+                Serialization.Build<string>(Serialization.Break("Hello world!"));
+            var end = DateTime.Now;
+            Console.WriteLine("{0} repetitions of simple string round-trip serialization took {1} seconds",
+                count, (end - start).TotalSeconds);
         }
     }
 }
