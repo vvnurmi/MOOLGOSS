@@ -40,7 +40,7 @@ namespace Client
                 Globals.Scene = root.CreateSceneManager(SceneType.Generic);
                 CreateCamera(window);
                 CreateSpace();
-                _ship = new Ship(new Guid(), Vector3.Zero, Vector3.UnitX, Vector3.UnitY);
+                _ship = new Ship(Guid.NewGuid(), Vector3.Zero, Vector3.UnitX, Vector3.UnitY);
                 root.FrameStarted += FrameStartedHandler;
                 root.StartRendering();
             }

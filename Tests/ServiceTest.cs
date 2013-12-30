@@ -25,7 +25,7 @@ namespace Tests
         public void TestShips()
         {
             CollectionAssert.IsEmpty(_service.GetShips());
-            var id = new Guid();
+            var id = Guid.NewGuid();
             Action<Vector3, Vector3, Vector3> setAndAssertShip = (pos, front, up) =>
             {
                 _service.UpdateShip(id, pos, front, up);

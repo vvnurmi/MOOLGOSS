@@ -17,7 +17,7 @@ namespace Tests
         [SetUp]
         public void Setup()
         {
-            _ship = new Ship(new Guid(), new Vector3(2, 3, 4), Vector3.UnitX, Vector3.UnitY);
+            _ship = new Ship(Guid.NewGuid(), new Vector3(2, 3, 4), Vector3.UnitX, Vector3.UnitY);
         }
 
         [Test]
