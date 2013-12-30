@@ -61,7 +61,7 @@ namespace Client
             _ship.Move(move * 50 * args.TimeSinceLastFrame);
             if (input.IsKeyPressed(KeyCodes.Escape)) args.StopRendering = true;
             UpdateCamera();
-            SendShipUpdate(args);
+            UpdateShips(args);
             _visualization.UpdateShip(_ship);
         }
 
@@ -76,12 +76,13 @@ namespace Client
             Globals.Camera.Position = _ship.Pos + SMOOTHNESS * cameraRelative + (1 - SMOOTHNESS) * cameraRelativeGoal;
         }
 
-        private void SendShipUpdate(FrameEventArgs args)
+        private void UpdateShips(FrameEventArgs args)
         {
             _timeToUpdate -= args.TimeSinceLastFrame;
             if (_timeToUpdate > 0) return;
             _timeToUpdate = 1;
             _service.UpdateShip(_ship.ID, _ship.Pos, _ship.Front, _ship.Up);
+            foreach (var ship in _service.GetShips()) _visualization.UpdateShip(ship);
         }
 
         private void CreateCamera(RenderWindow window)
