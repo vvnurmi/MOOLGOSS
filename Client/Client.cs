@@ -118,7 +118,7 @@ namespace Client
                 requestStream.Write(data, 0, data.Length);
             using (var response = request.GetResponse())
             {
-                if (response.ContentLength == -1) return null;
+                if (response.ContentLength <= 0) return null;
                 var responseData = new byte[response.ContentLength];
                 response.GetResponseStream().Read(responseData, 0, responseData.Length);
                 return Serialization.Build<object>(responseData);
