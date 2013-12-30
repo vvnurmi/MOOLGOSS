@@ -31,6 +31,11 @@ namespace Client
             {
                 root.RenderSystem = root.RenderSystems[0];
                 root.RenderSystem.ConfigOptions["VSync"].Value = "Yes";
+                var bestMode =
+                    root.RenderSystem.ConfigOptions["Video Mode"].PossibleValues
+                    .Where(x => x.Value.Contains("32-bit color"))
+                    .LastOrDefault().Value;
+                if (bestMode != null) root.RenderSystem.ConfigOptions["Video Mode"].Value = bestMode;
                 if (userConfigure && !configuration.ShowConfigDialog(root)) return;
                 var window = root.Initialize(true, "MOOLGOSS");
                 Globals.Input.Initialize(window, true, true, false, false);
@@ -88,10 +93,12 @@ namespace Client
         private void CreateCamera(RenderWindow window)
         {
             Globals.Camera = Globals.Scene.CreateCamera("camera");
-            var viewport = window.AddViewport(Globals.Camera, 0, 0, 1, 1, 10);
+            var viewport = window.AddViewport(Globals.Camera);
             viewport.BackgroundColor = ColorEx.Black;
             Globals.Camera.Near = 1;
             Globals.Camera.Far = 2000;
+            Globals.Camera.FieldOfView = Utility.DegreesToRadians(55);
+            Globals.Camera.AspectRatio = viewport.ActualWidth / (float)viewport.ActualHeight;
             Globals.Camera.Position = new Vector3(-100, 100, 0);
             Globals.Camera.LookAt(Vector3.Zero);
         }
