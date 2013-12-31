@@ -48,6 +48,7 @@ namespace Client
                 _ship = new Ship(Guid.NewGuid(), Vector3.Zero, Vector3.UnitX, Vector3.UnitY);
                 new Action(UpdateShipsLoop).BeginInvoke(null, null);
                 root.FrameStarted += FrameStartedHandler;
+                root.FrameStarted += _visualization.FrameStartHandler;
                 root.StartRendering();
             }
         }
@@ -57,8 +58,8 @@ namespace Client
             // When the window loses focus, Axiom keeps itself busy firing zero-time frames. Sleep calms it down!
             if (args.TimeSinceLastFrame == 0) Thread.Sleep(TimeSpan.FromSeconds(0.1));
 
+            Globals.TotalTime += args.TimeSinceLastFrame;
             var input = Globals.Input;
-            var camera = Globals.Camera;
             input.Capture();
             _ship.Yaw(-0.3f * input.RelativeMouseX);
             _ship.Pitch(-0.3f * input.RelativeMouseY);
@@ -73,7 +74,7 @@ namespace Client
             if (input.IsKeyPressed(KeyCodes.D)) move += _ship.Right;
             _ship.Move(move * 50 * args.TimeSinceLastFrame);
             UpdateCamera();
-            _visualization.UpdateShip(_ship);
+            _visualization.UpdateShip(_ship, 0);
 
             var dx9RenderWindow = Globals.Camera.Viewport.Target as Axiom.RenderSystems.DirectX9.D3DRenderWindow;
             if (dx9RenderWindow != null && dx9RenderWindow.IsClosed) args.StopRendering = true;
@@ -93,11 +94,13 @@ namespace Client
 
         private void UpdateShipsLoop()
         {
+            float updateInterval = 1;
             while (true)
             {
-                Thread.Sleep(TimeSpan.FromSeconds(1));
+                Thread.Sleep(TimeSpan.FromSeconds(updateInterval));
                 _service.UpdateShip(_ship.ID, _ship.Pos, _ship.Front, _ship.Up);
-                foreach (var ship in _service.GetShips()) _visualization.UpdateShip(ship);
+                foreach (var ship in _service.GetShips())
+                    if (ship.ID != _ship.ID) _visualization.UpdateShip(ship, updateInterval);
             }
         }
 

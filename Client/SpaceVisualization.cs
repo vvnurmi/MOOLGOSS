@@ -3,7 +3,9 @@ using Axiom.Graphics;
 using Axiom.Math;
 using Core;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,8 +14,42 @@ namespace Client
 {
     public class SpaceVisualization
     {
+        private struct NodeState
+        {
+            public Vector3 Pos;
+            public Quaternion Orientation;
+            public float Time;
+        }
+
+        private struct NodeUpdate
+        {
+            public NodeState Start;
+            public NodeState End;
+        }
+
         private int _entityIndex;
         private Dictionary<Guid, SceneNode> _nodes = new Dictionary<Guid, SceneNode>();
+        private ConcurrentDictionary<Guid, NodeUpdate> _nodeUpdates = new ConcurrentDictionary<Guid, NodeUpdate>();
+
+        public void FrameStartHandler(object sender, FrameEventArgs args)
+        {
+            foreach (var update in _nodeUpdates)
+            {
+                var start = update.Value.Start;
+                var end = update.Value.End;
+                var t = end.Time > start.Time
+                    ? Math.Min(1, (Globals.TotalTime - start.Time) / (end.Time - start.Time))
+                    : 1;
+                var node = _nodes[update.Key];
+                node.Position = t * end.Pos + (1 - t) * start.Pos;
+                node.Orientation = Util.SlerpShortest(t, start.Orientation, end.Orientation);
+            }
+            foreach (var oldTarget in _nodeUpdates.Where(x => x.Value.End.Time <= Globals.TotalTime).ToArray())
+            {
+                NodeUpdate _;
+                _nodeUpdates.TryRemove(oldTarget.Key, out _);
+            }
+        }
 
         public void Create(IEnumerable<Planet> planets)
         {
@@ -35,13 +71,31 @@ namespace Client
                 CreatePlanet(new Vector3(75 * planet.Name.Length, 0, z += 75));
         }
 
-        public void UpdateShip(Ship ship)
+        public void UpdateShip(Ship ship, float updateInterval)
         {
+            Debug.Assert(updateInterval >= 0);
             SceneNode node;
             if (!_nodes.TryGetValue(ship.ID, out node))
+            {
                 _nodes.Add(ship.ID, node = CreateShip());
-            node.Position = ship.Pos;
-            node.Orientation = ship.Orientation;
+                node.Position = ship.Pos;
+                node.Orientation = ship.Orientation;
+            }
+            _nodeUpdates[ship.ID] = new NodeUpdate
+            {
+                Start = new NodeState
+                {
+                    Pos = node.Position,
+                    Orientation = node.Orientation,
+                    Time = Globals.TotalTime,
+                },
+                End = new NodeState
+                {
+                    Pos = ship.Pos,
+                    Orientation = ship.Orientation,
+                    Time = Globals.TotalTime + updateInterval,
+                },
+            };
         }
 
         private void CreatePlanet(Vector3 pos)
