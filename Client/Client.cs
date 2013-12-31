@@ -11,6 +11,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Client
@@ -19,7 +20,6 @@ namespace Client
     {
         private IService _service;
         private SpaceVisualization _visualization;
-        private float _timeToUpdate;
         private Ship _ship;
 
         public void Start(bool userConfigure, string host)
@@ -46,6 +46,7 @@ namespace Client
                 CreateCamera(window);
                 CreateSpace();
                 _ship = new Ship(Guid.NewGuid(), Vector3.Zero, Vector3.UnitX, Vector3.UnitY);
+                new Action(UpdateShipsLoop).BeginInvoke(null, null);
                 root.FrameStarted += FrameStartedHandler;
                 root.StartRendering();
             }
@@ -70,7 +71,6 @@ namespace Client
             _ship.Move(move * 50 * args.TimeSinceLastFrame);
             if (input.IsKeyPressed(KeyCodes.Escape)) args.StopRendering = true;
             UpdateCamera();
-            UpdateShips(args);
             _visualization.UpdateShip(_ship);
         }
 
@@ -85,13 +85,14 @@ namespace Client
             Globals.Camera.Position = _ship.Pos + SMOOTHNESS * cameraRelative + (1 - SMOOTHNESS) * cameraRelativeGoal;
         }
 
-        private void UpdateShips(FrameEventArgs args)
+        private void UpdateShipsLoop()
         {
-            _timeToUpdate -= args.TimeSinceLastFrame;
-            if (_timeToUpdate > 0) return;
-            _timeToUpdate = 1;
-            _service.UpdateShip(_ship.ID, _ship.Pos, _ship.Front, _ship.Up);
-            foreach (var ship in _service.GetShips()) _visualization.UpdateShip(ship);
+            while (true)
+            {
+                Thread.Sleep(TimeSpan.FromSeconds(1));
+                _service.UpdateShip(_ship.ID, _ship.Pos, _ship.Front, _ship.Up);
+                foreach (var ship in _service.GetShips()) _visualization.UpdateShip(ship);
+            }
         }
 
         private RenderWindow CreateRenderWindow()
