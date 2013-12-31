@@ -72,9 +72,12 @@ namespace Client
             if (input.IsKeyPressed(KeyCodes.A)) move -= _ship.Right;
             if (input.IsKeyPressed(KeyCodes.D)) move += _ship.Right;
             _ship.Move(move * 50 * args.TimeSinceLastFrame);
-            if (input.IsKeyPressed(KeyCodes.Escape)) args.StopRendering = true;
             UpdateCamera();
             _visualization.UpdateShip(_ship);
+
+            var dx9RenderWindow = Globals.Camera.Viewport.Target as Axiom.RenderSystems.DirectX9.D3DRenderWindow;
+            if (dx9RenderWindow != null && dx9RenderWindow.IsClosed) args.StopRendering = true;
+            if (input.IsKeyPressed(KeyCodes.Escape)) args.StopRendering = true;
         }
 
         private void UpdateCamera()
