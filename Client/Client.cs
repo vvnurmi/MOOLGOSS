@@ -54,6 +54,9 @@ namespace Client
 
         private void FrameStartedHandler(object sender, FrameEventArgs args)
         {
+            // When the window loses focus, Axiom keeps itself busy firing zero-time frames. Sleep calms it down!
+            if (args.TimeSinceLastFrame == 0) Thread.Sleep(TimeSpan.FromSeconds(0.1));
+
             var input = Globals.Input;
             var camera = Globals.Camera;
             input.Capture();
