@@ -37,8 +37,8 @@ namespace Client
                     .LastOrDefault().Value;
                 if (bestMode != null) root.RenderSystem.ConfigOptions["Video Mode"].Value = bestMode;
                 if (userConfigure && !configuration.ShowConfigDialog(root)) return;
-                var window = root.Initialize(true, "MOOLGOSS");
-                Globals.Input.Initialize(window, true, true, false, false);
+                var window = CreateRenderWindow();
+                Globals.Input.Initialize(window, true, true, false, true);
                 TextureManager.Instance.DefaultMipmapCount = 5;
                 ResourceGroupManager.Instance.AddResourceLocation("Media", "Folder", true);
                 ResourceGroupManager.Instance.InitializeAllResourceGroups();
@@ -88,6 +88,20 @@ namespace Client
             _timeToUpdate = 1;
             _service.UpdateShip(_ship.ID, _ship.Pos, _ship.Front, _ship.Up);
             foreach (var ship in _service.GetShips()) _visualization.UpdateShip(ship);
+        }
+
+        private RenderWindow CreateRenderWindow()
+        {
+            var renderWindow = Root.Instance.Initialize(true, "MOOLGOSS");
+            var dx9RenderWindow = renderWindow as Axiom.RenderSystems.DirectX9.D3DRenderWindow;
+            if (dx9RenderWindow != null)
+            {
+                var handle = dx9RenderWindow.PresentationParameters.DeviceWindowHandle;
+                var window = System.Windows.Forms.Control.FromHandle(handle).FindForm();
+                window.WindowState = System.Windows.Forms.FormWindowState.Maximized;
+                window.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            }
+            return renderWindow;
         }
 
         private void CreateCamera(RenderWindow window)
