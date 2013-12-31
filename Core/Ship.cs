@@ -47,5 +47,11 @@ namespace Core
             var rotation = Quaternion.FromAngleAxis(Utility.DegreesToRadians(degrees), Up);
             Front = rotation * Front;
         }
+
+        public void Roll(float degrees)
+        {
+            var rotation = Quaternion.FromAngleAxis(Utility.DegreesToRadians(degrees), Front);
+            Up = rotation * Up;
+        }
     }
 }

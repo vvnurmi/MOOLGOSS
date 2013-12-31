@@ -58,6 +58,10 @@ namespace Client
             input.Capture();
             _ship.Yaw(-0.3f * input.RelativeMouseX);
             _ship.Pitch(-0.3f * input.RelativeMouseY);
+            var roll = 0f;
+            if (input.IsKeyPressed(KeyCodes.Q)) roll--;
+            if (input.IsKeyPressed(KeyCodes.E)) roll++;
+            _ship.Roll(roll * 50 * args.TimeSinceLastFrame);
             var move = Vector3.Zero;
             if (input.IsKeyPressed(KeyCodes.W)) move += _ship.Front;
             if (input.IsKeyPressed(KeyCodes.S)) move -= _ship.Front;
