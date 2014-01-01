@@ -1,4 +1,5 @@
 ﻿using Axiom.Math;
+using Core;
 using NUnit.Framework;
 using System;
 
@@ -61,10 +62,11 @@ namespace Tests
 
         private float GetSlerpQuarterAngle(float startDegrees, float endDegrees)
         {
-            return Quaternion.Slerp(0.25f,
-                Quaternion.FromAngleAxis(Utility.DegreesToRadians(startDegrees), Vector3.UnitY),
-                Quaternion.FromAngleAxis(Utility.DegreesToRadians(endDegrees), Vector3.UnitY),
-                true).YawInDegrees;
+            var from = Quaternion.FromAngleAxis(Utility.DegreesToRadians(startDegrees), Vector3.UnitY);
+            var to = Quaternion.FromAngleAxis(Utility.DegreesToRadians(endDegrees), Vector3.UnitY);
+            return Util.SlerpShortest(0.25f, from, to).YawInDegrees;
+            // Axiom.Math.Quaternion.Slerp would fail some tests:
+            // return Quaternion.Slerp(0.25f, from, to, true).YawInDegrees;
         }
     }
 }
