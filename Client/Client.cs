@@ -43,6 +43,7 @@ namespace Client
                 ResourceGroupManager.Instance.AddResourceLocation("Media", "Folder", true);
                 ResourceGroupManager.Instance.InitializeAllResourceGroups();
                 Globals.Scene = root.CreateSceneManager(SceneType.Generic);
+                Globals.UI = new UserInterface();
                 CreateCamera(window);
                 CreateSpace();
                 _ship = new Ship(Guid.NewGuid(), Vector3.Zero, Vector3.UnitX, Vector3.UnitY);
