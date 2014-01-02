@@ -112,8 +112,8 @@ namespace Client
             {
                 var handle = dx9RenderWindow.PresentationParameters.DeviceWindowHandle;
                 var window = System.Windows.Forms.Control.FromHandle(handle).FindForm();
-                window.WindowState = System.Windows.Forms.FormWindowState.Maximized;
                 window.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+                window.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             }
             return renderWindow;
         }
