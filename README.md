@@ -10,7 +10,7 @@ Setting Up the Development Environment
 ---
 1. Install Visual Studio 2012 Express for Desktop (or newer).
 2. Clone both the Git and boar repositories.
-    - The boar working folder has to be called *moolgoss-boar* and it has to reside next to your Git working folder.
+    - The boar working folder has to be called *Gamedata* and it has to reside next to your Git working folder.
     - Get boar from <https://code.google.com/p/boar/>
     - The boar repo contains art assets and is currently private. For access, contact someone who's working on the project.
 3. Enable NuGet Package Restore for the solution.

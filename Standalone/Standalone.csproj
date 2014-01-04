@@ -99,7 +99,7 @@
   <PropertyGroup>
     <PostBuildEvent Condition=" '$(OS)' == 'Windows_NT'">
 echo Copying game data to the output folder.
-robocopy "$(SolutionDir)..\moolgoss-boar\Gamedata" "$(TargetDir) " /S /XO /R:0 /NS /NC /NDL /NP /NJH /NJS
+robocopy "$(SolutionDir)..\Gamedata" "$(TargetDir) " /S /XD .boar /XO /R:0 /NS /NC /NDL /NP /NJH /NJS
 if errorlevel 4 goto :copyfail
 
 echo Copying finished.
@@ -110,7 +110,7 @@ exit 1
 </PostBuildEvent>
     <PostBuildEvent Condition=" '$(OS)' == 'Unix'">
 echo Linking game data files to the output path.
-DATA_SOURCE=$(SolutionDir)../moolgoss-boar/Gamedata
+DATA_SOURCE=$(SolutionDir)../Gamedata
 if [ ! -d $DATA_SOURCE ]
 then
     echo Source directory does not exist: $DATA_SOURCE
