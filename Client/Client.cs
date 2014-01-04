@@ -66,13 +66,13 @@ namespace Client
             var roll = 0f;
             if (input.IsKeyPressed(KeyCodes.Q)) roll--;
             if (input.IsKeyPressed(KeyCodes.E)) roll++;
-            _ship.Roll(roll * 50 * args.TimeSinceLastFrame);
+            _ship.Roll(roll * 45 * args.TimeSinceLastFrame);
             var move = Vector3.Zero;
             if (input.IsKeyPressed(KeyCodes.W)) move += _ship.Front;
             if (input.IsKeyPressed(KeyCodes.S)) move -= _ship.Front;
             if (input.IsKeyPressed(KeyCodes.A)) move -= _ship.Right;
             if (input.IsKeyPressed(KeyCodes.D)) move += _ship.Right;
-            _ship.Move(move * 50 * args.TimeSinceLastFrame);
+            _ship.Move(move * 25 * args.TimeSinceLastFrame);
             UpdateCamera();
             _visualization.UpdateShip(_ship, 0);
 
@@ -83,11 +83,11 @@ namespace Client
 
         private void UpdateCamera()
         {
-            float SMOOTHNESS = 0.94f; // To be slightly below one.
+            float SMOOTHNESS = 0.90f; // To be slightly below one.
             var cameraTilt = Quaternion.FromAngleAxis(Utility.DegreesToRadians(-10), _ship.Right);
             var targetOrientation = cameraTilt * _ship.Orientation;
             Globals.Camera.Orientation = Quaternion.Nlerp(1 - SMOOTHNESS, Globals.Camera.Orientation, targetOrientation, true);
-            var cameraRelativeGoal = -60 * _ship.Front + 20 * _ship.Up;
+            var cameraRelativeGoal = -6 * _ship.Front + 1.7 * _ship.Up;
             var cameraRelative = Globals.Camera.Position - _ship.Pos;
             Globals.Camera.Position = _ship.Pos + SMOOTHNESS * cameraRelative + (1 - SMOOTHNESS) * cameraRelativeGoal;
         }
