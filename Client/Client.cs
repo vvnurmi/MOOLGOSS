@@ -24,6 +24,9 @@ namespace Client
 
         public void Start(bool userConfigure, string host)
         {
+            // HACK: Use an English culture so that Axiom.Overlays.Elements.BorderPanel works.
+            System.Threading.Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+
             Connect(host);
             var configuration = ConfigurationManagerFactory.CreateDefault();
             using (var root = new Root("MOOLGOSS.log"))
