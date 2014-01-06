@@ -27,10 +27,14 @@ namespace Client
             // HACK: Use an English culture so that Axiom.Overlays.Elements.BorderPanel works.
             System.Threading.Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
 
+            // HACK: Get assembly Axiom.Platforms.Win32.dll loaded before any dynamically created assembly.
+            // This is to avoid an exception getting thrown from the Root constructor.
+            { var hack = typeof(Axiom.Platforms.Win32.Win32InputReader); }
+
             Connect(host);
             var configuration = ConfigurationManagerFactory.CreateDefault();
             using (var root = new Root("MOOLGOSS.log"))
-            using (Globals.Input = new Axiom.Platforms.Win32.Win32InputReader())
+            using (Globals.Input = new Input())
             {
                 root.RenderSystem = root.RenderSystems[0];
                 root.RenderSystem.ConfigOptions["VSync"].Value = "Yes";
@@ -41,7 +45,8 @@ namespace Client
                 if (bestMode != null) root.RenderSystem.ConfigOptions["Video Mode"].Value = bestMode;
                 if (userConfigure && !configuration.ShowConfigDialog(root)) return;
                 var window = CreateRenderWindow();
-                Globals.Input.Initialize(window, true, true, false, true);
+                Globals.Input.Initialize(window);
+                Globals.Input.KeyEventTargets.Add(KeyCodes.Space);
                 ResourceGroupManager.Instance.AddResourceLocation("Media", "Folder", true);
                 ResourceGroupManager.Instance.InitializeAllResourceGroups();
                 Globals.Scene = root.CreateSceneManager(SceneType.Generic);
@@ -63,7 +68,7 @@ namespace Client
 
             Globals.TotalTime += args.TimeSinceLastFrame;
             var input = Globals.Input;
-            input.Capture();
+            input.Update();
             _ship.Yaw(-0.3f * input.RelativeMouseX);
             _ship.Pitch(-0.3f * input.RelativeMouseY);
             var roll = 0f;

@@ -12,7 +12,7 @@ namespace Client
     {
         public static SceneManager Scene { get; set; }
         public static Camera Camera { get; set; }
-        public static InputReader Input { get; set; }
+        public static Input Input { get; set; }
         public static UserInterface UI { get; set; }
         public static float TotalTime { get; set; }
     }
