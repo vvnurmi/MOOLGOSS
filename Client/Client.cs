@@ -39,7 +39,6 @@ namespace Client
                 if (userConfigure && !configuration.ShowConfigDialog(root)) return;
                 var window = CreateRenderWindow();
                 Globals.Input.Initialize(window, true, true, false, true);
-                TextureManager.Instance.DefaultMipmapCount = 5;
                 ResourceGroupManager.Instance.AddResourceLocation("Media", "Folder", true);
                 ResourceGroupManager.Instance.InitializeAllResourceGroups();
                 Globals.Scene = root.CreateSceneManager(SceneType.Generic);
