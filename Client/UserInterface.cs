@@ -7,22 +7,30 @@ using System.Threading.Tasks;
 
 namespace Client
 {
+    internal struct ButtonDef
+    {
+        public string Name;
+        public Action Pressed;
+    }
+
     internal class UserInterface
     {
         private Overlay Dialog { get { return OverlayManager.Instance.GetByName("Overlays/Dialog"); } }
         private OverlayElementContainer DialogPanel { get { return Dialog.GetChild("Overlays/Elements/Dialog"); } }
         private OverlayElement ButtonTemplate { get { return OverlayManager.Instance.Elements.GetElement("Overlays/Templates/DialogButton", true); } }
+        private IEnumerable<OverlayElement> DialogButtons { get { return DialogPanel.Children.Where(c => c.Key.Contains("/DialogButtons/")).Select(c => c.Value); } }
 
-        public bool TryShowDialog(string text, params string[] buttonTexts)
+        public bool TryShowDialog(string text, params ButtonDef[] buttonDefs)
         {
             if (Dialog.IsVisible) return false;
             DialogPanel.GetChild("Overlays/Elements/DialogText").Text = text;
-            var space = (DialogPanel.Width - buttonTexts.Length * ButtonTemplate.Width) / (buttonTexts.Length + 1);
+            var space = (DialogPanel.Width - buttonDefs.Length * ButtonTemplate.Width) / (buttonDefs.Length + 1);
             var buttonX = space;
             var buttonY = DialogPanel.Height - 2 * ButtonTemplate.Height;
-            foreach (var buttonText in buttonTexts)
+            foreach (var def in buttonDefs)
             {
-                var button = CreateDialogButton(buttonText, buttonX, buttonY);
+                var button = CreateDialogButton(def.Name, buttonX, buttonY);
+                button.UserData = def.Pressed;
                 DialogPanel.AddChild(button);
                 buttonX += space + ButtonTemplate.Width;
             }
@@ -33,11 +41,32 @@ namespace Client
         public void HideDialog()
         {
             Dialog.Hide();
-            foreach (var button in DialogPanel.Children.Where(c => c.Key.Contains("/DialogButtons/")).ToArray())
+            foreach (var button in DialogButtons.ToArray())
             {
-                DialogPanel.RemoveChild(button.Key);
-                OverlayManager.Instance.Elements.DestroyElement(button.Key);
+                DialogPanel.RemoveChild(button.Name);
+                OverlayManager.Instance.Elements.DestroyElement(button.Name);
             }
+        }
+
+        public void Update()
+        {
+            var input = Globals.Input;
+            if (!Dialog.IsVisible) return;
+            if (!input.IsMouseDownEvent(Axiom.Input.MouseButtons.Left)) return;
+            var button = DialogButtons.FirstOrDefault(b => Contains(b, input.AbsoluteMouseX, input.AbsoluteMouseY));
+            if (button == null) return;
+            ((Action)button.UserData)();
+        }
+
+        private static bool Contains(OverlayElement e, float x, float y)
+        {
+            var actualLeftPx = Globals.Scene.CurrentViewport.ActualWidth * e.DerivedLeft;
+            var actualTopPx = Globals.Scene.CurrentViewport.ActualHeight * e.DerivedTop;
+            return
+                actualLeftPx <= x &&
+                actualLeftPx + e.Width > x &&
+                actualTopPx <= y &&
+                actualTopPx + e.Height > y;
         }
 
         private OverlayElementContainer CreateDialogButton(string name, float x, float y)

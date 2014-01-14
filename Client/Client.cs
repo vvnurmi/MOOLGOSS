@@ -69,6 +69,7 @@ namespace Client
             Globals.TotalTime += args.TimeSinceLastFrame;
             var input = Globals.Input;
             input.Update();
+            Globals.UI.Update();
             _ship.Yaw(-0.3f * input.RelativeMouseX);
             _ship.Pitch(-0.3f * input.RelativeMouseY);
             var roll = 0f;
