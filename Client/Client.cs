@@ -143,7 +143,7 @@ namespace Client
         private void CreateSpace()
         {
             _visualization = new SpaceVisualization();
-            _visualization.Create(_service.GetPlanets());
+            _visualization.Create(_service.GetPlanets(), _service.GetStations());
         }
 
         private void Connect(string host)

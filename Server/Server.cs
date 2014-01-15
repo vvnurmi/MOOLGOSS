@@ -1,4 +1,5 @@
-﻿using Core;
+﻿using Axiom.Math;
+using Core;
 using Core.Serial;
 using System;
 using System.Collections.Generic;
@@ -17,6 +18,7 @@ namespace Server
             listener.Prefixes.Add("http://*:8080/moolgoss/");
             if (!TryStart(listener)) return;
             var service = new Service();
+            service.AddStation(Guid.NewGuid(), new Vector3(200, 0, 100));
             var marshalledService = Marshal.Get(service);
             while (true)
             {

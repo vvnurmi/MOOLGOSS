@@ -22,6 +22,16 @@ namespace Tests
         }
 
         [Test]
+        public void TestGetStations()
+        {
+            _service.AddStation(Guid.NewGuid(), new Vector3(100, 0, 200));
+            _service.AddStation(Guid.NewGuid(), new Vector3(300, 0, 100));
+            CollectionAssert.AreEqual(
+                new[] { new Vector3(100, 0, 200), new Vector3(300, 0, 100) },
+                _service.GetStations().Select(x => x.Pos));
+        }
+
+        [Test]
         public void TestShips()
         {
             CollectionAssert.IsEmpty(_service.GetShips());

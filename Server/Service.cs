@@ -10,11 +10,17 @@ namespace Server
 {
     internal class Service : IService
     {
+        private Dictionary<Guid, Station> _stations = new Dictionary<Guid, Station>();
         private Dictionary<Guid, Ship> _ships = new Dictionary<Guid, Ship>();
 
         public Planet[] GetPlanets()
         {
             return new[] { new Planet("Earth") };
+        }
+
+        public Station[] GetStations()
+        {
+            return _stations.Values.ToArray();
         }
 
         public Ship[] GetShips()
@@ -27,6 +33,11 @@ namespace Server
             Ship ship;
             _ships.TryGetValue(id, out ship);
             return ship;
+        }
+
+        public void AddStation(Guid id, Vector3 pos)
+        {
+            _stations[id] = new Station(id) { Pos = pos };
         }
 
         public void UpdateShip(Guid id, Vector3 pos, Vector3 front, Vector3 up)

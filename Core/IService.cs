@@ -6,6 +6,7 @@ namespace Core
     public interface IService
     {
         Planet[] GetPlanets();
+        Station[] GetStations();
         Ship[] GetShips();
         Ship GetShip(Guid id);
         void UpdateShip(Guid id, Vector3 pos, Vector3 front, Vector3 up);

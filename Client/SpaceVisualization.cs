@@ -51,7 +51,7 @@ namespace Client
             }
         }
 
-        public void Create(IEnumerable<Planet> planets)
+        public void Create(IEnumerable<Planet> planets, IEnumerable<Station> stations)
         {
             Globals.Scene.AmbientLight = new ColorEx(0.1f, 0.1f, 0.1f);
             //Globals.Scene.ShadowTechnique = ShadowTechnique.StencilAdditive;
@@ -69,6 +69,8 @@ namespace Client
             var z = 0f;
             foreach (var planet in planets)
                 CreatePlanet(new Vector3(75 * planet.Name.Length, 0, z += 75));
+            foreach (var station in stations)
+                CreateStation(station.Pos);
         }
 
         public void UpdateShip(Ship ship, float updateInterval)
@@ -104,6 +106,14 @@ namespace Client
             groundEnt.CastShadows = true;
             var node = Globals.Scene.RootSceneNode.CreateChildSceneNode(pos);
             node.AttachObject(groundEnt);
+        }
+
+        private void CreateStation(Vector3 pos)
+        {
+            var stationEnt = Globals.Scene.CreateEntity("station entity " + _entityIndex++, "station1.mesh");
+            stationEnt.CastShadows = true;
+            var node = Globals.Scene.RootSceneNode.CreateChildSceneNode(pos);
+            node.AttachObject(stationEnt);
         }
 
         private SceneNode CreateShip()

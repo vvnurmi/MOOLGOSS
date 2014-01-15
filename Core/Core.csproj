@@ -52,6 +52,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Station.cs" />
     <Compile Include="IService.cs" />
     <Compile Include="Marshal.cs" />
     <Compile Include="Planet.cs" />
