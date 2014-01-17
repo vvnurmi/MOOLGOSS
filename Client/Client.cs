@@ -97,9 +97,9 @@ namespace Client
                 {
                     Globals.UI.ConfirmTitleScreen();
                 }
-            }
 
-            Globals.UI.TryShowTitleScreen();
+                Globals.UI.TryShowTitleScreen();
+            }
         }
 
         private void UpdateCamera()
