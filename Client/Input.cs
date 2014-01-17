@@ -17,7 +17,6 @@ namespace Client
         private bool[] _previousKeyStates;
         private bool[] _currentKeyStates;
 
-        public bool MouseCapture { get; set; }
         public float RelativeMouseX { get { return _input.RelativeMouseX; } }
         public float RelativeMouseY { get { return _input.RelativeMouseY; } }
         public float AbsoluteMouseX { get { return _input.AbsoluteMouseX; } }
@@ -36,13 +35,12 @@ namespace Client
             var maxMouseCode = (int)Enum.GetValues(typeof(MouseButtons)).Cast<MouseButtons>().Max();
             _previousMouseStates = new bool[maxMouseCode + 1];
             _currentMouseStates = new bool[maxMouseCode + 1];
-            MouseCapture = false;
             KeyEventTargets = new List<KeyCodes>();
         }
 
         public void Initialize(RenderWindow window)
         {
-            _input.Initialize(window, true, true, false, MouseCapture);
+            _input.Initialize(window, true, true, false, true);
         }
 
         public void Update()

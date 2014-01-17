@@ -71,18 +71,26 @@ namespace Client
             var input = Globals.Input;
             input.Update();
             Globals.UI.Update();
-            _ship.Yaw(-0.3f * input.RelativeMouseX);
-            _ship.Pitch(-0.3f * input.RelativeMouseY);
-            var roll = 0f;
-            if (input.IsKeyPressed(KeyCodes.Q)) roll--;
-            if (input.IsKeyPressed(KeyCodes.E)) roll++;
-            _ship.Roll(roll * 45 * args.TimeSinceLastFrame);
-            var move = Vector3.Zero;
-            if (input.IsKeyPressed(KeyCodes.W)) move += _ship.Front;
-            if (input.IsKeyPressed(KeyCodes.S)) move -= _ship.Front;
-            if (input.IsKeyPressed(KeyCodes.A)) move -= _ship.Right;
-            if (input.IsKeyPressed(KeyCodes.D)) move += _ship.Right;
-            _ship.Move(move * 25 * args.TimeSinceLastFrame);
+            if (input.IsKeyDownEvent(KeyCodes.Space))
+                if (Globals.UI.IsMouseVisible)
+                    Globals.UI.HideMouse();
+                else
+                    Globals.UI.ShowMouse();
+            if (!Globals.UI.IsMouseVisible)
+            {
+                _ship.Yaw(-0.3f * input.RelativeMouseX);
+                _ship.Pitch(-0.3f * input.RelativeMouseY);
+                var roll = 0f;
+                if (input.IsKeyPressed(KeyCodes.Q)) roll--;
+                if (input.IsKeyPressed(KeyCodes.E)) roll++;
+                _ship.Roll(roll * 45 * args.TimeSinceLastFrame);
+                var move = Vector3.Zero;
+                if (input.IsKeyPressed(KeyCodes.W)) move += _ship.Front;
+                if (input.IsKeyPressed(KeyCodes.S)) move -= _ship.Front;
+                if (input.IsKeyPressed(KeyCodes.A)) move -= _ship.Right;
+                if (input.IsKeyPressed(KeyCodes.D)) move += _ship.Right;
+                _ship.Move(move * 25 * args.TimeSinceLastFrame);
+            }
             UpdateCamera();
             UpdateMission();
             _visualization.UpdateShip(_ship, 0);
