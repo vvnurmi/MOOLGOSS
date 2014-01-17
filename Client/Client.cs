@@ -21,6 +21,7 @@ namespace Client
         private IService _service;
         private SpaceVisualization _visualization;
         private Ship _ship;
+        private Mission _mission;
 
         public void Start(bool userConfigure, string host)
         {
@@ -83,6 +84,7 @@ namespace Client
             if (input.IsKeyPressed(KeyCodes.D)) move += _ship.Right;
             _ship.Move(move * 25 * args.TimeSinceLastFrame);
             UpdateCamera();
+            UpdateMission();
             _visualization.UpdateShip(_ship, 0);
 
             var dx9RenderWindow = Globals.Camera.Viewport.Target as Axiom.RenderSystems.DirectX9.D3DRenderWindow;
@@ -99,6 +101,33 @@ namespace Client
             var cameraRelativeGoal = -6 * _ship.Front + 1.7 * _ship.Up;
             var cameraRelative = Globals.Camera.Position - _ship.Pos;
             Globals.Camera.Position = _ship.Pos + SMOOTHNESS * cameraRelative + (1 - SMOOTHNESS) * cameraRelativeGoal;
+        }
+
+        private void UpdateMission()
+        {
+            switch (_mission.State)
+            {
+                case MissionState.Open:
+                    if (_mission.AssignVolume.Intersects(_ship.Pos))
+                    {
+                        _mission.Offer();
+                        Globals.UI.TryShowDialog(_mission.AssignMessage,
+                            new ButtonDef { Name = "Refuse", Pressed = () => { Globals.UI.HideDialog(); _mission.Unoffer(); } },
+                            new ButtonDef { Name = "Accept", Pressed = () => { Globals.UI.HideDialog(); _mission.Assign(); } });
+                    }
+                    break;
+                case MissionState.Offering: break;
+                case MissionState.Assigned:
+                    if (_mission.CompleteVolume.Intersects(_ship.Pos))
+                    {
+                        _mission.Complete();
+                        Globals.UI.TryShowDialog(_mission.CompleteMessage,
+                            new ButtonDef { Name = "OK", Pressed = Globals.UI.HideDialog });
+                    }
+                    break;
+                case MissionState.Completed: break;
+                default: throw new NotImplementedException();
+            }
         }
 
         private void UpdateShipsLoop()
@@ -143,7 +172,16 @@ namespace Client
         private void CreateSpace()
         {
             _visualization = new SpaceVisualization();
-            _visualization.Create(_service.GetPlanets(), _service.GetStations());
+            var planets = _service.GetPlanets();
+            var stations = _service.GetStations();
+            _visualization.Create(planets, stations);
+            _mission = new Mission
+            {
+                AssignMessage = "Go and find a planet!\nThere'll be no reward.",
+                AssignVolume = new Sphere(stations[0].Pos, 50),
+                CompleteMessage = "You found the planet, nice!",
+                CompleteVolume = new Sphere(planets[0].Pos, 80),
+            };
         }
 
         private void Connect(string host)

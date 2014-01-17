@@ -57,6 +57,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MissionTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="MarshallingTest.cs" />
     <Compile Include="QuaternionTest.cs" />
@@ -69,6 +70,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Client\Client.csproj">
+      <Project>{a03ef133-9e67-4ab9-a6cc-5aa37ea887d4}</Project>
+      <Name>Client</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Core\Core.csproj">
       <Project>{b51364e9-c99a-4a40-a095-c13a18c6595a}</Project>
       <Name>Core</Name>

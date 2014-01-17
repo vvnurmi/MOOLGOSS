@@ -66,11 +66,8 @@ namespace Client
             light2.Diffuse = new ColorEx(0.2f, 0.2f, 0.2f);
 
             Globals.Scene.SetSkyBox(true, "Skybox/Space", 1000);
-            var z = 0f;
-            foreach (var planet in planets)
-                CreatePlanet(new Vector3(75 * planet.Name.Length, 0, z += 75));
-            foreach (var station in stations)
-                CreateStation(station.Pos);
+            foreach (var planet in planets) CreatePlanet(planet.Pos);
+            foreach (var station in stations) CreateStation(station.Pos);
         }
 
         public void UpdateShip(Ship ship, float updateInterval)
