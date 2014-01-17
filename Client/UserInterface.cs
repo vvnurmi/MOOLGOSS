@@ -20,6 +20,8 @@ namespace Client
         private OverlayElement ButtonTemplate { get { return OverlayManager.Instance.Elements.GetElement("Overlays/Templates/DialogButton", true); } }
         private IEnumerable<OverlayElement> DialogButtons { get { return DialogPanel.Children.Where(c => c.Key.Contains("/DialogButtons/")).Select(c => c.Value); } }
 
+        private Overlay TitleScreen { get { return OverlayManager.Instance.GetByName("Overlays/TitleScreen"); } }
+
         public bool TryShowDialog(string text, params ButtonDef[] buttonDefs)
         {
             if (Dialog.IsVisible) return false;
@@ -46,6 +48,24 @@ namespace Client
                 DialogPanel.RemoveChild(button.Name);
                 OverlayManager.Instance.Elements.DestroyElement(button.Name);
             }
+        }
+
+        public bool TryShowTitleScreen()
+        {
+            if (TitleScreen.IsVisible) return false;
+            TitleScreen.Show();
+            return true;
+        }
+
+        public void HideTitleScreen()
+        {
+            TitleScreen.Hide();
+        }
+
+        public void ToggleTitleScreen()
+        {
+            if (TitleScreen.IsVisible) TitleScreen.Hide();
+            else TitleScreen.Show();
         }
 
         public void Update()

@@ -90,6 +90,11 @@ namespace Client
             var dx9RenderWindow = Globals.Camera.Viewport.Target as Axiom.RenderSystems.DirectX9.D3DRenderWindow;
             if (dx9RenderWindow != null && dx9RenderWindow.IsClosed) args.StopRendering = true;
             if (input.IsKeyPressed(KeyCodes.Escape)) args.StopRendering = true;
+
+            if (input.IsKeyPressed(KeyCodes.T))
+            {
+                Globals.UI.ToggleTitleScreen();
+            } 
         }
 
         private void UpdateCamera()
