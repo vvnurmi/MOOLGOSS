@@ -21,6 +21,8 @@ namespace Client
         private IEnumerable<OverlayElement> DialogButtons { get { return DialogPanel.Children.Where(c => c.Key.Contains("/DialogButtons/")).Select(c => c.Value); } }
 
         private Overlay TitleScreen { get { return OverlayManager.Instance.GetByName("Overlays/TitleScreen"); } }
+        private bool TitleScreenShown = false;
+        private bool TitleScreenConfirmed = false;
 
         public bool TryShowDialog(string text, params ButtonDef[] buttonDefs)
         {
@@ -52,7 +54,8 @@ namespace Client
 
         public bool TryShowTitleScreen()
         {
-            if (TitleScreen.IsVisible) return false;
+            if (TitleScreen.IsVisible || TitleScreenShown || TitleScreenConfirmed) return false;
+            TitleScreenShown = true;
             TitleScreen.Show();
             return true;
         }
@@ -66,6 +69,17 @@ namespace Client
         {
             if (TitleScreen.IsVisible) TitleScreen.Hide();
             else TitleScreen.Show();
+        }
+
+        public void ConfirmTitleScreen()
+        {
+            TitleScreenConfirmed = true;
+            HideTitleScreen();
+        }
+
+        public bool IsTitleScreenConfirmed()
+        {
+            return TitleScreenConfirmed;
         }
 
         public void Update()

@@ -91,10 +91,15 @@ namespace Client
             if (dx9RenderWindow != null && dx9RenderWindow.IsClosed) args.StopRendering = true;
             if (input.IsKeyPressed(KeyCodes.Escape)) args.StopRendering = true;
 
-            if (input.IsKeyPressed(KeyCodes.T))
+            if (!Globals.UI.IsTitleScreenConfirmed())
             {
-                Globals.UI.ToggleTitleScreen();
-            } 
+                if (input.IsKeyPressed(KeyCodes.Enter) || input.IsKeyPressed(KeyCodes.Space))
+                {
+                    Globals.UI.ConfirmTitleScreen();
+                }
+            }
+
+            Globals.UI.TryShowTitleScreen();
         }
 
         private void UpdateCamera()
