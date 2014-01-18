@@ -14,11 +14,12 @@ namespace Tests
     public class ServiceTest
     {
         private Service _service = new Service();
+        private IService PublicService { get { return _service; } }
 
         [Test]
         public void TestGetPlanets()
         {
-            CollectionAssert.AreEqual(new[] { "Earth" }, _service.GetPlanets().Select(x => x.Name));
+            CollectionAssert.AreEqual(new[] { "Earth" }, PublicService.GetPlanets().Select(x => x.Name));
         }
 
         [Test]
@@ -28,18 +29,18 @@ namespace Tests
             _service.AddStation(Guid.NewGuid(), new Vector3(300, 0, 100));
             CollectionAssert.AreEqual(
                 new[] { new Vector3(100, 0, 200), new Vector3(300, 0, 100) },
-                _service.GetStations().Select(x => x.Pos));
+                PublicService.GetStations().Select(x => x.Pos));
         }
 
         [Test]
         public void TestShips()
         {
-            CollectionAssert.IsEmpty(_service.GetShips());
+            CollectionAssert.IsEmpty(PublicService.GetShips());
             var id = Guid.NewGuid();
             Action<Vector3, Vector3, Vector3> setAndAssertShip = (pos, front, up) =>
             {
-                _service.UpdateShip(id, pos, front, up);
-                Ship ship = _service.GetShips().SingleOrDefault();
+                PublicService.UpdateShip(id, pos, front, up);
+                Ship ship = PublicService.GetShips().SingleOrDefault();
                 Assert.IsNotNull(ship);
                 var expected = Tuple.Create(id, pos, front, up);
                 Assert.AreEqual(expected, Tuple.Create(ship.ID, ship.Pos, ship.Front, ship.Up));
