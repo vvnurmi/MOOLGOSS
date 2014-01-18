@@ -1,5 +1,6 @@
 ﻿using Axiom.Math;
 using Core;
+using Core.Items;
 using NUnit.Framework;
 using Server;
 using System;
@@ -47,6 +48,14 @@ namespace Tests
             };
             setAndAssertShip(new Vector3(1, 2, 3), Vector3.UnitX, Vector3.UnitY);
             setAndAssertShip(new Vector3(2, 2, 3), Vector3.UnitY, Vector3.UnitZ);
+        }
+
+        [Test]
+        public void TestInventory()
+        {
+            var id = Guid.NewGuid();
+            Assert.IsEmpty(PublicService.GetInventory(id));
+            PublicService.AddToInventory(id, new ItemStack(Guid.NewGuid(), ItemType.MiningDroid, 1));
         }
     }
 }

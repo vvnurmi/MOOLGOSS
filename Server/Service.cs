@@ -1,5 +1,6 @@
 ﻿using Axiom.Math;
 using Core;
+using Core.Items;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,7 @@ namespace Server
     {
         private Dictionary<Guid, Station> _stations = new Dictionary<Guid, Station>();
         private Dictionary<Guid, Ship> _ships = new Dictionary<Guid, Ship>();
+        private Dictionary<Guid, Inventory> _inventories = new Dictionary<Guid, Inventory>();
 
         public Planet[] GetPlanets()
         {
@@ -46,12 +48,30 @@ namespace Server
             ship.Set(pos, front, up);
         }
 
+        public Inventory GetInventory(Guid id)
+        {
+            return GetOrAddInventory(id);
+        }
+
+        public void AddToInventory(Guid id, ItemStack stack)
+        {
+            _inventories[id].Add(stack);
+        }
+
         private Ship GetOrAddShip(Guid id)
         {
             Ship ship;
             if (!_ships.TryGetValue(id, out ship))
                 _ships.Add(id, ship = new Ship(id, Vector3.Zero, Vector3.UnitX, Vector3.UnitY));
             return ship;
+        }
+
+        private Inventory GetOrAddInventory(Guid id)
+        {
+            Inventory inventory;
+            if (!_inventories.TryGetValue(id, out inventory))
+                _inventories.Add(id, inventory = new Inventory(id));
+            return inventory;
         }
     }
 }

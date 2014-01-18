@@ -52,6 +52,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Items\Inventory.cs" />
+    <Compile Include="Items\ItemStack.cs" />
+    <Compile Include="Items\ItemType.cs" />
     <Compile Include="Station.cs" />
     <Compile Include="IService.cs" />
     <Compile Include="Marshal.cs" />

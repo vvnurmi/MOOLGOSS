@@ -64,6 +64,7 @@
     <Compile Include="SerializationTest.cs" />
     <Compile Include="ShipTest.cs" />
     <Compile Include="ServiceTest.cs" />
+    <Compile Include="InventoryTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
