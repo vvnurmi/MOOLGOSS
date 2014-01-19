@@ -4,6 +4,7 @@ using Axiom.Graphics;
 using Axiom.Input;
 using Axiom.Math;
 using Core;
+using Core.Items;
 using Core.Serial;
 using System;
 using System.Collections.Generic;
@@ -22,6 +23,7 @@ namespace Client
         private SpaceVisualization _visualization;
         private Ship _ship;
         private Mission _mission;
+        private Inventory _inventory;
 
         public void Start(bool userConfigure, string host)
         {
@@ -54,6 +56,7 @@ namespace Client
                 Globals.UI = new UserInterface();
                 CreateCamera(window);
                 CreateSpace();
+                _inventory = _service.GetInventory(Guid.NewGuid());
                 _ship = new Ship(Guid.NewGuid(), Vector3.Zero, Vector3.UnitX, Vector3.UnitY);
                 new Action(UpdateShipsLoop).BeginInvoke(null, null);
                 root.FrameStarted += FrameStartedHandler;
