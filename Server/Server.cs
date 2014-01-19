@@ -21,17 +21,22 @@ namespace Server
             service.AddStation(Guid.NewGuid(), new Vector3(200, 0, 100));
             var marshalledService = Marshal.Get(service);
             while (true)
-            {
-                var context = listener.GetContext();
-                var data = new byte[context.Request.ContentLength64];
-                context.Request.InputStream.Read(data, 0, data.Length);
-                var callspec = Serialization.Build<MarshalledCall>(data);
-                var result = marshalledService.Invoke(callspec.Name, callspec.Args);
-                if (result != null)
-                    context.Response.Close(Serialization.Break(result), true);
-                else
-                    context.Response.Close();
-            }
+                try
+                {
+                    var context = listener.GetContext();
+                    var data = new byte[context.Request.ContentLength64];
+                    context.Request.InputStream.Read(data, 0, data.Length);
+                    var callspec = Serialization.Build<MarshalledCall>(data);
+                    var result = marshalledService.Invoke(callspec.Name, callspec.Args);
+                    if (result != null)
+                        context.Response.Close(Serialization.Break(result), true);
+                    else
+                        context.Response.Close();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("[{0:u}] Exception: {1}", DateTime.Now, e);
+                }
         }
 
         private bool TryStart(HttpListener listener)
