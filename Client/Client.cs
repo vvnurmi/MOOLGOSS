@@ -24,6 +24,8 @@ namespace Client
         private Ship _ship;
         private Mission _mission;
         private Inventory _inventory;
+        private bool _shuttingDown;
+        private IAsyncResult _shipUpdateHandle;
 
         public void Start(bool userConfigure, string host)
         {
@@ -58,10 +60,11 @@ namespace Client
                 CreateSpace();
                 _inventory = _service.GetInventory(Guid.NewGuid());
                 _ship = new Ship(Guid.NewGuid(), Vector3.Zero, Vector3.UnitX, Vector3.UnitY);
-                new Action(UpdateShipsLoop).BeginInvoke(null, null);
+                _shipUpdateHandle = new Action(UpdateShipsLoop).BeginInvoke(null, null);
                 root.FrameStarted += FrameStartedHandler;
                 root.FrameStarted += _visualization.FrameStartHandler;
                 root.StartRendering();
+                _shipUpdateHandle.AsyncWaitHandle.WaitOne(TimeSpan.FromSeconds(2));
             }
         }
 
@@ -111,6 +114,8 @@ namespace Client
 
                 Globals.UI.TryShowTitleScreen();
             }
+
+            _shuttingDown = args.StopRendering;
         }
 
         private void UpdateCamera()
@@ -154,7 +159,7 @@ namespace Client
         private void UpdateShipsLoop()
         {
             float updateInterval = 1;
-            while (true)
+            while (!_shuttingDown)
             {
                 Thread.Sleep(TimeSpan.FromSeconds(updateInterval));
                 _service.UpdateShip(_ship.ID, _ship.Pos, _ship.Front, _ship.Up);
