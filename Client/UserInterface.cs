@@ -15,6 +15,7 @@ namespace Client
 
     internal class UserInterface
     {
+        private Overlay TestWindow { get { return OverlayManager.Instance.GetByName("Overlays/TestWindow"); } }
         private Overlay Cursor { get { return OverlayManager.Instance.GetByName("Overlays/Cursor"); } }
         private OverlayElementContainer CursorPanel { get { return Cursor.GetChild("Overlays/Elements/CursorPanel"); } }
         private Overlay Dialog { get { return OverlayManager.Instance.GetByName("Overlays/Dialog"); } }
@@ -26,6 +27,13 @@ namespace Client
         private bool TitleScreenConfirmed = false;
 
         public bool IsMouseVisible { get { return Cursor.IsVisible; } }
+
+        public bool TryShowTestWindow()
+        {
+            if (TestWindow.IsVisible) return false;
+            TestWindow.Show();
+            return true;
+        }
 
         public bool TryShowDialog(string text, params ButtonDef[] buttonDefs)
         {
@@ -60,6 +68,7 @@ namespace Client
             if (TitleScreen.IsVisible || TitleScreenShown || TitleScreenConfirmed) return false;
             TitleScreenShown = true;
             TitleScreen.Show();
+            TryShowTestWindow();
             return true;
         }
 
