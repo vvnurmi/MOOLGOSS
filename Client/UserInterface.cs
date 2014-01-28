@@ -15,6 +15,7 @@ namespace Client
 
     internal class UserInterface
     {
+        private Overlay Inventory { get { return OverlayManager.Instance.GetByName("Overlays/Inventory"); } }
         private Overlay TestWindow { get { return OverlayManager.Instance.GetByName("Overlays/TestWindow"); } }
         private Overlay Cursor { get { return OverlayManager.Instance.GetByName("Overlays/Cursor"); } }
         private OverlayElementContainer CursorPanel { get { return Cursor.GetChild("Overlays/Elements/CursorPanel"); } }
@@ -33,6 +34,18 @@ namespace Client
             if (TestWindow.IsVisible) return false;
             TestWindow.Show();
             return true;
+        }
+
+        public bool TryShowInventory()
+        {
+            if (Inventory.IsVisible) return false;
+            Inventory.Show();
+            return true;
+        }
+
+        public void HideInventory()
+        {
+            Inventory.Hide();
         }
 
         public bool TryShowDialog(string text, params ButtonDef[] buttonDefs)
@@ -68,7 +81,8 @@ namespace Client
             if (TitleScreen.IsVisible || TitleScreenShown || TitleScreenConfirmed) return false;
             TitleScreenShown = true;
             TitleScreen.Show();
-            TryShowTestWindow();
+            //TryShowTestWindow();
+            TryShowInventory();
             return true;
         }
 
