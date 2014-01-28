@@ -48,6 +48,11 @@ namespace Client
             Inventory.Hide();
         }
 
+        public bool IsInventoryVisible()
+        {
+            return Inventory.IsVisible;
+        }
+
         public bool TryShowDialog(string text, params ButtonDef[] buttonDefs)
         {
             if (Dialog.IsVisible) return false;
@@ -81,8 +86,6 @@ namespace Client
             if (TitleScreen.IsVisible || TitleScreenShown || TitleScreenConfirmed) return false;
             TitleScreenShown = true;
             TitleScreen.Show();
-            //TryShowTestWindow();
-            TryShowInventory();
             return true;
         }
 

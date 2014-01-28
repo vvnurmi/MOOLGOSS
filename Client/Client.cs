@@ -114,6 +114,20 @@ namespace Client
 
                 Globals.UI.TryShowTitleScreen();
             }
+            else
+            {
+                if (input.IsKeyPressed(KeyCodes.I))
+                {
+                    if (Globals.UI.IsInventoryVisible())
+                    {
+                        Globals.UI.HideInventory();
+                    }
+                    else
+                    {
+                        Globals.UI.TryShowInventory();
+                    }
+                }
+            }
 
             _shuttingDown = args.StopRendering;
         }
