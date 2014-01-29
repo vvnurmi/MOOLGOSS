@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Client
 {
-    public enum MissionState { Open, Offering, Assigned, Completed };
+    public enum MissionState { Open, Offering, Suppressed , Assigned, Completed };
 
     public class Mission
     {
@@ -19,14 +19,14 @@ namespace Client
 
         public void Offer()
         {
-            if (State != MissionState.Open) throw new InvalidOperationException();
+            if (State != MissionState.Open && State != MissionState.Suppressed) throw new InvalidOperationException();
             State = MissionState.Offering;
         }
 
-        public void Unoffer()
+        public void Suppress()
         {
             if (State != MissionState.Offering) throw new InvalidOperationException();
-            State = MissionState.Open;
+            State = MissionState.Suppressed;
         }
 
         public void Assign()

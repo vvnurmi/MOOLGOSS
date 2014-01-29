@@ -152,11 +152,12 @@ namespace Client
                     {
                         _mission.Offer();
                         Globals.UI.TryShowDialog(_mission.AssignMessage,
-                            new ButtonDef { Name = "Refuse", Pressed = () => { Globals.UI.HideDialog(); _mission.Unoffer(); } },
+                            new ButtonDef { Name = "Refuse", Pressed = () => { Globals.UI.HideDialog(); _mission.Suppress(); } },
                             new ButtonDef { Name = "Accept", Pressed = () => { Globals.UI.HideDialog(); _mission.Assign(); } });
                     }
                     break;
                 case MissionState.Offering: break;
+                case MissionState.Suppressed: break;
                 case MissionState.Assigned:
                     if (_mission.CompleteVolume.Intersects(_ship.Pos))
                     {

@@ -32,35 +32,37 @@ namespace Tests
         public void TestStateTransition()
         {
             Assert.AreEqual(MissionState.Open, _mission.State);
-            Assert.Throws<InvalidOperationException>(_mission.Unoffer);
-            Assert.Throws<InvalidOperationException>(_mission.Assign);
-            Assert.Throws<InvalidOperationException>(_mission.Complete);
+            AssertInvalidOperations(_mission.Suppress, _mission.Assign, _mission.Complete);
 
             _mission.Offer();
             Assert.AreEqual(MissionState.Offering, _mission.State);
-            Assert.Throws<InvalidOperationException>(_mission.Offer);
-            Assert.Throws<InvalidOperationException>(_mission.Complete);
+            AssertInvalidOperations(_mission.Offer, _mission.Complete);
 
             _mission.Assign();
             Assert.AreEqual(MissionState.Assigned, _mission.State);
-            Assert.Throws<InvalidOperationException>(_mission.Offer);
-            Assert.Throws<InvalidOperationException>(_mission.Unoffer);
-            Assert.Throws<InvalidOperationException>(_mission.Assign);
+            AssertInvalidOperations(_mission.Offer, _mission.Suppress, _mission.Assign);
 
             _mission.Complete();
             Assert.AreEqual(MissionState.Completed, _mission.State);
-            Assert.Throws<InvalidOperationException>(_mission.Offer);
-            Assert.Throws<InvalidOperationException>(_mission.Unoffer);
-            Assert.Throws<InvalidOperationException>(_mission.Assign);
-            Assert.Throws<InvalidOperationException>(_mission.Complete);
+            AssertInvalidOperations(_mission.Offer, _mission.Suppress, _mission.Assign, _mission.Complete);
         }
 
         [Test]
-        public void TestStateTransition_Unoffer()
+        public void TestStateTransition_Suppress()
         {
             _mission.Offer();
-            _mission.Unoffer();
-            Assert.AreEqual(MissionState.Open, _mission.State);
+            _mission.Suppress();
+            Assert.AreEqual(MissionState.Suppressed, _mission.State);
+            AssertInvalidOperations(_mission.Suppress, _mission.Assign, _mission.Complete);
+
+            _mission.Offer();
+            Assert.AreEqual(MissionState.Offering, _mission.State);
+        }
+
+        private void AssertInvalidOperations(params TestDelegate[] ops)
+        {
+            foreach (var op in ops)
+                Assert.Throws<InvalidOperationException>(op);
         }
     }
 }
