@@ -85,6 +85,11 @@ namespace Client
                 return;
             }
 
+            if (input.IsKeyDownEvent(KeyCodes.I))
+                if (Globals.UI.IsInventoryVisible)
+                    Globals.UI.HideInventory();
+                else
+                    Globals.UI.ShowInventory();
             if (input.IsKeyDownEvent(KeyCodes.Space))
                 if (Globals.UI.IsMouseVisible)
                     Globals.UI.HideMouse();
@@ -112,18 +117,6 @@ namespace Client
             var dx9RenderWindow = Globals.Camera.Viewport.Target as Axiom.RenderSystems.DirectX9.D3DRenderWindow;
             if (dx9RenderWindow != null && dx9RenderWindow.IsClosed) args.StopRendering = true;
             if (input.IsKeyDownEvent(KeyCodes.Escape)) args.StopRendering = true;
-
-            if (input.IsKeyDownEvent(KeyCodes.I))
-            {
-                if (Globals.UI.IsInventoryVisible())
-                {
-                    Globals.UI.HideInventory();
-                }
-                else
-                {
-                    Globals.UI.TryShowInventory();
-                }
-            }
 
             _shuttingDown = args.StopRendering;
         }

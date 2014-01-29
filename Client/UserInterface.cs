@@ -25,6 +25,7 @@ namespace Client
         private IEnumerable<OverlayElement> DialogButtons { get { return DialogPanel.Children.Where(c => c.Key.Contains("/DialogButtons/")).Select(c => c.Value); } }
         private Overlay TitleScreen { get { return OverlayManager.Instance.GetByName("Overlays/TitleScreen"); } }
 
+        public bool IsInventoryVisible { get { return Inventory.IsVisible; } }
         public bool IsTitleScreenVisible { get { return TitleScreen.IsVisible; } }
         public bool IsMouseVisible { get { return Cursor.IsVisible; } }
 
@@ -35,21 +36,14 @@ namespace Client
             return true;
         }
 
-        public bool TryShowInventory()
+        public void ShowInventory()
         {
-            if (Inventory.IsVisible) return false;
             Inventory.Show();
-            return true;
         }
 
         public void HideInventory()
         {
             Inventory.Hide();
-        }
-
-        public bool IsInventoryVisible()
-        {
-            return Inventory.IsVisible;
         }
 
         public bool TryShowDialog(string text, params ButtonDef[] buttonDefs)
