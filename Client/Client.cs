@@ -60,6 +60,7 @@ namespace Client
                 _inventory = _service.GetInventory(Guid.NewGuid());
                 _ship = new Ship(Guid.NewGuid(), Vector3.Zero, Vector3.UnitX, Vector3.UnitY);
                 _shipUpdateHandle = new Action(UpdateShipsLoop).BeginInvoke(null, null);
+                Globals.UI.ShowTitleScreen();
                 root.FrameStarted += FrameStartedHandler;
                 root.FrameStarted += _visualization.FrameStartHandler;
                 root.StartRendering();
@@ -76,6 +77,14 @@ namespace Client
             var input = Globals.Input;
             input.Update();
             Globals.UI.Update();
+
+            if (Globals.UI.IsTitleScreenVisible)
+            {
+                if (input.IsKeyDownEvent(KeyCodes.Enter) || input.IsKeyDownEvent(KeyCodes.Space))
+                    Globals.UI.HideTitleScreen();
+                return;
+            }
+
             if (input.IsKeyDownEvent(KeyCodes.Space))
                 if (Globals.UI.IsMouseVisible)
                     Globals.UI.HideMouse();
@@ -104,27 +113,15 @@ namespace Client
             if (dx9RenderWindow != null && dx9RenderWindow.IsClosed) args.StopRendering = true;
             if (input.IsKeyDownEvent(KeyCodes.Escape)) args.StopRendering = true;
 
-            if (!Globals.UI.IsTitleScreenConfirmed())
+            if (input.IsKeyDownEvent(KeyCodes.I))
             {
-                if (input.IsKeyDownEvent(KeyCodes.Enter) || input.IsKeyDownEvent(KeyCodes.Space))
+                if (Globals.UI.IsInventoryVisible())
                 {
-                    Globals.UI.ConfirmTitleScreen();
+                    Globals.UI.HideInventory();
                 }
-
-                Globals.UI.TryShowTitleScreen();
-            }
-            else
-            {
-                if (input.IsKeyDownEvent(KeyCodes.I))
+                else
                 {
-                    if (Globals.UI.IsInventoryVisible())
-                    {
-                        Globals.UI.HideInventory();
-                    }
-                    else
-                    {
-                        Globals.UI.TryShowInventory();
-                    }
+                    Globals.UI.TryShowInventory();
                 }
             }
 

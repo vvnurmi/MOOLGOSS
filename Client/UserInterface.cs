@@ -24,9 +24,8 @@ namespace Client
         private OverlayElement ButtonTemplate { get { return OverlayManager.Instance.Elements.GetElement("Overlays/Templates/DialogButton", true); } }
         private IEnumerable<OverlayElement> DialogButtons { get { return DialogPanel.Children.Where(c => c.Key.Contains("/DialogButtons/")).Select(c => c.Value); } }
         private Overlay TitleScreen { get { return OverlayManager.Instance.GetByName("Overlays/TitleScreen"); } }
-        private bool TitleScreenShown = false;
-        private bool TitleScreenConfirmed = false;
 
+        public bool IsTitleScreenVisible { get { return TitleScreen.IsVisible; } }
         public bool IsMouseVisible { get { return Cursor.IsVisible; } }
 
         public bool TryShowTestWindow()
@@ -81,34 +80,14 @@ namespace Client
             }
         }
 
-        public bool TryShowTitleScreen()
+        public void ShowTitleScreen()
         {
-            if (TitleScreen.IsVisible || TitleScreenShown || TitleScreenConfirmed) return false;
-            TitleScreenShown = true;
             TitleScreen.Show();
-            return true;
         }
 
         public void HideTitleScreen()
         {
             TitleScreen.Hide();
-        }
-
-        public void ToggleTitleScreen()
-        {
-            if (TitleScreen.IsVisible) TitleScreen.Hide();
-            else TitleScreen.Show();
-        }
-
-        public void ConfirmTitleScreen()
-        {
-            TitleScreenConfirmed = true;
-            HideTitleScreen();
-        }
-
-        public bool IsTitleScreenConfirmed()
-        {
-            return TitleScreenConfirmed;
         }
 
         public void ShowMouse()
