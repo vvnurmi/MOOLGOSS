@@ -51,7 +51,6 @@ namespace Client
                 if (userConfigure && !configuration.ShowConfigDialog(root)) return;
                 var window = CreateRenderWindow();
                 Globals.Input.Initialize(window);
-                Globals.Input.KeyEventTargets.Add(KeyCodes.Space);
                 ResourceGroupManager.Instance.AddResourceLocation("Media", "Folder", true);
                 ResourceGroupManager.Instance.InitializeAllResourceGroups();
                 Globals.Scene = root.CreateSceneManager(SceneType.Generic);
@@ -103,11 +102,11 @@ namespace Client
 
             var dx9RenderWindow = Globals.Camera.Viewport.Target as Axiom.RenderSystems.DirectX9.D3DRenderWindow;
             if (dx9RenderWindow != null && dx9RenderWindow.IsClosed) args.StopRendering = true;
-            if (input.IsKeyPressed(KeyCodes.Escape)) args.StopRendering = true;
+            if (input.IsKeyDownEvent(KeyCodes.Escape)) args.StopRendering = true;
 
             if (!Globals.UI.IsTitleScreenConfirmed())
             {
-                if (input.IsKeyPressed(KeyCodes.Enter) || input.IsKeyPressed(KeyCodes.Space))
+                if (input.IsKeyDownEvent(KeyCodes.Enter) || input.IsKeyDownEvent(KeyCodes.Space))
                 {
                     Globals.UI.ConfirmTitleScreen();
                 }
@@ -116,7 +115,7 @@ namespace Client
             }
             else
             {
-                if (input.IsKeyPressed(KeyCodes.I))
+                if (input.IsKeyDownEvent(KeyCodes.I))
                 {
                     if (Globals.UI.IsInventoryVisible())
                     {

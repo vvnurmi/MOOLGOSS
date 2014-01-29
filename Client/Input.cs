@@ -16,15 +16,15 @@ namespace Client
         private bool[] _currentMouseStates;
         private bool[] _previousKeyStates;
         private bool[] _currentKeyStates;
+        /// <summary>
+        /// Key events are obtained only for these keys. Hacky hack.
+        /// </summary>
+        private List<KeyCodes> _keyEventTargets = new List<KeyCodes>();
 
         public float RelativeMouseX { get { return _input.RelativeMouseX; } }
         public float RelativeMouseY { get { return _input.RelativeMouseY; } }
         public float AbsoluteMouseX { get { return _input.AbsoluteMouseX; } }
         public float AbsoluteMouseY { get { return _input.AbsoluteMouseY; } }
-        /// <summary>
-        /// Key events are obtained only for these keys. Hacky hack.
-        /// </summary>
-        public List<KeyCodes> KeyEventTargets { get; private set; }
 
         public Input()
         {
@@ -35,7 +35,6 @@ namespace Client
             var maxMouseCode = (int)Enum.GetValues(typeof(MouseButtons)).Cast<MouseButtons>().Max();
             _previousMouseStates = new bool[maxMouseCode + 1];
             _currentMouseStates = new bool[maxMouseCode + 1];
-            KeyEventTargets = new List<KeyCodes>();
         }
 
         public void Initialize(RenderWindow window)
@@ -52,7 +51,7 @@ namespace Client
             Array.Clear(_currentKeyStates, 0, _currentKeyStates.Length);
             foreach (MouseButtons button in Enum.GetValues(typeof(MouseButtons)))
                 _currentMouseStates[(int)button] = _input.IsMousePressed(button);
-            foreach (var key in KeyEventTargets)
+            foreach (var key in _keyEventTargets)
                 _currentKeyStates[(int)key] = _input.IsKeyPressed(key);
         }
 
@@ -69,6 +68,7 @@ namespace Client
 
         public bool IsKeyDownEvent(KeyCodes key)
         {
+            if (!_keyEventTargets.Contains(key)) _keyEventTargets.Add(key);
             return !_previousKeyStates[(int)key] && _currentKeyStates[(int)key];
         }
 
