@@ -31,7 +31,7 @@ namespace Client
         private Dictionary<Guid, SceneNode> _nodes = new Dictionary<Guid, SceneNode>();
         private ConcurrentDictionary<Guid, NodeUpdate> _nodeUpdates = new ConcurrentDictionary<Guid, NodeUpdate>();
 
-        public void FrameStartHandler(object sender, FrameEventArgs args)
+        public void Update()
         {
             foreach (var update in _nodeUpdates)
             {

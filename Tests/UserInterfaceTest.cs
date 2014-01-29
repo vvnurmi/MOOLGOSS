@@ -26,6 +26,22 @@ namespace Tests
         }
 
         [Test]
+        public void StartFromNullMode()
+        {
+            Assert.AreEqual("<none>", _ui.Mode);
+        }
+
+        [Test]
+        public void ResetToNullMode()
+        {
+            _ui.AddMode(new UIMode("foobar"));
+            _ui.SetMode("foobar");
+            Assert.AreNotEqual("<none>", _ui.Mode);
+            _ui.SetMode(null);
+            Assert.AreEqual("<none>", _ui.Mode);
+        }
+
+        [Test]
         public void DoubleRegistrationThrows()
         {
             _ui.AddMode(new UIMode("foobar"));
@@ -46,7 +62,7 @@ namespace Tests
             bool entered, updated, exited;
             entered = updated = exited = false;
             Action enter = () => entered = true;
-            Action update = () => updated = true;
+            UIMode.UpdateDelegate update = secondsPassed => updated = true;
             Action exit = () => exited = true;
             Action<bool, bool, bool, Action> assertEvents = (expected_entered, expected_updated, expected_exited, op) =>
             {
@@ -60,7 +76,7 @@ namespace Tests
             assertEvents(false, false, false, () => _ui.AddMode(new UIMode("foobar")
                 { Enter = enter, Update = update, Exit = exit }));
             assertEvents(true, false, false, () => _ui.SetMode("foobar"));
-            assertEvents(false, true, false, _ui.Update);
+            assertEvents(false, true, false, () => _ui.Update(1));
             assertEvents(false, false, true, () => _ui.SetMode("exit"));
         }
     }

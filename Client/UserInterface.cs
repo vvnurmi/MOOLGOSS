@@ -15,15 +15,18 @@ namespace Client
 
     public class UIMode
     {
+        public delegate void UpdateDelegate(float secondsPassed);
+
         public string Name { get; private set; }
         public Action Enter { get; set; }
-        public Action Update { get; set; }
+        public UpdateDelegate Update { get; set; }
         public Action Exit { get; set; }
 
         public UIMode(string name)
         {
             Name = name;
-            Enter = Update = Exit = () => { };
+            Enter = Exit = () => { };
+            Update = secondsPassed => { };
         }
     }
 
@@ -115,7 +118,7 @@ namespace Client
             Cursor.Hide();
         }
 
-        public void Update()
+        public void Update(float secondsPassed)
         {
             var input = Globals.Input;
             if (IsInitialized && IsMouseVisible)
@@ -123,7 +126,7 @@ namespace Client
                 CursorPanel.Left = input.AbsoluteMouseX;
                 CursorPanel.Top = input.AbsoluteMouseY;
             }
-            if (_mode != null) _mode.Update();
+            if (_mode != null) _mode.Update(secondsPassed);
             if (IsInitialized)
             {
                 if (!Dialog.IsVisible) return;
@@ -141,8 +144,8 @@ namespace Client
         public void SetMode(string name)
         {
             if (_mode != null) _mode.Exit();
-            _mode = _modes[name];
-            _mode.Enter();
+            _mode = name == null ? null : _modes[name];
+            if (_mode != null) _mode.Enter();
         }
 
         private static bool Contains(OverlayElement e, float x, float y)

@@ -3,6 +3,7 @@ using Axiom.Framework.Configuration;
 using Axiom.Graphics;
 using Axiom.Input;
 using Axiom.Math;
+using Client.UI;
 using Core;
 using Core.Items;
 using Core.Serial;
@@ -19,14 +20,6 @@ namespace Client
 {
     public class Client
     {
-        private IService _service;
-        private SpaceVisualization _visualization;
-        private Ship _ship;
-        private Mission _mission;
-        private Inventory _inventory;
-        private bool _shuttingDown;
-        private IAsyncResult _shipUpdateHandle;
-
         public void Start(bool userConfigure, string host)
         {
             // HACK: Use an English culture so that Axiom.Overlays.Elements.BorderPanel works.
@@ -36,7 +29,7 @@ namespace Client
             // This is to avoid an exception getting thrown from the Root constructor.
             { var hack = typeof(Axiom.Platforms.Win32.Win32InputReader); }
 
-            Connect(host);
+            var service = Connect(host);
             var configuration = ConfigurationManagerFactory.CreateDefault();
             using (var root = new Root("MOOLGOSS.log"))
             using (Globals.Input = new Input())
@@ -55,16 +48,12 @@ namespace Client
                 ResourceGroupManager.Instance.InitializeAllResourceGroups();
                 Globals.Scene = root.CreateSceneManager(SceneType.Generic);
                 Globals.UI = new UserInterface();
+                Globals.UI.AddMode(new TitleScreen());
+                Globals.UI.AddMode(new Gameplay(service));
+                Globals.UI.SetMode("Title Screen");
                 CreateCamera(window);
-                CreateSpace();
-                _inventory = _service.GetInventory(Guid.NewGuid());
-                _ship = new Ship(Guid.NewGuid(), Vector3.Zero, Vector3.UnitX, Vector3.UnitY);
-                _shipUpdateHandle = new Action(UpdateShipsLoop).BeginInvoke(null, null);
-                Globals.UI.ShowTitleScreen();
                 root.FrameStarted += FrameStartedHandler;
-                root.FrameStarted += _visualization.FrameStartHandler;
                 root.StartRendering();
-                _shipUpdateHandle.AsyncWaitHandle.WaitOne(TimeSpan.FromSeconds(2));
             }
         }
 
@@ -76,100 +65,13 @@ namespace Client
             Globals.TotalTime += args.TimeSinceLastFrame;
             var input = Globals.Input;
             input.Update();
-            Globals.UI.Update();
-
-            if (Globals.UI.IsTitleScreenVisible)
-            {
-                if (input.IsKeyDownEvent(KeyCodes.Enter) || input.IsKeyDownEvent(KeyCodes.Space))
-                    Globals.UI.HideTitleScreen();
-                return;
-            }
-
-            if (input.IsKeyDownEvent(KeyCodes.I))
-                if (Globals.UI.IsInventoryVisible)
-                    Globals.UI.HideInventory();
-                else
-                    Globals.UI.ShowInventory();
-            if (input.IsKeyDownEvent(KeyCodes.Space))
-                if (Globals.UI.IsMouseVisible)
-                    Globals.UI.HideMouse();
-                else
-                    Globals.UI.ShowMouse();
-            if (!Globals.UI.IsMouseVisible)
-            {
-                _ship.Yaw(-0.3f * input.RelativeMouseX);
-                _ship.Pitch(-0.3f * input.RelativeMouseY);
-                var roll = 0f;
-                if (input.IsKeyPressed(KeyCodes.Q)) roll--;
-                if (input.IsKeyPressed(KeyCodes.E)) roll++;
-                _ship.Roll(roll * 45 * args.TimeSinceLastFrame);
-                var move = Vector3.Zero;
-                if (input.IsKeyPressed(KeyCodes.W)) move += _ship.Front;
-                if (input.IsKeyPressed(KeyCodes.S)) move -= _ship.Front;
-                if (input.IsKeyPressed(KeyCodes.A)) move -= _ship.Right;
-                if (input.IsKeyPressed(KeyCodes.D)) move += _ship.Right;
-                _ship.Move(move * 25 * args.TimeSinceLastFrame);
-            }
-            UpdateCamera();
-            UpdateMission();
-            _visualization.UpdateShip(_ship, 0);
+            Globals.UI.Update(args.TimeSinceLastFrame);
 
             var dx9RenderWindow = Globals.Camera.Viewport.Target as Axiom.RenderSystems.DirectX9.D3DRenderWindow;
             if (dx9RenderWindow != null && dx9RenderWindow.IsClosed) args.StopRendering = true;
             if (input.IsKeyDownEvent(KeyCodes.Escape)) args.StopRendering = true;
 
-            _shuttingDown = args.StopRendering;
-        }
-
-        private void UpdateCamera()
-        {
-            float SMOOTHNESS = 0.90f; // To be slightly below one.
-            var cameraTilt = Quaternion.FromAngleAxis(Utility.DegreesToRadians(-10), _ship.Right);
-            var targetOrientation = cameraTilt * _ship.Orientation;
-            Globals.Camera.Orientation = Quaternion.Nlerp(1 - SMOOTHNESS, Globals.Camera.Orientation, targetOrientation, true);
-            var cameraRelativeGoal = -6 * _ship.Front + 1.7 * _ship.Up;
-            var cameraRelative = Globals.Camera.Position - _ship.Pos;
-            Globals.Camera.Position = _ship.Pos + SMOOTHNESS * cameraRelative + (1 - SMOOTHNESS) * cameraRelativeGoal;
-        }
-
-        private void UpdateMission()
-        {
-            switch (_mission.State)
-            {
-                case MissionState.Open:
-                    if (_mission.AssignVolume.Intersects(_ship.Pos))
-                    {
-                        _mission.Offer();
-                        Globals.UI.TryShowDialog(_mission.AssignMessage,
-                            new ButtonDef { Name = "Refuse", Pressed = () => { Globals.UI.HideDialog(); _mission.Suppress(); } },
-                            new ButtonDef { Name = "Accept", Pressed = () => { Globals.UI.HideDialog(); _mission.Assign(); } });
-                    }
-                    break;
-                case MissionState.Offering: break;
-                case MissionState.Suppressed: break;
-                case MissionState.Assigned:
-                    if (_mission.CompleteVolume.Intersects(_ship.Pos))
-                    {
-                        _mission.Complete();
-                        Globals.UI.TryShowDialog(_mission.CompleteMessage,
-                            new ButtonDef { Name = "OK", Pressed = Globals.UI.HideDialog });
-                    }
-                    break;
-                case MissionState.Completed: break;
-                default: throw new NotImplementedException();
-            }
-        }
-
-        private void UpdateShipsLoop()
-        {
-            float updateInterval = 1;
-            while (!_shuttingDown)
-            {
-                Thread.Sleep(TimeSpan.FromSeconds(updateInterval));
-                _service.UpdateShip(_ship.ID, _ship.Pos, _ship.Front, _ship.Up);
-                foreach (var ship in _service.GetShips())
-                    if (ship.ID != _ship.ID) _visualization.UpdateShip(ship, updateInterval);
-            }
+            if (args.StopRendering) Globals.UI.SetMode(null);
         }
 
         private RenderWindow CreateRenderWindow()
@@ -199,25 +101,9 @@ namespace Client
             Globals.Camera.LookAt(Vector3.Zero);
         }
 
-        private void CreateSpace()
+        private IService Connect(string host)
         {
-            _visualization = new SpaceVisualization();
-            var planets = _service.GetPlanets();
-            var stations = _service.GetStations();
-            _visualization.Create(planets, stations);
-            _mission = new Mission
-            {
-                AssignMessage = "Go and find a planet!\nThere'll be no reward.",
-                AssignVolume = new Sphere(stations[0].Pos, 50),
-                CompleteMessage = "You found the planet, nice!",
-                CompleteVolume = new Sphere(planets[0].Pos, 80),
-            };
-        }
-
-        private void Connect(string host)
-        {
-            Debug.Assert(_service == null);
-            _service = Marshal.Get<IService>((method, args) => Invoke(host, method, args));
+            return Marshal.Get<IService>((method, args) => Invoke(host, method, args));
         }
 
         private static object Invoke(string host, string method, object[] args)

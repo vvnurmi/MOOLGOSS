@@ -86,6 +86,8 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SpaceVisualization.cs" />
+    <Compile Include="UI\Gameplay.cs" />
+    <Compile Include="UI\TitleScreen.cs" />
     <Compile Include="UserInterface.cs" />
   </ItemGroup>
   <ItemGroup>
