@@ -13,8 +13,26 @@ namespace Client
         public Action Pressed;
     }
 
+    public class UIMode
+    {
+        public string Name { get; private set; }
+        public Action Enter { get; set; }
+        public Action Update { get; set; }
+        public Action Exit { get; set; }
+
+        public UIMode(string name)
+        {
+            Name = name;
+            Enter = Update = Exit = () => { };
+        }
+    }
+
     internal class UserInterface
     {
+        private Dictionary<string, UIMode> _modes = new Dictionary<string, UIMode>();
+        private UIMode _mode;
+
+        private bool IsInitialized { get { return Globals.UI != null; } }
         private Overlay Inventory { get { return OverlayManager.Instance.GetByName("Overlays/Inventory"); } }
         private Overlay TestWindow { get { return OverlayManager.Instance.GetByName("Overlays/TestWindow"); } }
         private Overlay Cursor { get { return OverlayManager.Instance.GetByName("Overlays/Cursor"); } }
@@ -25,6 +43,7 @@ namespace Client
         private IEnumerable<OverlayElement> DialogButtons { get { return DialogPanel.Children.Where(c => c.Key.Contains("/DialogButtons/")).Select(c => c.Value); } }
         private Overlay TitleScreen { get { return OverlayManager.Instance.GetByName("Overlays/TitleScreen"); } }
 
+        public string Mode { get { return _mode == null ? "<none>" : _mode.Name; } }
         public bool IsInventoryVisible { get { return Inventory.IsVisible; } }
         public bool IsTitleScreenVisible { get { return TitleScreen.IsVisible; } }
         public bool IsMouseVisible { get { return Cursor.IsVisible; } }
@@ -99,16 +118,31 @@ namespace Client
         public void Update()
         {
             var input = Globals.Input;
-            if (IsMouseVisible)
+            if (IsInitialized && IsMouseVisible)
             {
                 CursorPanel.Left = input.AbsoluteMouseX;
                 CursorPanel.Top = input.AbsoluteMouseY;
             }
-            if (!Dialog.IsVisible) return;
-            if (!input.IsMouseDownEvent(Axiom.Input.MouseButtons.Left)) return;
-            var button = DialogButtons.FirstOrDefault(b => Contains(b, input.AbsoluteMouseX, input.AbsoluteMouseY));
-            if (button == null) return;
-            ((Action)button.UserData)();
+            if (_mode != null) _mode.Update();
+            if (IsInitialized)
+            {
+                if (!Dialog.IsVisible) return;
+                if (!input.IsMouseDownEvent(Axiom.Input.MouseButtons.Left)) return;
+                var button = DialogButtons.FirstOrDefault(b => Contains(b, input.AbsoluteMouseX, input.AbsoluteMouseY));
+                if (button != null) ((Action)button.UserData)();
+            }
+        }
+
+        public void AddMode(UIMode mode)
+        {
+            _modes.Add(mode.Name, mode);
+        }
+
+        public void SetMode(string name)
+        {
+            if (_mode != null) _mode.Exit();
+            _mode = _modes[name];
+            _mode.Enter();
         }
 
         private static bool Contains(OverlayElement e, float x, float y)
