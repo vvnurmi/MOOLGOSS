@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -72,9 +73,22 @@ namespace Client
             return !_previousKeyStates[(int)key] && _currentKeyStates[(int)key];
         }
 
+        public void SetMousePosition(int x, int y)
+        {
+#if !WINDOWS
+#error SetMousePosition implemented only on Windows
+#endif
+            SetCursorPos(x, y);
+        }
+
         public void Dispose()
         {
             _input.Dispose();
         }
+
+#if WINDOWS
+        [DllImport("user32.dll")]
+        static extern bool SetCursorPos(int x, int y);
+#endif
     }
 }

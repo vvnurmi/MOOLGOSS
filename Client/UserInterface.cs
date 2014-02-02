@@ -34,6 +34,8 @@ namespace Client
     {
         private Dictionary<string, UIMode> _modes = new Dictionary<string, UIMode>();
         private UIMode _mode;
+        private int _mouseHideX;
+        private int _mouseHideY;
 
         private bool IsInitialized { get { return Globals.UI != null; } }
         private Overlay Inventory { get { return OverlayManager.Instance.GetByName("Overlays/Inventory"); } }
@@ -50,6 +52,11 @@ namespace Client
         public bool IsInventoryVisible { get { return Inventory.IsVisible; } }
         public bool IsTitleScreenVisible { get { return TitleScreen.IsVisible; } }
         public bool IsMouseVisible { get { return Cursor.IsVisible; } }
+
+        public UserInterface()
+        {
+            HideMouse();
+        }
 
         public bool TryShowTestWindow()
         {
@@ -108,13 +115,16 @@ namespace Client
 
         public void ShowMouse()
         {
-            CursorPanel.Left = Globals.Input.AbsoluteMouseX;
-            CursorPanel.Top = Globals.Input.AbsoluteMouseY;
+            Globals.Input.SetMousePosition(_mouseHideX, _mouseHideY);
+            CursorPanel.Left = _mouseHideX;
+            CursorPanel.Top = _mouseHideY;
             Cursor.Show();
         }
 
         public void HideMouse()
         {
+            _mouseHideX = (int)Math.Round(Globals.Input.AbsoluteMouseX);
+            _mouseHideY = (int)Math.Round(Globals.Input.AbsoluteMouseY);
             Cursor.Hide();
         }
 
