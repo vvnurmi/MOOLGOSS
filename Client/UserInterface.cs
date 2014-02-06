@@ -202,18 +202,14 @@ namespace Client
             var inventorySlot = (OverlayElementContainer)OverlayManager.Instance.Elements.GetElement(InventoryInstanceBaseName + inventoryName + "/" + InventorySlotInstanceBaseName + slot);
 
             if (inventorySlot != null)
-            {
                 inventorySlot.AddChildElement(CreateIcon(iconCategory, iconName, count));
-            }
         }
 
         public void RemoveItemFromInventory(string inventoryName, int slot)
         {
             var inventorySlot = (OverlayElementContainer)OverlayManager.Instance.Elements.GetElement(InventoryInstanceBaseName + inventoryName + "/" + InventorySlotInstanceBaseName + slot);
-            if (inventorySlot != null)
-            {
-                inventorySlot.RemoveChild(inventorySlot.Children.ElementAt(0).Value.Name);
-            }
+            if (inventorySlot != null && inventorySlot.Children.Count > 0)
+                    inventorySlot.RemoveChild(inventorySlot.Children.ElementAt(0).Value.Name);
         }
 
         private OverlayElementContainer CreateIcon(string category, string name, int count)
