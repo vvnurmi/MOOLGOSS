@@ -1,6 +1,7 @@
 ﻿using Axiom.Overlays;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -33,6 +34,7 @@ namespace Client
     internal class UserInterface
     {
         private Dictionary<string, UIMode> _modes = new Dictionary<string, UIMode>();
+        private HashSet<OverlayElement> _buttons = new HashSet<OverlayElement>();
         private UIMode _mode;
         private int _mouseHideX;
         private int _mouseHideY;
@@ -55,6 +57,19 @@ namespace Client
             HideMouse();
         }
 
+        public void AddButton(OverlayElement button)
+        {
+            if (!(button.UserData is Action)) throw new ArgumentException("Button UserData must be an Action");
+            Debug.Assert(!_buttons.Contains(button));
+            _buttons.Add(button);
+        }
+
+        public void RemoveButton(OverlayElement button)
+        {
+            var success = _buttons.Remove(button);
+            Debug.Assert(success, "Button wasn't registered");
+        }
+
         public bool TryShowDialog(string text, params ButtonDef[] buttonDefs)
         {
             if (Dialog.IsVisible) return false;
@@ -67,6 +82,7 @@ namespace Client
                 var button = CreateDialogButton(def.Name, buttonX, buttonY);
                 button.UserData = def.Pressed;
                 DialogPanel.AddChild(button);
+                AddButton(button);
                 buttonX += space + ButtonTemplate.Width;
             }
             Dialog.Show();
@@ -78,6 +94,7 @@ namespace Client
             Dialog.Hide();
             foreach (var button in DialogButtons.ToArray())
             {
+                RemoveButton(button);
                 DialogPanel.RemoveChild(button.Name);
                 OverlayManager.Instance.Elements.DestroyElement(button.Name);
             }
@@ -117,11 +134,9 @@ namespace Client
                 CursorPanel.Top = input.AbsoluteMouseY;
             }
             if (_mode != null) _mode.Update(secondsPassed);
-            if (IsInitialized)
+            if (IsInitialized && input.IsMouseDownEvent(Axiom.Input.MouseButtons.Left))
             {
-                if (!Dialog.IsVisible) return;
-                if (!input.IsMouseDownEvent(Axiom.Input.MouseButtons.Left)) return;
-                var button = DialogButtons.FirstOrDefault(b => Contains(b, input.AbsoluteMouseX, input.AbsoluteMouseY));
+                var button = _buttons.FirstOrDefault(b => b.IsVisible && Contains(b, input.AbsoluteMouseX, input.AbsoluteMouseY));
                 if (button != null) ((Action)button.UserData)();
             }
         }
