@@ -12,31 +12,31 @@ namespace Client.Views
     /// </summary>
     internal class Inventory
     {
-        private string InventoryInstanceBaseName = "Overlays/Elements/InventoryInstance";
-        private string InventorySlotInstanceBaseName = "InventorySlot";
-        private string IconBaseName = "Overlays/Elements/IconInstance";
-        private int IconCount = 0;
+        private const string InventoryInstanceBaseName = "Overlays/Elements/InventoryInstance";
+        private const string InventorySlotInstanceBaseName = "InventorySlot";
+        private const string IconBaseName = "Overlays/Elements/IconInstance";
+        private int _iconCount;
         private string _name;
-        private Overlay _playerInventory;
+        private Overlay _inventory;
 
-        public bool IsVisible { get { return _playerInventory.IsVisible; } }
+        public bool IsVisible { get { return _inventory.IsVisible; } }
 
         public Inventory(string name, float x, float y, int size, int width)
         {
             _name = name;
-            _playerInventory = OverlayManager.Instance.Create("Overlays/PlayerInventory");
-            var playerInventoryElement = CreateInventory(x, y, size, width);
-            _playerInventory.AddElement(playerInventoryElement);
+            _inventory = OverlayManager.Instance.Create("Overlays/Inventory/" + _name);
+            var inventoryElement = CreateInventory(x, y, size, width);
+            _inventory.AddElement(inventoryElement);
         }
 
         public void Show()
         {
-            _playerInventory.Show();
+            _inventory.Show();
         }
 
         public void Hide()
         {
-            _playerInventory.Hide();
+            _inventory.Hide();
         }
 
         public void AddItemToInventory(int slot, string iconCategory, string iconName, int count)
@@ -56,7 +56,7 @@ namespace Client.Views
 
         private OverlayElementContainer CreateIcon(string category, string name, int count)
         {
-            var iconName = IconBaseName + "_" + IconCount;
+            var iconName = IconBaseName + "/" + _name + "_" + _iconCount;
             var iconBase = (OverlayElementContainer)OverlayManager.Instance.Elements.CreateElementFromTemplate("Overlays/Templates/IconBase", null, iconName);
             var iconImage = (OverlayElementContainer)OverlayManager.Instance.Elements.CreateElementFromTemplate("Overlays/Templates/Icons/" + category + "/" + name, null, iconName + "/IconImage");
             var iconOverlay = (OverlayElementContainer)OverlayManager.Instance.Elements.CreateElementFromTemplate("Overlays/Templates/IconOverlay", null, iconName + "/IconOverlay");
@@ -67,7 +67,7 @@ namespace Client.Views
             iconBase.Top = 3;
             iconBase.Left = 3;
 
-            IconCount++;
+            _iconCount++;
             return iconBase;
         }
 
