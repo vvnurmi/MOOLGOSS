@@ -36,15 +36,10 @@ namespace Client
         private UIMode _mode;
         private int _mouseHideX;
         private int _mouseHideY;
+        private Views.Inventory _playerInventory;
 
         private bool IsInitialized { get { return Globals.UI != null; } }
-        private string InventoryInstanceBaseName = "Overlays/Elements/InventoryInstance";
-        private string InventorySlotInstanceBaseName = "InventorySlot";
-        private string IconBaseName = "Overlays/Elements/IconInstance";
-        private int IconCount = 0;
-        private string PlayerInventoryName = "Player0";
-        private Overlay PlayerInventory { get { return OverlayManager.Instance.GetByName("Overlays/PlayerInventory"); } }
-        private OverlayElementContainer PlayerInventoryElement = null;
+        public Views.Inventory PlayerInventory { get { return _playerInventory = _playerInventory ?? new Views.Inventory("Player0", 10, 10, 28, 5); } }
         private Overlay TestWindow { get { return OverlayManager.Instance.GetByName("Overlays/TestWindow"); } }
         private Overlay Cursor { get { return OverlayManager.Instance.GetByName("Overlays/Cursor"); } }
         private OverlayElementContainer CursorPanel { get { return Cursor.GetChild("Overlays/Elements/CursorPanel"); } }
@@ -55,7 +50,6 @@ namespace Client
         private Overlay TitleScreen { get { return OverlayManager.Instance.GetByName("Overlays/TitleScreen"); } }
 
         public string Mode { get { return _mode == null ? "<none>" : _mode.Name; } }
-        public bool IsPlayerInventoryVisible { get { return PlayerInventory.IsVisible; } }
         public bool IsTitleScreenVisible { get { return TitleScreen.IsVisible; } }
         public bool IsMouseVisible { get { return Cursor.IsVisible; } }
 
@@ -174,89 +168,6 @@ namespace Client
             button.Left = x;
             button.Top = y;
             return button;
-        }
-
-        public void ShowPlayerInventory()
-        {
-            if (PlayerInventoryElement == null)
-            {
-                PlayerInventoryElement = CreateInventory(PlayerInventoryName, 10, 10, 28, 5);
-                PlayerInventory.AddElement(PlayerInventoryElement);
-                AddItemToInventory(PlayerInventoryName, 3, "Solid", "IronOre", 23);
-                AddItemToInventory(PlayerInventoryName, 10, "Data", "Default", 310);
-                //RemoveItemFromInventory(PlayerInventoryName, 3);
-            }
-            
-            if (!IsPlayerInventoryVisible)
-                PlayerInventory.Show();
-        }
-
-        public void HidePlayerInventory()
-        {
-            if (IsPlayerInventoryVisible)
-                PlayerInventory.Hide();
-        }
-
-        public void AddItemToInventory(string inventoryName, int slot, string iconCategory, string iconName, int count)
-        {
-            var inventorySlot = (OverlayElementContainer)OverlayManager.Instance.Elements.GetElement(InventoryInstanceBaseName + inventoryName + "/" + InventorySlotInstanceBaseName + slot);
-
-            if (inventorySlot != null)
-                inventorySlot.AddChildElement(CreateIcon(iconCategory, iconName, count));
-        }
-
-        public void RemoveItemFromInventory(string inventoryName, int slot)
-        {
-            var inventorySlot = (OverlayElementContainer)OverlayManager.Instance.Elements.GetElement(InventoryInstanceBaseName + inventoryName + "/" + InventorySlotInstanceBaseName + slot);
-            if (inventorySlot != null && inventorySlot.Children.Count > 0)
-                    inventorySlot.RemoveChild(inventorySlot.Children.ElementAt(0).Value.Name);
-        }
-
-        private OverlayElementContainer CreateIcon(string category, string name, int count)
-        {
-            var iconName = IconBaseName + "_" + IconCount;
-            var iconBase = (OverlayElementContainer)OverlayManager.Instance.Elements.CreateElementFromTemplate("Overlays/Templates/IconBase", null, iconName);
-            var iconImage = (OverlayElementContainer)OverlayManager.Instance.Elements.CreateElementFromTemplate("Overlays/Templates/Icons/" + category + "/" + name, null, iconName + "/IconImage");
-            var iconOverlay = (OverlayElementContainer)OverlayManager.Instance.Elements.CreateElementFromTemplate("Overlays/Templates/IconOverlay", null, iconName + "/IconOverlay");
-            iconOverlay.GetChild(iconName + "/IconOverlay/Count").Text = "" + count;
-            
-            iconBase.AddChildElement(iconImage);
-            iconBase.AddChildElement(iconOverlay);
-            iconBase.Top = 3;
-            iconBase.Left = 3;
-
-            IconCount++;
-            return iconBase;
-        }
-
-        private OverlayElementContainer CreateInventory(string name, float x, float y, int size, int width)
-        {
-            var inventoryInstanceName = InventoryInstanceBaseName + name;
-            var inventory = (OverlayElementContainer)OverlayManager.Instance.Elements.CreateElementFromTemplate("Overlays/Templates/InventoryBase", null, inventoryInstanceName);
-            inventory.Left = x;
-            inventory.Top = y;
-
-            var inventorySlotMargin = 2;
-            OverlayElement inventorySlotTemplate = (OverlayElement)OverlayManager.Instance.Elements.GetElement("Overlays/Templates/WindowItemSlot", true);
-            var inventoryBaseBorders = (OverlayElementContainer)inventory.GetChild(inventoryInstanceName + "/InventoryBaseBorder");
-            inventoryBaseBorders.Width = width * (inventorySlotTemplate.Width + inventorySlotMargin) + 14;
-            inventoryBaseBorders.Height = ((int)Math.Ceiling((Decimal)size / (Decimal)width) * (inventorySlotTemplate.Height + inventorySlotMargin)) + 14;
-            var inventoryContent = (OverlayElementContainer)inventory.GetChild(inventoryInstanceName + "/InventoryContent");
-            inventoryContent.Width = inventoryBaseBorders.Width - 8;
-            inventoryContent.Height = inventoryBaseBorders.Height - 8;
-
-            for (int i = 0; i < size; i++)
-            {
-                int yPos = i / width;
-                int xPos = i % width;
-                var inventorySlotInstanceName = inventoryInstanceName + "/" + InventorySlotInstanceBaseName + i;
-                var inventorySlot = (OverlayElementContainer)OverlayManager.Instance.Elements.CreateElementFromTemplate("Overlays/Templates/WindowItemSlot", null, inventorySlotInstanceName);
-                inventorySlot.Left = xPos * (inventorySlot.Width + inventorySlotMargin) + 4;
-                inventorySlot.Top = yPos * (inventorySlot.Height + inventorySlotMargin) + 4;
-                inventoryContent.AddChildElement(inventorySlot);
-            }
-
-            return inventory;
         }
     }
 }

@@ -43,10 +43,10 @@ namespace Client.UI
         private void UpdateHandler(float secondsPassed)
         {
             if (Input.IsKeyDownEvent(KeyCodes.I))
-                if (Globals.UI.IsPlayerInventoryVisible)
-                    Globals.UI.HidePlayerInventory();
+                if (Globals.UI.PlayerInventory.IsVisible)
+                    Globals.UI.PlayerInventory.Hide();
                 else
-                    Globals.UI.ShowPlayerInventory();
+                    Globals.UI.PlayerInventory.Show();
             if (Input.IsKeyDownEvent(KeyCodes.Space))
                 if (Globals.UI.IsMouseVisible)
                     Globals.UI.HideMouse();
