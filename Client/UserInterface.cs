@@ -36,10 +36,8 @@ namespace Client
         private UIMode _mode;
         private int _mouseHideX;
         private int _mouseHideY;
-        private Views.Inventory _playerInventory;
 
         private bool IsInitialized { get { return Globals.UI != null; } }
-        public Views.Inventory PlayerInventory { get { return _playerInventory = _playerInventory ?? new Views.Inventory("Player0", 10, 10, 28, 5); } }
         private Overlay Cursor { get { return OverlayManager.Instance.GetByName("Overlays/Cursor"); } }
         private OverlayElementContainer CursorPanel { get { return Cursor.GetChild("Overlays/Elements/CursorPanel"); } }
         private Overlay Dialog { get { return OverlayManager.Instance.GetByName("Overlays/Dialog"); } }

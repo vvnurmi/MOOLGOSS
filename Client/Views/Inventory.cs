@@ -1,9 +1,11 @@
 ﻿using Axiom.Overlays;
+using Core.Items;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using InventoryModel = Core.Items.Inventory;
 
 namespace Client.Views
 {
@@ -12,21 +14,33 @@ namespace Client.Views
     /// </summary>
     internal class Inventory
     {
-        private const string InventoryInstanceBaseName = "Overlays/Elements/InventoryInstance";
+        private string InstanceName { get { return "Overlays/Elements/Inventory/" + _name; } }
         private const string InventorySlotInstanceBaseName = "InventorySlot";
         private const string IconBaseName = "Overlays/Elements/IconInstance";
         private int _iconCount;
         private string _name;
+        private int _slotCount;
         private Overlay _inventory;
+        private InventoryModel _model;
 
         public bool IsVisible { get { return _inventory.IsVisible; } }
 
-        public Inventory(string name, float x, float y, int size, int width)
+        public Inventory(string name, float x, float y, int slotCount, int slotCountX, InventoryModel model)
         {
             _name = name;
+            _slotCount = slotCount;
             _inventory = OverlayManager.Instance.Create("Overlays/Inventory/" + _name);
-            var inventoryElement = CreateInventory(x, y, size, width);
+            _model = model;
+            var inventoryElement = CreateOverlayElementContainer(x, y, slotCountX);
             _inventory.AddElement(inventoryElement);
+        }
+
+        public void SyncWithModel()
+        {
+            Clear();
+            var slot = 0;
+            foreach (var item in _model)
+                AddItem(slot++, ItemTypes.GetCategoryName(item.Type), ItemTypes.GetIconName(item.Type), item.Count);
         }
 
         public void Show()
@@ -39,19 +53,33 @@ namespace Client.Views
             _inventory.Hide();
         }
 
-        public void AddItemToInventory(int slot, string iconCategory, string iconName, int count)
+        private string GetSlotName(int slot)
         {
-            var inventorySlot = (OverlayElementContainer)OverlayManager.Instance.Elements.GetElement(InventoryInstanceBaseName + _name + "/" + InventorySlotInstanceBaseName + slot);
+            return InstanceName + "/" + InventorySlotInstanceBaseName + slot;
+        }
 
+        private OverlayElementContainer GetSlot(int slot)
+        {
+            return (OverlayElementContainer)OverlayManager.Instance.Elements.GetElement(GetSlotName(slot));
+        }
+
+        private void AddItem(int slot, string iconCategory, string iconName, int count)
+        {
+            var inventorySlot = GetSlot(slot);
             if (inventorySlot != null)
                 inventorySlot.AddChildElement(CreateIcon(iconCategory, iconName, count));
         }
 
-        public void RemoveItemFromInventory(int slot)
+        private void RemoveItem(int slot)
         {
-            var inventorySlot = (OverlayElementContainer)OverlayManager.Instance.Elements.GetElement(InventoryInstanceBaseName + _name + "/" + InventorySlotInstanceBaseName + slot);
+            var inventorySlot = GetSlot(slot);
             if (inventorySlot != null && inventorySlot.Children.Count > 0)
                 inventorySlot.RemoveChild(inventorySlot.Children.ElementAt(0).Value.Name);
+        }
+
+        private void Clear()
+        {
+            for (int i = 0; i < _slotCount; i++) RemoveItem(i);
         }
 
         private OverlayElementContainer CreateIcon(string category, string name, int count)
@@ -71,28 +99,27 @@ namespace Client.Views
             return iconBase;
         }
 
-        private OverlayElementContainer CreateInventory(float x, float y, int size, int width)
+        private OverlayElementContainer CreateOverlayElementContainer(float x, float y, int slotCountX)
         {
-            var inventoryInstanceName = InventoryInstanceBaseName + _name;
-            var inventory = (OverlayElementContainer)OverlayManager.Instance.Elements.CreateElementFromTemplate("Overlays/Templates/InventoryBase", null, inventoryInstanceName);
+            var inventory = (OverlayElementContainer)OverlayManager.Instance.Elements.CreateElementFromTemplate("Overlays/Templates/InventoryBase", null, InstanceName);
             inventory.Left = x;
             inventory.Top = y;
 
             var inventorySlotMargin = 2;
-            OverlayElement inventorySlotTemplate = (OverlayElement)OverlayManager.Instance.Elements.GetElement("Overlays/Templates/WindowItemSlot", true);
-            var inventoryBaseBorders = (OverlayElementContainer)inventory.GetChild(inventoryInstanceName + "/InventoryBaseBorder");
-            inventoryBaseBorders.Width = width * (inventorySlotTemplate.Width + inventorySlotMargin) + 14;
-            inventoryBaseBorders.Height = ((int)Math.Ceiling((Decimal)size / (Decimal)width) * (inventorySlotTemplate.Height + inventorySlotMargin)) + 14;
-            var inventoryContent = (OverlayElementContainer)inventory.GetChild(inventoryInstanceName + "/InventoryContent");
+            var inventorySlotTemplate = OverlayManager.Instance.Elements.GetElement("Overlays/Templates/WindowItemSlot", true);
+            var inventoryBaseBorders = inventory.GetChild(InstanceName + "/InventoryBaseBorder");
+            inventoryBaseBorders.Width = slotCountX * (inventorySlotTemplate.Width + inventorySlotMargin) + 14;
+            var rowCount = (_slotCount + slotCountX - 1) / slotCountX;
+            inventoryBaseBorders.Height = rowCount * (inventorySlotTemplate.Height + inventorySlotMargin) + 14;
+            var inventoryContent = (OverlayElementContainer)inventory.GetChild(InstanceName + "/InventoryContent");
             inventoryContent.Width = inventoryBaseBorders.Width - 8;
             inventoryContent.Height = inventoryBaseBorders.Height - 8;
 
-            for (int i = 0; i < size; i++)
+            for (int i = 0; i < _slotCount; i++)
             {
-                int yPos = i / width;
-                int xPos = i % width;
-                var inventorySlotInstanceName = inventoryInstanceName + "/" + InventorySlotInstanceBaseName + i;
-                var inventorySlot = (OverlayElementContainer)OverlayManager.Instance.Elements.CreateElementFromTemplate("Overlays/Templates/WindowItemSlot", null, inventorySlotInstanceName);
+                int yPos = i / slotCountX;
+                int xPos = i % slotCountX;
+                var inventorySlot = (OverlayElementContainer)OverlayManager.Instance.Elements.CreateElementFromTemplate("Overlays/Templates/WindowItemSlot", null, GetSlotName(i));
                 inventorySlot.Left = xPos * (inventorySlot.Width + inventorySlotMargin) + 4;
                 inventorySlot.Top = yPos * (inventorySlot.Height + inventorySlotMargin) + 4;
                 inventoryContent.AddChildElement(inventorySlot);

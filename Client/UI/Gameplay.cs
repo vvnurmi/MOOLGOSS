@@ -1,13 +1,14 @@
 ﻿using Axiom.Input;
 using Axiom.Math;
 using Core;
-using Core.Items;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using InventoryView = Client.Views.Inventory;
+using InventoryModel = Core.Items.Inventory;
 
 namespace Client.UI
 {
@@ -17,7 +18,8 @@ namespace Client.UI
         private SpaceVisualization _visualization;
         private Ship _ship;
         private Mission _mission;
-        private Inventory _inventory;
+        private InventoryModel _inventory;
+        private InventoryView _inventoryView;
         private IAsyncResult _shipUpdateHandle;
         private bool _exiting;
 
@@ -35,6 +37,8 @@ namespace Client.UI
         private void EnterHandler()
         {
             _inventory = _service.GetInventory(Guid.NewGuid());
+            _inventory.Add(new Core.Items.ItemStack(Guid.NewGuid(), Core.Items.ItemType.MiningDroid, 2)); // !!!
+            _inventoryView = new InventoryView("Player", 10, 10, 28, 5, _inventory);
             _ship = new Ship(Guid.NewGuid(), Vector3.Zero, Vector3.UnitX, Vector3.UnitY);
             _shipUpdateHandle = new Action(UpdateShipsLoop).BeginInvoke(null, null);
             CreateSpace();
@@ -43,10 +47,10 @@ namespace Client.UI
         private void UpdateHandler(float secondsPassed)
         {
             if (Input.IsKeyDownEvent(KeyCodes.I))
-                if (Globals.UI.PlayerInventory.IsVisible)
-                    Globals.UI.PlayerInventory.Hide();
+                if (_inventoryView.IsVisible)
+                    _inventoryView.Hide();
                 else
-                    Globals.UI.PlayerInventory.Show();
+                    _inventoryView.Show();
             if (Input.IsKeyDownEvent(KeyCodes.Space))
                 if (Globals.UI.IsMouseVisible)
                     Globals.UI.HideMouse();
@@ -69,6 +73,7 @@ namespace Client.UI
             }
             UpdateCamera();
             UpdateMission();
+            _inventoryView.SyncWithModel();
             _visualization.UpdateShip(_ship, 0);
             _visualization.Update();
         }
