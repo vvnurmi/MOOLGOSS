@@ -40,7 +40,6 @@ namespace Client
 
         private bool IsInitialized { get { return Globals.UI != null; } }
         public Views.Inventory PlayerInventory { get { return _playerInventory = _playerInventory ?? new Views.Inventory("Player0", 10, 10, 28, 5); } }
-        private Overlay TestWindow { get { return OverlayManager.Instance.GetByName("Overlays/TestWindow"); } }
         private Overlay Cursor { get { return OverlayManager.Instance.GetByName("Overlays/Cursor"); } }
         private OverlayElementContainer CursorPanel { get { return Cursor.GetChild("Overlays/Elements/CursorPanel"); } }
         private Overlay Dialog { get { return OverlayManager.Instance.GetByName("Overlays/Dialog"); } }
@@ -56,13 +55,6 @@ namespace Client
         public UserInterface()
         {
             HideMouse();
-        }
-
-        public bool TryShowTestWindow()
-        {
-            if (TestWindow.IsVisible) return false;
-            TestWindow.Show();
-            return true;
         }
 
         public bool TryShowDialog(string text, params ButtonDef[] buttonDefs)
