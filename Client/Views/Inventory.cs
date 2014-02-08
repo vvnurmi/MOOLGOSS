@@ -22,6 +22,7 @@ namespace Client.Views
         private int _slotCount;
         private Overlay _inventory;
         private InventoryModel _model;
+        private int _modelChangeTimestamp;
 
         public bool IsVisible { get { return _inventory.IsVisible; } }
 
@@ -31,12 +32,15 @@ namespace Client.Views
             _slotCount = slotCount;
             _inventory = OverlayManager.Instance.Create("Overlays/Inventory/" + _name);
             _model = model;
+            _modelChangeTimestamp = -1;
             var inventoryElement = CreateOverlayElementContainer(x, y, slotCountX);
             _inventory.AddElement(inventoryElement);
         }
 
         public void SyncWithModel()
         {
+            if (_modelChangeTimestamp == _model.ChangeTimestamp) return;
+            _modelChangeTimestamp = _model.ChangeTimestamp;
             Clear();
             var slot = 0;
             foreach (var item in _model)

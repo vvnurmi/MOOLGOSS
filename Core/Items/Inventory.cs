@@ -13,6 +13,7 @@ namespace Core.Items
         private Dictionary<Guid, ItemStack> _stacks = new Dictionary<Guid,ItemStack>();
 
         public Guid ID { get; private set; }
+        public int ChangeTimestamp { get; private set; }
 
         public Inventory(Guid id)
         {
@@ -23,11 +24,13 @@ namespace Core.Items
         {
             Debug.Assert(!_stacks.ContainsKey(stack.ID));
             _stacks.Add(stack.ID, stack);
+            ChangeTimestamp++;
         }
 
         public void Remove(Guid id)
         {
             _stacks.Remove(id);
+            ChangeTimestamp++;
         }
 
         public IEnumerator<ItemStack> GetEnumerator()
