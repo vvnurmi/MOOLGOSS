@@ -54,7 +54,7 @@ namespace Client
 
         public UserInterface()
         {
-            HideMouse();
+            if (Globals.Input != null) HideMouse();
         }
 
         public void AddButton(OverlayElement button)
