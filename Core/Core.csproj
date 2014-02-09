@@ -64,6 +64,7 @@
     <Compile Include="Serial\Vector3Surrogate.cs" />
     <Compile Include="Ship.cs" />
     <Compile Include="Util.cs" />
+    <Compile Include="World.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
