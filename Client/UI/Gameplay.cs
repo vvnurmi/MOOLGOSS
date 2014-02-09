@@ -17,7 +17,6 @@ namespace Client.UI
     {
         private IService _service;
         private SpaceVisualization _visualization;
-        private Ship _ship;
         private Mission _mission;
         private InventoryModel _inventory;
         private InventoryView _inventoryView;
@@ -43,14 +42,15 @@ namespace Client.UI
             _inventoryView = new InventoryView("Player", 10, 10, 28, 5, _inventory);
             _topBarView = new TopBarView("Space", "The Ancient Sector : First Space Station");
             _topBarView.AddHotBarButton("dock", "DOCK (F1)");
-            _ship = new Ship(Guid.NewGuid(), Vector3.Zero, Vector3.UnitX, Vector3.UnitY);
+            Globals.PlayerShip = new Ship(Guid.NewGuid(), Vector3.Zero, Vector3.UnitX, Vector3.UnitY);
             _shipUpdateHandle = new Action(UpdateShipsLoop).BeginInvoke(null, null);
             CreateSpace();
         }
 
         private void UpdateHandler(float secondsPassed)
         {
-           if (!_topBarView.IsVisible)
+            var ship = Globals.PlayerShip;
+            if (!_topBarView.IsVisible)
                 _topBarView.Show();
 
             if (Input.IsKeyDownEvent(KeyCodes.I))
@@ -65,23 +65,23 @@ namespace Client.UI
                     Globals.UI.ShowMouse();
             if (!Globals.UI.IsMouseVisible)
             {
-                _ship.Yaw(-0.3f * Input.RelativeMouseX);
-                _ship.Pitch(-0.3f * Input.RelativeMouseY);
+                ship.Yaw(-0.3f * Input.RelativeMouseX);
+                ship.Pitch(-0.3f * Input.RelativeMouseY);
                 var roll = 0f;
                 if (Input.IsKeyPressed(KeyCodes.Q)) roll--;
                 if (Input.IsKeyPressed(KeyCodes.E)) roll++;
-                _ship.Roll(roll * 45 * secondsPassed);
+                ship.Roll(roll * 45 * secondsPassed);
                 var move = Vector3.Zero;
-                if (Input.IsKeyPressed(KeyCodes.W)) move += _ship.Front;
-                if (Input.IsKeyPressed(KeyCodes.S)) move -= _ship.Front;
-                if (Input.IsKeyPressed(KeyCodes.A)) move -= _ship.Right;
-                if (Input.IsKeyPressed(KeyCodes.D)) move += _ship.Right;
-                _ship.Move(move * 25 * secondsPassed);
+                if (Input.IsKeyPressed(KeyCodes.W)) move += ship.Front;
+                if (Input.IsKeyPressed(KeyCodes.S)) move -= ship.Front;
+                if (Input.IsKeyPressed(KeyCodes.A)) move -= ship.Right;
+                if (Input.IsKeyPressed(KeyCodes.D)) move += ship.Right;
+                ship.Move(move * 25 * secondsPassed);
             }
             UpdateCamera();
             UpdateMission();
             _inventoryView.SyncWithModel();
-            _visualization.UpdateShip(_ship, 0);
+            _visualization.UpdateShip(ship, 0);
             _visualization.Update();
         }
 
@@ -112,12 +112,13 @@ namespace Client.UI
         private void UpdateCamera()
         {
             float SMOOTHNESS = 0.90f; // To be slightly below one.
-            var cameraTilt = Quaternion.FromAngleAxis(Utility.DegreesToRadians(-10), _ship.Right);
-            var targetOrientation = cameraTilt * _ship.Orientation;
+            var ship = Globals.PlayerShip;
+            var cameraTilt = Quaternion.FromAngleAxis(Utility.DegreesToRadians(-10), ship.Right);
+            var targetOrientation = cameraTilt * ship.Orientation;
             Globals.Camera.Orientation = Quaternion.Nlerp(1 - SMOOTHNESS, Globals.Camera.Orientation, targetOrientation, true);
-            var cameraRelativeGoal = -6 * _ship.Front + 1.7 * _ship.Up;
-            var cameraRelative = Globals.Camera.Position - _ship.Pos;
-            Globals.Camera.Position = _ship.Pos + SMOOTHNESS * cameraRelative + (1 - SMOOTHNESS) * cameraRelativeGoal;
+            var cameraRelativeGoal = -6 * ship.Front + 1.7 * ship.Up;
+            var cameraRelative = Globals.Camera.Position - ship.Pos;
+            Globals.Camera.Position = ship.Pos + SMOOTHNESS * cameraRelative + (1 - SMOOTHNESS) * cameraRelativeGoal;
         }
 
         private void UpdateMission()
@@ -125,7 +126,7 @@ namespace Client.UI
             switch (_mission.State)
             {
                 case MissionState.Open:
-                    if (_mission.AssignVolume.Intersects(_ship.Pos))
+                    if (_mission.AssignVolume.Intersects(Globals.PlayerShip.Pos))
                     {
                         _mission.Offer();
                         Globals.UI.TryShowDialog(_mission.AssignMessage,
@@ -136,7 +137,7 @@ namespace Client.UI
                 case MissionState.Offering: break;
                 case MissionState.Suppressed: break;
                 case MissionState.Assigned:
-                    if (_mission.CompleteVolume.Intersects(_ship.Pos))
+                    if (_mission.CompleteVolume.Intersects(Globals.PlayerShip.Pos))
                     {
                         _mission.Complete();
                         Globals.UI.TryShowDialog(_mission.CompleteMessage,
@@ -154,9 +155,9 @@ namespace Client.UI
             while (!_exiting)
             {
                 Thread.Sleep(TimeSpan.FromSeconds(updateInterval));
-                _service.UpdateShip(_ship.ID, _ship.Pos, _ship.Front, _ship.Up);
+                _service.UpdateShip(Globals.PlayerShip.ID, Globals.PlayerShip.Pos, Globals.PlayerShip.Front, Globals.PlayerShip.Up);
                 foreach (var ship in _service.GetShips())
-                    if (ship.ID != _ship.ID) _visualization.UpdateShip(ship, updateInterval);
+                    if (ship.ID != Globals.PlayerShip.ID) _visualization.UpdateShip(ship, updateInterval);
             }
         }
     }

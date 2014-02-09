@@ -1,4 +1,5 @@
-﻿using Core.Items;
+﻿using Axiom.Math;
+using Core.Items;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,6 +8,14 @@ using System.Threading.Tasks;
 
 namespace Client
 {
+    internal enum ItemActivationResult
+    {
+        /// <summary>
+        /// The item was depleted and should be erased from its container.
+        /// </summary>
+        IsDepleted,
+    }
+
     internal static class ItemTypes
     {
         public static string GetCategoryName(ItemType type)
@@ -27,10 +36,13 @@ namespace Client
             }
         }
 
-        public static void Activate(ItemType type)
+        public static ItemActivationResult Activate(ItemType type, Vector3 pos)
         {
             switch (type)
             {
+                case ItemType.MiningDroid:
+                    //!!! Globals.World.Droids.Add(pos);
+                    return ItemActivationResult.IsDepleted;
                 default: throw new NotImplementedException("Activate for " + type);
             }
         }

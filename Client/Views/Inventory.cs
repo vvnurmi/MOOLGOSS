@@ -72,7 +72,19 @@ namespace Client.Views
             var inventorySlot = GetSlot(slot);
             Debug.Assert(inventorySlot != null && !inventorySlot.Children.Any());
             var icon = CreateIcon(ItemTypes.GetCategoryName(stack.Type), ItemTypes.GetIconName(stack.Type), stack.Count);
-            icon.UserData = new Action(() => ItemTypes.Activate(stack.Type));
+            icon.UserData = new Action(() =>
+            {
+                var result = ItemTypes.Activate(stack.Type, Globals.PlayerShip.Pos);
+                switch (result)
+                {
+                    case ItemActivationResult.IsDepleted:
+                        // TODO: Only use one item off the stack.
+                        // TODO: What if the item has been moved to another slot?
+                        ClearSlot(slot);
+                        break;
+                    default: throw new NotImplementedException("Activation result " + result);
+                }
+            });
             Globals.UI.AddButton(icon);
             inventorySlot.AddChildElement(icon);
         }

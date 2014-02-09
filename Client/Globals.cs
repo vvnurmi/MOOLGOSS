@@ -1,5 +1,6 @@
 ﻿using Axiom.Core;
 using Axiom.Input;
+using Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +15,7 @@ namespace Client
         public static Camera Camera { get; set; }
         public static Input Input { get; set; }
         public static UserInterface UI { get; set; }
+        public static Ship PlayerShip { get; set; }
         public static float TotalTime { get; set; }
     }
 }
