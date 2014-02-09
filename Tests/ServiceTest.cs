@@ -51,11 +51,24 @@ namespace Tests
         }
 
         [Test]
-        public void TestInventory()
+        public void TestInventoryAdd_Success()
         {
             var id = Guid.NewGuid();
             Assert.IsEmpty(PublicService.GetInventory(id));
             PublicService.AddToInventory(id, new ItemStack(Guid.NewGuid(), ItemType.MiningDroid, 1));
+        }
+
+        [Test]
+        public void TestInventoryAdd_DoubleAddFails()
+        {
+            var id1 = Guid.NewGuid();
+            var id2 = Guid.NewGuid();
+            var stack = new ItemStack(Guid.NewGuid(), ItemType.MiningDroid, 1);
+            PublicService.AddToInventory(id1, stack);
+            PublicService.AddToInventory(id1, stack); // Fails silently.
+            PublicService.AddToInventory(id2, stack); // Fails silently.
+            Assert.AreEqual(1, PublicService.GetInventory(id1).Count());
+            Assert.AreEqual(0, PublicService.GetInventory(id2).Count());
         }
     }
 }

@@ -28,7 +28,10 @@ namespace Tests
         [Test]
         public void TestAdd()
         {
-            _inventory.Add(new ItemStack(Guid.NewGuid(), ItemType.MiningDroid, 1));
+            var stack = new ItemStack(Guid.NewGuid(), ItemType.MiningDroid, 1);
+            Assert.AreEqual(Guid.Empty, stack.ContainerID);
+            _inventory.Add(stack);
+            Assert.AreEqual(_inventory.ID, stack.ContainerID);
             CollectionAssert.AreEqual(
                 new[] { Tuple.Create(ItemType.MiningDroid, 1) },
                 _inventory.Select(x => Tuple.Create(x.Type, x.Count)));
@@ -38,9 +41,17 @@ namespace Tests
         public void TestRemove()
         {
             var id = Guid.NewGuid();
-            _inventory.Add(new ItemStack(id, ItemType.MiningDroid, 1));
+            var stack = new ItemStack(id, ItemType.MiningDroid, 1);
+            _inventory.Add(stack);
             _inventory.Remove(id);
+            Assert.AreEqual(Guid.Empty, stack.ContainerID);
             Assert.IsEmpty(_inventory);
+        }
+
+        [Test]
+        public void TestRemove_NonexistentOk()
+        {
+            _inventory.Remove(Guid.NewGuid());
         }
     }
 }

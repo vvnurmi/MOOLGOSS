@@ -20,16 +20,24 @@ namespace Core.Items
             ID = id;
         }
 
+        /// <summary>
+        /// Throws <see cref="InvalidOperationException"/> if the stack is already contained in some inventory.
+        /// </summary>
         public void Add(ItemStack stack)
         {
+            if (stack.ContainerID != Guid.Empty) throw new InvalidOperationException("The stack is already contained somewhere else");
             Debug.Assert(!_stacks.ContainsKey(stack.ID));
             _stacks.Add(stack.ID, stack);
+            stack.ContainerID = ID;
             ChangeTimestamp++;
         }
 
         public void Remove(Guid id)
         {
+            ItemStack stack;
+            if (!_stacks.TryGetValue(id, out stack)) return;
             _stacks.Remove(id);
+            stack.ContainerID = Guid.Empty;
             ChangeTimestamp++;
         }
 

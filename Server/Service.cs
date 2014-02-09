@@ -55,7 +55,14 @@ namespace Server
 
         public void AddToInventory(Guid id, ItemStack stack)
         {
-            _inventories[id].Add(stack);
+            var inventory = GetOrAddInventory(id);
+            try
+            {
+                inventory.Add(stack);
+            }
+            catch (InvalidOperationException)
+            {
+            }
         }
 
         private Ship GetOrAddShip(Guid id)

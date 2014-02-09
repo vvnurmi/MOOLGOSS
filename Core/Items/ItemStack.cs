@@ -10,6 +10,11 @@ namespace Core.Items
     public class ItemStack
     {
         public Guid ID { get; private set; }
+        /// <summary>
+        /// ID of the container of the <see cref="ItemStack"/>
+        /// or <see cref="Guid.Empty"/> if the stack is not contained in anything.
+        /// </summary>
+        public Guid ContainerID { get; set; }
         public ItemType Type { get; private set; }
         public int Count { get; private set; }
 
