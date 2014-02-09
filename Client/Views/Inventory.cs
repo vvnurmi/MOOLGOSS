@@ -2,6 +2,7 @@
 using Core.Items;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -43,8 +44,7 @@ namespace Client.Views
             _modelChangeTimestamp = _model.ChangeTimestamp;
             Clear();
             var slot = 0;
-            foreach (var item in _model)
-                AddItem(slot++, ItemTypes.GetCategoryName(item.Type), ItemTypes.GetIconName(item.Type), item.Count);
+            foreach (var item in _model) AddItemStack(slot++, item);
         }
 
         public void Show()
@@ -67,23 +67,28 @@ namespace Client.Views
             return (OverlayElementContainer)OverlayManager.Instance.Elements.GetElement(GetSlotName(slot));
         }
 
-        private void AddItem(int slot, string iconCategory, string iconName, int count)
+        private void AddItemStack(int slot, ItemStack stack)
         {
             var inventorySlot = GetSlot(slot);
-            if (inventorySlot != null)
-                inventorySlot.AddChildElement(CreateIcon(iconCategory, iconName, count));
+            Debug.Assert(inventorySlot != null && !inventorySlot.Children.Any());
+            var icon = CreateIcon(ItemTypes.GetCategoryName(stack.Type), ItemTypes.GetIconName(stack.Type), stack.Count);
+            icon.UserData = new Action(() => ItemTypes.Activate(stack.Type));
+            Globals.UI.AddButton(icon);
+            inventorySlot.AddChildElement(icon);
         }
 
-        private void RemoveItem(int slot)
+        private void ClearSlot(int slot)
         {
             var inventorySlot = GetSlot(slot);
-            if (inventorySlot != null && inventorySlot.Children.Count > 0)
-                inventorySlot.RemoveChild(inventorySlot.Children.ElementAt(0).Value.Name);
+            if (inventorySlot == null || !inventorySlot.Children.Any()) return;
+            var icon = inventorySlot.Children.First().Value;
+            Globals.UI.RemoveButton(icon);
+            inventorySlot.RemoveChild(icon.Name);
         }
 
         private void Clear()
         {
-            for (int i = 0; i < _slotCount; i++) RemoveItem(i);
+            for (int i = 0; i < _slotCount; i++) ClearSlot(i);
         }
 
         private OverlayElementContainer CreateIcon(string category, string name, int count)
