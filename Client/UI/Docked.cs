@@ -13,6 +13,8 @@ namespace Client.UI
     class Docked : UIMode
     {
         private TopBarView _topBarView;
+        private string _baseName = "First Space Station";
+        private string _currentLocation;
 
         public Docked()
             : base("Docked")
@@ -28,13 +30,15 @@ namespace Client.UI
 
             if (_topBarView == null)
             {
-                _topBarView = new TopBarView("Docked", "First Space Station");
+                _topBarView = new TopBarView("Docked", _baseName);
             }
 
             _topBarView.AddButton("bar", "BAR (F1)", MoveToBar);
             _topBarView.AddButton("shopping", "SHOPS (F2)", MoveToShopping);
             _topBarView.AddButton("hangar", "HANGAR (F3)", MoveToHangar);
             _topBarView.AddButton("leave", "LEAVE (F4)", TryLeave);
+
+            MoveToHangar();
         }
 
         private void UpdateHandler(float secondsPassed)
@@ -63,16 +67,27 @@ namespace Client.UI
             }
         }
 
+        private void MoveTo(string location)
+        {
+            _currentLocation = location;
+
+            if (_topBarView != null)
+                _topBarView.SetLocationText(_baseName + " : " + _currentLocation);
+        }
+
         private void MoveToBar()
         {
+            MoveTo("Bar");
         }
 
         private void MoveToShopping()
         {
+            MoveTo("Shops");
         }
 
         private void MoveToHangar()
         {
+            MoveTo("Hangar");
         }
 
         private void TryLeave()
