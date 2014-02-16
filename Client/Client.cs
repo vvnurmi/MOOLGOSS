@@ -50,6 +50,7 @@ namespace Client
                 Globals.UI = new UserInterface();
                 Globals.UI.AddMode(new TitleScreen());
                 Globals.UI.AddMode(new Gameplay(service));
+                Globals.UI.AddMode(new Docked());
                 Globals.UI.SetMode("Title Screen");
                 CreateCamera(window);
                 root.FrameStarted += FrameStartedHandler;

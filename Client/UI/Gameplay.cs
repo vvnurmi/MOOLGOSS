@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using InventoryView = Client.Views.Inventory;
+using TopBarView = Client.Views.TopBar;
 using InventoryModel = Core.Items.Inventory;
 
 namespace Client.UI
@@ -20,6 +21,7 @@ namespace Client.UI
         private Mission _mission;
         private InventoryModel _inventory;
         private InventoryView _inventoryView;
+        private TopBarView _topBarView;
         private IAsyncResult _shipUpdateHandle;
         private bool _exiting;
 
@@ -39,6 +41,8 @@ namespace Client.UI
             _inventory = _service.GetInventory(Guid.NewGuid());
             _inventory.Add(new Core.Items.ItemStack(Guid.NewGuid(), Core.Items.ItemType.MiningDroid, 2)); // !!!
             _inventoryView = new InventoryView("Player", 10, 10, 28, 5, _inventory);
+            _topBarView = new TopBarView("Space", "The Ancient Sector : First Space Station");
+            _topBarView.AddHotBarButton("dock", "DOCK (F1)");
             _ship = new Ship(Guid.NewGuid(), Vector3.Zero, Vector3.UnitX, Vector3.UnitY);
             _shipUpdateHandle = new Action(UpdateShipsLoop).BeginInvoke(null, null);
             CreateSpace();
@@ -46,6 +50,9 @@ namespace Client.UI
 
         private void UpdateHandler(float secondsPassed)
         {
+           if (!_topBarView.IsVisible)
+                _topBarView.Show();
+
             if (Input.IsKeyDownEvent(KeyCodes.I))
                 if (_inventoryView.IsVisible)
                     _inventoryView.Hide();
@@ -80,6 +87,9 @@ namespace Client.UI
 
         private void ExitHandler()
         {
+            if (_topBarView.IsVisible)
+                _topBarView.Hide();
+
             _exiting = true;
             _shipUpdateHandle.AsyncWaitHandle.WaitOne(TimeSpan.FromSeconds(2));
         }

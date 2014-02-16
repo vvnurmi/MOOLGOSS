@@ -92,7 +92,7 @@ namespace Client.Views
             var iconBase = (OverlayElementContainer)OverlayManager.Instance.Elements.CreateElementFromTemplate("Overlays/Templates/IconBase", null, iconName);
             var iconImage = (OverlayElementContainer)OverlayManager.Instance.Elements.CreateElementFromTemplate("Overlays/Templates/Icons/" + category + "/" + name, null, iconName + "/IconImage");
             var iconOverlay = (OverlayElementContainer)OverlayManager.Instance.Elements.CreateElementFromTemplate("Overlays/Templates/IconOverlay", null, iconName + "/IconOverlay");
-            iconOverlay.GetChild(iconName + "/IconOverlay/Count").Text = "" + count;
+            iconOverlay.GetChild(iconName + "/IconOverlay/IconText").Text = "" + count;
 
             iconBase.AddChildElement(iconImage);
             iconBase.AddChildElement(iconOverlay);
