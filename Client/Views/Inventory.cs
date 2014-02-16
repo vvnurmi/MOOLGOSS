@@ -96,6 +96,7 @@ namespace Client.Views
             var icon = inventorySlot.Children.First().Value;
             Globals.UI.RemoveButton(icon);
             inventorySlot.RemoveChild(icon.Name);
+            OverlayManager.Instance.Elements.DestroyElement(icon);
         }
 
         private void Clear()

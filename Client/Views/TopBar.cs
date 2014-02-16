@@ -43,12 +43,14 @@ namespace Client.Views
             _topBarElement.GetChild(InstanceName + "/LocationText").Text = location;
         }
 
-        public void AddButton(string name, string label)
+        public void AddButton(string name, string label, Action action)
         {
             var topBarButtonBarElement = (OverlayElementContainer)_topBarElement.GetChild(InstanceName + "/ButtonContainer");
             var button = CreateButton(name, label);
             button.Left = _buttonCount * (ButtonTemplate.Width + _buttonBarButtonMargin);
+            button.UserData = action;
             _buttonCount++;
+            Globals.UI.AddButton(button);
             topBarButtonBarElement.AddChild(button);
             ResizeButtonContainer();
         }
@@ -56,6 +58,9 @@ namespace Client.Views
         public void RemoveButton(string name)
         {
             var topBarButtonBarElement = (OverlayElementContainer)_topBarElement.GetChild(InstanceName + "/ButtonContainer");
+            var button = (OverlayElementContainer)topBarButtonBarElement.GetChild(ButtonBarButtonBaseName + "/" + _name + "_" + name);
+            Globals.UI.RemoveButton(button);
+            OverlayManager.Instance.Elements.DestroyElement(button);
             topBarButtonBarElement.RemoveChild(ButtonBarButtonBaseName + "/" + _name + "_" + name);
             _buttonCount--;
             ResizeButtonContainer();

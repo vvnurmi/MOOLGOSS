@@ -37,14 +37,36 @@ namespace Client.UI
 
         private void EnterHandler()
         {
-            _inventory = _service.GetInventory(Guid.NewGuid());
-            _inventory.Add(new Core.Items.ItemStack(Guid.NewGuid(), Core.Items.ItemType.MiningDroid, 2)); // !!!
-            _inventoryView = new InventoryView("Player", 10, 10, 28, 5, _inventory);
-            _topBarView = new TopBarView("Space", "The Ancient Sector : First Space Station");
-            _topBarView.AddButton("dock", "DOCK (F1)");
-            Globals.PlayerShip = new Ship(Guid.NewGuid(), Vector3.Zero, Vector3.UnitX, Vector3.UnitY);
-            _shipUpdateHandle = new Action(UpdateShipsLoop).BeginInvoke(null, null);
-            CreateSpace();
+            Globals.UI.HideMouse();
+
+            if (_inventory == null)
+            {
+                _inventory = _service.GetInventory(Guid.NewGuid());
+                _inventory.Add(new Core.Items.ItemStack(Guid.NewGuid(), Core.Items.ItemType.MiningDroid, 2)); // !!!
+                _inventoryView = new InventoryView("Player", 10, 10, 28, 5, _inventory);
+            }
+
+            if (_topBarView == null)
+            {
+                _topBarView = new TopBarView("Space", "The Ancient Sector : First Space Station");
+            }
+
+            _topBarView.AddButton("dock", "DOCK (F1)", TryDocking);
+
+            if (Globals.PlayerShip == null)
+            {
+                Globals.PlayerShip = new Ship(Guid.NewGuid(), Vector3.Zero, Vector3.UnitX, Vector3.UnitY);
+            }
+
+            if (_shipUpdateHandle == null)
+            {
+                _shipUpdateHandle = new Action(UpdateShipsLoop).BeginInvoke(null, null);
+            }
+
+            if (_visualization == null)
+            {
+                CreateSpace();
+            }
         }
 
         private void UpdateHandler(float secondsPassed)
@@ -52,7 +74,8 @@ namespace Client.UI
             var ship = Globals.PlayerShip;
             if (!_topBarView.IsVisible)
                 _topBarView.Show();
-
+            if (Input.IsKeyDownEvent(KeyCodes.F1))
+                TryDocking();
             if (Input.IsKeyDownEvent(KeyCodes.I))
                 if (_inventoryView.IsVisible)
                     _inventoryView.Hide();
@@ -87,8 +110,12 @@ namespace Client.UI
 
         private void ExitHandler()
         {
-            if (_topBarView.IsVisible)
+            if (_topBarView != null && _topBarView.IsVisible)
+            {
+                _topBarView.RemoveButton("dock");
                 _topBarView.Hide();
+            }
+
 
             _exiting = true;
             _shipUpdateHandle.AsyncWaitHandle.WaitOne(TimeSpan.FromSeconds(2));
@@ -159,6 +186,11 @@ namespace Client.UI
                 foreach (var ship in _service.GetShips())
                     if (ship.ID != Globals.PlayerShip.ID) _visualization.UpdateShip(ship, updateInterval);
             }
+        }
+
+        private void TryDocking()
+        {
+            Globals.UI.SetMode("Docked");
         }
     }
 }
