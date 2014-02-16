@@ -16,6 +16,7 @@ namespace Client.Views
         private OverlayElementContainer _topBarElement;
         private Overlay _topBar;
         private string _name;
+        private string _defaultLocation;
         private int _buttonCount;
         private int _buttonBarButtonMargin = 0;
 
@@ -24,37 +25,43 @@ namespace Client.Views
         public TopBar(string name, string defaultLocation)
         {
             _name = name;
+            _defaultLocation = defaultLocation;
             _topBar = OverlayManager.Instance.Create("Overlays/TopBar/" + _name);
-            _topBarElement = CreateTopBarElement(defaultLocation);
+            _topBarElement = CreateTopBarElement();
+            SetLocationText(_defaultLocation);
             _topBar.AddElement(_topBarElement);
         }
 
-        private OverlayElementContainer CreateTopBarElement(string defaultLocation)
+        private OverlayElementContainer CreateTopBarElement()
         {
             var topBarElement = (OverlayElementContainer)OverlayManager.Instance.Elements.CreateElementFromTemplate("Overlays/Templates/TopBar", null, InstanceName);
-            topBarElement.GetChild(InstanceName + "/LocationText").Text = defaultLocation;
             return topBarElement;
         }
 
-        public void AddHotBarButton(string name, string label)
+        public void SetLocationText(string location)
+        {
+            _topBarElement.GetChild(InstanceName + "/LocationText").Text = location;
+        }
+
+        public void AddButton(string name, string label)
         {
             var topBarButtonBarElement = (OverlayElementContainer)_topBarElement.GetChild(InstanceName + "/ButtonContainer");
-            var button = CreateHotBarButton(name, label);
+            var button = CreateButton(name, label);
             button.Left = _buttonCount * (ButtonTemplate.Width + _buttonBarButtonMargin);
             _buttonCount++;
             topBarButtonBarElement.AddChild(button);
-            ResizeHotBarContainer();
+            ResizeButtonContainer();
         }
 
-        public void RemoveHotBarButton(string name)
+        public void RemoveButton(string name)
         {
             var topBarButtonBarElement = (OverlayElementContainer)_topBarElement.GetChild(InstanceName + "/ButtonContainer");
             topBarButtonBarElement.RemoveChild(ButtonBarButtonBaseName + "/" + _name + "_" + name);
             _buttonCount--;
-            ResizeHotBarContainer();
+            ResizeButtonContainer();
         }
 
-        private OverlayElementContainer CreateHotBarButton(string name, string label)
+        private OverlayElementContainer CreateButton(string name, string label)
         {
             var buttonName = ButtonBarButtonBaseName + "/" + _name + "_" + name;
             var buttonBase = (OverlayElementContainer)OverlayManager.Instance.Elements.CreateElementFromTemplate("Overlays/Templates/SimpleDarkButton", null, buttonName);
@@ -63,7 +70,7 @@ namespace Client.Views
             return buttonBase;
         }
 
-        private void ResizeHotBarContainer()
+        private void ResizeButtonContainer()
         {
             var topBarHotBarElement = (OverlayElementContainer)_topBarElement.GetChild(InstanceName + "/ButtonContainer");
             topBarHotBarElement.Width = _buttonCount * (ButtonTemplate.Width + _buttonBarButtonMargin);

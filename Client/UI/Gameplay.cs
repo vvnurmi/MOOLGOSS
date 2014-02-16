@@ -41,7 +41,7 @@ namespace Client.UI
             _inventory.Add(new Core.Items.ItemStack(Guid.NewGuid(), Core.Items.ItemType.MiningDroid, 2)); // !!!
             _inventoryView = new InventoryView("Player", 10, 10, 28, 5, _inventory);
             _topBarView = new TopBarView("Space", "The Ancient Sector : First Space Station");
-            _topBarView.AddHotBarButton("dock", "DOCK (F1)");
+            _topBarView.AddButton("dock", "DOCK (F1)");
             Globals.PlayerShip = new Ship(Guid.NewGuid(), Vector3.Zero, Vector3.UnitX, Vector3.UnitY);
             _shipUpdateHandle = new Action(UpdateShipsLoop).BeginInvoke(null, null);
             CreateSpace();
