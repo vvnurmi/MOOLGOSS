@@ -13,31 +13,36 @@ namespace Server
     {
         private World _world = new World();
 
+        public Service()
+        {
+            _world.AddPlanet(new Planet(Guid.NewGuid(), "Earth"));
+        }
+
         public Planet[] GetPlanets()
         {
-            return new[] { new Planet("Earth") };
+            return _world.Planets.ToArray();
         }
 
         public Station[] GetStations()
         {
-            return _world.Stations.Values.ToArray();
+            return _world.Stations.ToArray();
         }
 
         public Ship[] GetShips()
         {
-            return _world.Ships.Values.ToArray();
+            return _world.Ships.ToArray();
         }
 
         public Ship GetShip(Guid id)
         {
-            Ship ship;
-            _world.Ships.TryGetValue(id, out ship);
-            return ship;
+            return _world.GetShip(id);
         }
 
         public void AddStation(Guid id, Vector3 pos)
         {
-            _world.Stations[id] = new Station(id) { Pos = pos };
+            try { _world.RemoveStation(id); }
+            catch (ArgumentException) { }
+            _world.AddStation(new Station(id) { Pos = pos });
         }
 
         public void UpdateShip(Guid id, Vector3 pos, Vector3 front, Vector3 up)
@@ -65,17 +70,15 @@ namespace Server
 
         private Ship GetOrAddShip(Guid id)
         {
-            Ship ship;
-            if (!_world.Ships.TryGetValue(id, out ship))
-                _world.Ships.Add(id, ship = new Ship(id, Vector3.Zero, Vector3.UnitX, Vector3.UnitY));
+            var ship = _world.GetShip(id);
+            if (ship == null) _world.AddShip(ship = new Ship(id, Vector3.Zero, Vector3.UnitX, Vector3.UnitY));
             return ship;
         }
 
         private Inventory GetOrAddInventory(Guid id)
         {
-            Inventory inventory;
-            if (!_world.Inventories.TryGetValue(id, out inventory))
-                _world.Inventories.Add(id, inventory = new Inventory(id));
+            var inventory = _world.GetInventory(id);
+            if (inventory == null) _world.AddInventory(inventory = new Inventory(id));
             return inventory;
         }
     }
