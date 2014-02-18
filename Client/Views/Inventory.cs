@@ -17,7 +17,7 @@ namespace Client.Views
     {
         private string InstanceName { get { return "Overlays/Elements/Inventory/" + _name; } }
         private const string InventorySlotInstanceBaseName = "InventorySlot";
-        private const string IconBaseName = "Overlays/Elements/IconInstance";
+        private const string IconBaseName = "Overlays/Elements/InventoryIconInstance";
         private int _iconCount;
         private string _name;
         private int _slotCount;
@@ -96,7 +96,7 @@ namespace Client.Views
             var icon = inventorySlot.Children.First().Value;
             Globals.UI.RemoveButton(icon);
             inventorySlot.RemoveChild(icon.Name);
-            OverlayManager.Instance.Elements.DestroyElement(icon);
+            Globals.UI.DestroyIcon(icon.Name);
         }
 
         private void Clear()
@@ -105,20 +105,10 @@ namespace Client.Views
         }
 
         private OverlayElementContainer CreateIcon(string category, string name, int count)
-        {
+        {            
             var iconName = IconBaseName + "/" + _name + "_" + _iconCount;
-            var iconBase = (OverlayElementContainer)OverlayManager.Instance.Elements.CreateElementFromTemplate("Overlays/Templates/IconBase", null, iconName);
-            var iconImage = (OverlayElementContainer)OverlayManager.Instance.Elements.CreateElementFromTemplate("Overlays/Templates/Icons/" + category + "/" + name, null, iconName + "/IconImage");
-            var iconOverlay = (OverlayElementContainer)OverlayManager.Instance.Elements.CreateElementFromTemplate("Overlays/Templates/IconOverlay", null, iconName + "/IconOverlay");
-            iconOverlay.GetChild(iconName + "/IconOverlay/IconText").Text = "" + count;
-
-            iconBase.AddChildElement(iconImage);
-            iconBase.AddChildElement(iconOverlay);
-            iconBase.Top = 3;
-            iconBase.Left = 3;
-
             _iconCount++;
-            return iconBase;
+            return Globals.UI.CreateIcon(iconName, category, name, "" + count);
         }
 
         private OverlayElementContainer CreateOverlayElementContainer(float x, float y, int slotCountX)

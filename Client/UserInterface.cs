@@ -174,5 +174,27 @@ namespace Client
             button.Top = y;
             return button;
         }
+
+        public void DestroyIcon(string instanceName)
+        {
+            OverlayManager.Instance.Elements.DestroyElement(instanceName + "/IconImage");
+            OverlayManager.Instance.Elements.DestroyElement(instanceName + "/IconOverlay");
+            OverlayManager.Instance.Elements.DestroyElement(instanceName);
+        }
+
+        public OverlayElementContainer CreateIcon(string instanceName, string category, string name, string count)
+        {
+            var iconBase = (OverlayElementContainer)OverlayManager.Instance.Elements.CreateElementFromTemplate("Overlays/Templates/IconBase", null, instanceName);
+            var iconImage = (OverlayElementContainer)OverlayManager.Instance.Elements.CreateElementFromTemplate("Overlays/Templates/Icons/" + category + "/" + name, null, instanceName + "/IconImage");
+            var iconOverlay = (OverlayElementContainer)OverlayManager.Instance.Elements.CreateElementFromTemplate("Overlays/Templates/IconOverlay", null, instanceName + "/IconOverlay");
+            iconOverlay.GetChild(instanceName + "/IconOverlay/IconText").Text = "" + count;
+
+            iconBase.AddChildElement(iconImage);
+            iconBase.AddChildElement(iconOverlay);
+            iconBase.Top = 3;
+            iconBase.Left = 3;
+
+            return iconBase;
+        }
     }
 }
