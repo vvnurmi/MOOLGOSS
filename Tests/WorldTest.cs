@@ -45,10 +45,10 @@ namespace Tests
             _world.AddStation(_station);
             _world.AddShip(_ship);
             _world.AddInventory(_inventory);
-            CollectionAssert.AreEquivalent(new[] { _planet }, _world.Planets);
-            CollectionAssert.AreEquivalent(new[] { _station }, _world.Stations);
-            CollectionAssert.AreEquivalent(new[] { _ship }, _world.Ships);
-            CollectionAssert.AreEquivalent(new[] { _inventory }, _world.Inventories);
+            CollectionAssert.AreEquivalent(new[] { _planet }, _world.Planets.Values);
+            CollectionAssert.AreEquivalent(new[] { _station }, _world.Stations.Values);
+            CollectionAssert.AreEquivalent(new[] { _ship }, _world.Ships.Values);
+            CollectionAssert.AreEquivalent(new[] { _inventory }, _world.Inventories.Values);
         }
 
         [Test]

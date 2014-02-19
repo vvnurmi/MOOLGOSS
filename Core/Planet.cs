@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Core
 {
     [Serializable]
-    public class Planet
+    public class Planet : IEquatable<Planet>
     {
         public Guid ID { get; private set; }
         public string Name { get; private set; }
@@ -18,6 +18,11 @@ namespace Core
         {
             ID = id;
             Name = name;
+        }
+
+        public bool Equals(Planet other)
+        {
+            return ID == other.ID && Name == other.Name && Pos == other.Pos;
         }
 
         public override string ToString()

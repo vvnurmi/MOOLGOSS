@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Core.Items
 {
-    public class ItemStack
+    public class ItemStack : IEquatable<ItemStack>
     {
         public Guid ID { get; private set; }
         /// <summary>
@@ -26,9 +26,14 @@ namespace Core.Items
             Count = count;
         }
 
+        public bool Equals(ItemStack other)
+        {
+            return ID == other.ID && Type == other.Type && Count == other.Count;
+        }
+
         public override string ToString()
         {
-            return string.Format("ItemStack {0} with {1} stacks", ID, Count);
+            return string.Format("ItemStack {0} with {1} times {2}", ID, Count, Type);
         }
     }
 }

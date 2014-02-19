@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 namespace Core.Items
 {
     [Serializable]
-    public class Inventory : IEnumerable<ItemStack>
+    public class Inventory : IEnumerable<ItemStack>, IEquatable<Inventory>
     {
-        private Dictionary<Guid, ItemStack> _stacks = new Dictionary<Guid,ItemStack>();
+        private Dictionary<Guid, ItemStack> _stacks = new Dictionary<Guid, ItemStack>();
 
         public Guid ID { get; private set; }
         public int ChangeTimestamp { get; private set; }
@@ -18,6 +18,11 @@ namespace Core.Items
         public Inventory(Guid id)
         {
             ID = id;
+        }
+
+        public bool Equals(Inventory other)
+        {
+            return ID == other.ID && _stacks.Equals(other._stacks);
         }
 
         /// <summary>

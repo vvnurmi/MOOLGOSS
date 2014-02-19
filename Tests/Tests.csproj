@@ -66,6 +66,7 @@
     <Compile Include="ServiceTest.cs" />
     <Compile Include="InventoryTest.cs" />
     <Compile Include="UserInterfaceTest.cs" />
+    <Compile Include="WorldDiffTest.cs" />
     <Compile Include="WorldTest.cs" />
   </ItemGroup>
   <ItemGroup>

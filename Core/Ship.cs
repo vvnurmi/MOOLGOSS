@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Core
 {
     [Serializable]
-    public class Ship
+    public class Ship : IEquatable<Ship>
     {
         public Guid ID { get; private set; }
         public Vector3 Pos { get; private set; }
@@ -21,6 +21,12 @@ namespace Core
         {
             ID = id;
             Set(pos, front, up);
+        }
+
+        public bool Equals(Ship other)
+        {
+            return ID == other.ID && Pos == other.Pos
+                && Front == other.Front && Up == other.Up && Right == other.Right;
         }
 
         public void Set(Vector3 pos, Vector3 front, Vector3 up)

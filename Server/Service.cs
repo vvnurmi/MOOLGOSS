@@ -20,17 +20,17 @@ namespace Server
 
         public Planet[] GetPlanets()
         {
-            return _world.Planets.ToArray();
+            return _world.Planets.Values.ToArray();
         }
 
         public Station[] GetStations()
         {
-            return _world.Stations.ToArray();
+            return _world.Stations.Values.ToArray();
         }
 
         public Ship[] GetShips()
         {
-            return _world.Ships.ToArray();
+            return _world.Ships.Values.ToArray();
         }
 
         public Ship GetShip(Guid id)

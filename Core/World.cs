@@ -14,10 +14,10 @@ namespace Core
         private Dictionary<Guid, Ship> _ships = new Dictionary<Guid, Ship>();
         private Dictionary<Guid, Inventory> _inventories = new Dictionary<Guid, Inventory>();
 
-        public IEnumerable<Planet> Planets { get { return _planets.Values; } }
-        public IEnumerable<Station> Stations { get { return _stations.Values; } }
-        public IEnumerable<Ship> Ships { get { return _ships.Values; } }
-        public IEnumerable<Inventory> Inventories { get { return _inventories.Values; } }
+        public IReadOnlyDictionary<Guid, Planet> Planets { get { return _planets; } }
+        public IReadOnlyDictionary<Guid, Station> Stations { get { return _stations; } }
+        public IReadOnlyDictionary<Guid, Ship> Ships { get { return _ships; } }
+        public IReadOnlyDictionary<Guid, Inventory> Inventories { get { return _inventories; } }
 
         public Planet GetPlanet(Guid id)
         {
