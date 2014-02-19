@@ -11,7 +11,6 @@ namespace Client.Views
     class TopBar
     {
         private string InstanceName { get { return "Overlays/Elements/TopBar/" + _name; } }
-        private const string ButtonBarButtonBaseName = "Overlays/Elements/TopBarButtonInstance";
         private OverlayElement ButtonTemplate { get { return OverlayManager.Instance.Elements.GetElement("Overlays/Templates/SimpleDarkButton", true); } }
         private OverlayElementContainer _topBarElement;
         private Overlay _topBar;
@@ -58,17 +57,22 @@ namespace Client.Views
         public void RemoveButton(string name)
         {
             var topBarButtonBarElement = (OverlayElementContainer)_topBarElement.GetChild(InstanceName + "/ButtonContainer");
-            var button = (OverlayElementContainer)topBarButtonBarElement.GetChild(ButtonBarButtonBaseName + "/" + _name + "_" + name);
+            var buttonInstanceName = InstanceName + "/Button/" + name;
+            var button = (OverlayElementContainer)topBarButtonBarElement.GetChild(buttonInstanceName);
             Globals.UI.RemoveButton(button);
-            OverlayManager.Instance.Elements.DestroyElement(button);
-            topBarButtonBarElement.RemoveChild(ButtonBarButtonBaseName + "/" + _name + "_" + name);
+            topBarButtonBarElement.RemoveChild(buttonInstanceName);
+
+            OverlayManager.Instance.Elements.DestroyElement(buttonInstanceName + "/SimpleDarkButtonContent");
+            OverlayManager.Instance.Elements.DestroyElement(buttonInstanceName + "/SimpleDarkButtonText");
+            OverlayManager.Instance.Elements.DestroyElement(buttonInstanceName);
+
             _buttonCount--;
             ResizeButtonContainer();
         }
 
         private OverlayElementContainer CreateButton(string name, string label)
         {
-            var buttonName = ButtonBarButtonBaseName + "/" + _name + "_" + name;
+            var buttonName = InstanceName + "/Button/" + name;
             var buttonBase = (OverlayElementContainer)OverlayManager.Instance.Elements.CreateElementFromTemplate("Overlays/Templates/SimpleDarkButton", null, buttonName);
             buttonBase.GetChild(buttonName + "/SimpleDarkButtonText").Text = label;
 

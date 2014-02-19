@@ -11,8 +11,6 @@ namespace Client.Views
     class SimpleList
     {
         private string InstanceName { get { return "Overlays/Elements/SimpleList/" + _name; } }
-        private const string IconBaseName = "Overlays/Elements/ListItemIconInstance";
-        private const string SimpleListItemBaseName = "Overlays/Elements/SimpleListItemInstance";
         private OverlayElementContainer _simpleListElement;
         private string _name;
         private int _listItemCount = 0;
@@ -41,17 +39,21 @@ namespace Client.Views
 
         public void RemoveItem(string instanceName)
         {
-            var listItemName = SimpleListItemBaseName + "/" + _name + "_" + instanceName;
+            var listItemName = InstanceName + "/Item/" + instanceName;
             var listContent = (OverlayElementContainer)_simpleListElement.GetChild(InstanceName + "/SimpleListContent");
             var listItem = (OverlayElementContainer)listContent.GetChild(listItemName);
-            var iconInstanceName = IconBaseName + "/" + _name + "_" + instanceName;
+            var iconInstanceName = listItemName + "/Icon";
 
             Globals.UI.RemoveButton(listItem);
             listContent.RemoveChild(listItemName);
-            OverlayManager.Instance.Elements.DestroyElement(listItemName);
 
             listItem.RemoveChild(iconInstanceName);
             Globals.UI.DestroyIcon(iconInstanceName);
+
+            OverlayManager.Instance.Elements.DestroyElement(listItemName + "/SimpleListItemContent");
+            OverlayManager.Instance.Elements.DestroyElement(listItemName + "/SimpleListItemHeader");
+            OverlayManager.Instance.Elements.DestroyElement(listItemName + "/SimpleListItemDescription");
+            OverlayManager.Instance.Elements.DestroyElement(listItemName);
 
             _listItemCount--;
         }
@@ -68,12 +70,12 @@ namespace Client.Views
 
         private OverlayElementContainer CreateListItem(string instanceName, string header, string description, string iconCategory, string iconName, string iconLabel)
         {
-            var listItemName = SimpleListItemBaseName + "/" + _name + "_" + instanceName;
+            var listItemName = InstanceName + "/Item/" + instanceName;
             var listItemBase = (OverlayElementContainer)OverlayManager.Instance.Elements.CreateElementFromTemplate("Overlays/Templates/SimpleListItem", null, listItemName);
             listItemBase.GetChild(listItemName + "/SimpleListItemHeader").Text = header;
             listItemBase.GetChild(listItemName + "/SimpleListItemDescription").Text = description;
-           
-            var iconBase = CreateIcon(instanceName, iconCategory, iconName, iconLabel);
+
+            var iconBase = CreateIcon(listItemName, iconCategory, iconName, iconLabel);
             iconBase.Top = 3;
             iconBase.Left = 3;
             listItemBase.Left = 7;
@@ -84,9 +86,9 @@ namespace Client.Views
             return listItemBase;
         }
 
-        private OverlayElementContainer CreateIcon(string listItemInstanceName, string category, string name, string label)
+        private OverlayElementContainer CreateIcon(string listItemName, string category, string name, string label)
         {
-            var instanceName = IconBaseName + "/" + _name + "_" + listItemInstanceName;
+            var instanceName = listItemName + "/Icon";
             return Globals.UI.CreateIcon(instanceName, category, name, label);
         }
     }

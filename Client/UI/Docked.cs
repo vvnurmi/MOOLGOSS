@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 using TopBarView = Client.Views.TopBar;
 using InteractionView = Client.Views.SimpleList;
+using DialogueView = Client.Views.Dialogue;
 
 namespace Client.UI
 {
@@ -17,6 +18,7 @@ namespace Client.UI
         private string LeftVerticalBarInstanceName { get { return "Overlays/Elements/LeftVerticalBarInstance/Docked"; } }
         private TopBarView _topBarView;
         private InteractionView _interactionView;
+        private DialogueView _dialogueView;
         private string _baseName = "First Space Station";
         private string _currentLocation;
         private OverlayElementContainer _leftVerticalBarElement;
@@ -91,10 +93,16 @@ namespace Client.UI
                 _topBarView.RemoveButton("leave");
                 _topBarView.Hide();
             }
-            if (_leftVerticalBar.IsVisible)
+            if (_interactionView != null)
             {
                 _interactionView.RemoveItem("TestInstance");
                 _interactionView.RemoveItem("TestInstance2");
+            }
+
+            DestroyDialogueView();
+
+            if (_leftVerticalBar.IsVisible)
+            {
                 _leftVerticalBar.Hide();
             }
         }
@@ -129,6 +137,44 @@ namespace Client.UI
 
         private void InteractionListElementClicked()
         {
+            DestroyDialogueView();
+            _dialogueView = CreateDialogueView();
+            _dialogueView.DialogueElement.Left = _interactionView.ListElement.Width + 30;
+            _dialogueView.DialogueElement.VerticalAlignment = VerticalAlignment.Center;
+            _dialogueView.DialogueElement.Top = -(float)Math.Round(_dialogueView.DialogueElement.Height / 2);
+            _leftVerticalBarElement.AddChildElement(_dialogueView.DialogueElement);
+        }
+
+        private DialogueView CreateDialogueView()
+        {
+            if (_dialogueView == null)
+            {
+                var dialogueView = new DialogueView("DockedDialogue", 310, 600);
+                dialogueView.AddOption("quit", "Bye Bye!", DialogueViewOptionClicked);
+                dialogueView.AddOption("buy", "Can I buy something?", DialogueViewOptionClicked);
+                dialogueView.AddOption("chape", "Tell me about Chapelier!", DialogueViewOptionClicked);
+                return dialogueView;
+            }
+
+            return _dialogueView;
+        }
+
+        private void DestroyDialogueView()
+        {
+            if (_dialogueView != null)
+            {
+                _leftVerticalBarElement.RemoveChild(_dialogueView.DialogueElement.Name);
+                _dialogueView.RemoveOption("buy");
+                _dialogueView.RemoveOption("quit");
+                _dialogueView.RemoveOption("chape");
+                _dialogueView.Destroy();
+                _dialogueView = null;
+            }
+        }
+
+        private void DialogueViewOptionClicked()
+        {
+            DestroyDialogueView();
         }
 
         private OverlayElementContainer CreateLeftVerticalBarElement()

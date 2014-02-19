@@ -175,13 +175,6 @@ namespace Client
             return button;
         }
 
-        public void DestroyIcon(string instanceName)
-        {
-            OverlayManager.Instance.Elements.DestroyElement(instanceName + "/IconImage");
-            OverlayManager.Instance.Elements.DestroyElement(instanceName + "/IconOverlay");
-            OverlayManager.Instance.Elements.DestroyElement(instanceName);
-        }
-
         public OverlayElementContainer CreateIcon(string instanceName, string category, string name, string count)
         {
             var iconBase = (OverlayElementContainer)OverlayManager.Instance.Elements.CreateElementFromTemplate("Overlays/Templates/IconBase", null, instanceName);
@@ -195,6 +188,30 @@ namespace Client
             iconBase.Left = 3;
 
             return iconBase;
+        }
+
+        public void DestroyIcon(string instanceName)
+        {
+            OverlayManager.Instance.Elements.DestroyElement(instanceName + "/IconImage");
+            OverlayManager.Instance.Elements.DestroyElement(instanceName + "/IconOverlay");
+            OverlayManager.Instance.Elements.DestroyElement(instanceName + "/IconOverlay/IconText");
+            OverlayManager.Instance.Elements.DestroyElement(instanceName);
+        }
+
+        public OverlayElementContainer CreateDarkButton(string instanceName, string label, int width, int height, int textSize)
+        {
+            var darkButtonBase = (OverlayElementContainer)OverlayManager.Instance.Elements.CreateElementFromTemplate("Overlays/Templates/DarkButton", null, instanceName);
+            darkButtonBase.GetChild(instanceName + "/DarkButtonText").Text = label;
+            darkButtonBase.GetChild(instanceName + "/DarkButtonText").SetParam("char_height", "" + textSize);
+            darkButtonBase.Height = height;
+            darkButtonBase.Width = width;
+            return darkButtonBase;
+        }
+
+        public void DestroyDarkButton(string instanceName)
+        {
+            OverlayManager.Instance.Elements.DestroyElement(instanceName + "/DarkButtonText");
+            OverlayManager.Instance.Elements.DestroyElement(instanceName);
         }
     }
 }
