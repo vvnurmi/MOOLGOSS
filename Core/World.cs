@@ -90,5 +90,21 @@ namespace Core
         {
             return _inventories.Remove(id);
         }
+
+        /// <summary>
+        /// Applies a patch to the world. Returns self.
+        /// </summary>
+        public World Patch(WorldDiff diff)
+        {
+            foreach (var id in diff.Planets.Removed.Keys) _planets.Remove(id);
+            foreach (var x in diff.Planets.Added.Values) AddPlanet(x);
+            foreach (var id in diff.Stations.Removed.Keys) _stations.Remove(id);
+            foreach (var x in diff.Stations.Added.Values) AddStation(x);
+            foreach (var id in diff.Ships.Removed.Keys) _ships.Remove(id);
+            foreach (var x in diff.Ships.Added.Values) AddShip(x);
+            foreach (var id in diff.Inventories.Removed.Keys) _inventories.Remove(id);
+            foreach (var x in diff.Inventories.Added.Values) AddInventory(x);
+            return this;
+        }
     }
 }
