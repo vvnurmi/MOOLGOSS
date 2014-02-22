@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using TopBarView = Client.Views.TopBar;
-using InteractionView = Client.Views.SimpleList;
+using InteractionView = Client.Views.List;
 using DialogueView = Client.Views.Dialogue;
 
 namespace Client.UI
@@ -46,8 +46,8 @@ namespace Client.UI
                 _interactionView = new InteractionView("Docked", 320, 500);
             }
 
-            _interactionView.AddItem("TestInstance", "[RK] Gom", "Guild Master", "Solid", "IronOre", "DEAD", InteractionListElementClicked);
-            _interactionView.AddItem("TestInstance2", "[RK] Chapelier", "Lord of The Code", "Gas", "Hydrogen", "", InteractionListElementClicked);
+            _interactionView.AddItem("TestInstance", "Portrait", "[RK] Gom", "Guild Master", "Small", "Default", "DEAD", InteractionListElementClicked);
+            _interactionView.AddItem("TestInstance2", "Portrait", "[RK] Chapelier", "Lord of The Code", "Small", "Default", "", InteractionListElementClicked);
 
             if (_leftVerticalBar == null)
             {
@@ -150,9 +150,14 @@ namespace Client.UI
             if (_dialogueView == null)
             {
                 var dialogueView = new DialogueView("DockedDialogue", 310, 600);
+                dialogueView.AddButton("history", "Blue", "History (Event log)", DialogueViewOptionClicked);
                 dialogueView.AddOption("quit", "Bye Bye!", DialogueViewOptionClicked);
                 dialogueView.AddOption("buy", "Can I buy something?", DialogueViewOptionClicked);
                 dialogueView.AddOption("chape", "Tell me about Chapelier!", DialogueViewOptionClicked);
+                dialogueView.AddProperty("name", "NAME:", "Gom", DialogueViewOptionClicked);
+                dialogueView.AddProperty("faction", "FACTION:", "Reilu Kerho [RK]", DialogueViewOptionClicked);
+                dialogueView.AddProperty("title", "TITLE:", "Guild Master", DialogueViewOptionClicked);
+                dialogueView.SetPortrait("Default");
                 return dialogueView;
             }
 
@@ -164,9 +169,13 @@ namespace Client.UI
             if (_dialogueView != null)
             {
                 _leftVerticalBarElement.RemoveChild(_dialogueView.DialogueElement.Name);
+                _dialogueView.RemoveButton("history");
                 _dialogueView.RemoveOption("buy");
                 _dialogueView.RemoveOption("quit");
                 _dialogueView.RemoveOption("chape");
+                _dialogueView.RemoveProperty("name");
+                _dialogueView.RemoveProperty("faction");
+                _dialogueView.RemoveProperty("title");
                 _dialogueView.Destroy();
                 _dialogueView = null;
             }

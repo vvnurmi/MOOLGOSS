@@ -175,12 +175,40 @@ namespace Client
             return button;
         }
 
+        public OverlayElementContainer CreatePortrait(string instanceName, string type, string name, string label)
+        {
+            var portraitBase = (OverlayElementContainer)OverlayManager.Instance.Elements.CreateElementFromTemplate("Overlays/Templates/Portrait" + type + "Base", null, instanceName);
+            var portraitImage = (OverlayElementContainer)OverlayManager.Instance.Elements.CreateElementFromTemplate("Overlays/Templates/Portraits/" + type + "/" + name, null, instanceName + "/PortraitImage");            
+            portraitBase.AddChildElement(portraitImage);
+
+            if (type.Equals("Small"))
+            {
+                var portraitOverlay = CreateIconOverlay(instanceName, label);
+                portraitBase.AddChildElement(portraitOverlay);
+            }
+
+            return portraitBase;
+        }
+
+        public void DestroyPortrait(string instanceName)
+        {
+            var portraitBase = (OverlayElementContainer)OverlayManager.Instance.Elements.GetElement(instanceName);
+            OverlayManager.Instance.Elements.DestroyElement(instanceName + "/PortraitImage");
+
+            if (portraitBase.SourceTemplate.Name.Contains("Small"))
+            {
+                OverlayManager.Instance.Elements.DestroyElement(instanceName + "/IconOverlay");
+                OverlayManager.Instance.Elements.DestroyElement(instanceName + "/IconOverlay/IconText");
+            }
+
+            OverlayManager.Instance.Elements.DestroyElement(instanceName);
+        }
+
         public OverlayElementContainer CreateIcon(string instanceName, string category, string name, string count)
         {
             var iconBase = (OverlayElementContainer)OverlayManager.Instance.Elements.CreateElementFromTemplate("Overlays/Templates/IconBase", null, instanceName);
             var iconImage = (OverlayElementContainer)OverlayManager.Instance.Elements.CreateElementFromTemplate("Overlays/Templates/Icons/" + category + "/" + name, null, instanceName + "/IconImage");
-            var iconOverlay = (OverlayElementContainer)OverlayManager.Instance.Elements.CreateElementFromTemplate("Overlays/Templates/IconOverlay", null, instanceName + "/IconOverlay");
-            iconOverlay.GetChild(instanceName + "/IconOverlay/IconText").Text = "" + count;
+            var iconOverlay = CreateIconOverlay(instanceName, "" + count);
 
             iconBase.AddChildElement(iconImage);
             iconBase.AddChildElement(iconOverlay);
@@ -188,6 +216,13 @@ namespace Client
             iconBase.Left = 3;
 
             return iconBase;
+        }
+
+        public OverlayElementContainer CreateIconOverlay(string parentInstanceName, string label)
+        {
+            var iconOverlay = (OverlayElementContainer)OverlayManager.Instance.Elements.CreateElementFromTemplate("Overlays/Templates/IconOverlay", null, parentInstanceName + "/IconOverlay");
+            iconOverlay.GetChild(parentInstanceName + "/IconOverlay/IconText").Text = label;
+            return iconOverlay;
         }
 
         public void DestroyIcon(string instanceName)
@@ -203,14 +238,64 @@ namespace Client
             var darkButtonBase = (OverlayElementContainer)OverlayManager.Instance.Elements.CreateElementFromTemplate("Overlays/Templates/DarkButton", null, instanceName);
             darkButtonBase.GetChild(instanceName + "/DarkButtonText").Text = label;
             darkButtonBase.GetChild(instanceName + "/DarkButtonText").SetParam("char_height", "" + textSize);
-            darkButtonBase.Height = height;
             darkButtonBase.Width = width;
+            darkButtonBase.Height = height;
             return darkButtonBase;
         }
 
         public void DestroyDarkButton(string instanceName)
         {
             OverlayManager.Instance.Elements.DestroyElement(instanceName + "/DarkButtonText");
+            OverlayManager.Instance.Elements.DestroyElement(instanceName);
+        }
+
+        public OverlayElementContainer CreateButton(string instanceName, string type, string label, int width, int height, int textSize)
+        {
+            var buttonBase = (OverlayElementContainer)OverlayManager.Instance.Elements.CreateElementFromTemplate("Overlays/Templates/WindowButton" + type, null, instanceName);
+            buttonBase.Width = width;
+            buttonBase.Height = height;
+            var textField = (OverlayElement)OverlayManager.Instance.Elements.GetElement(instanceName + "/WindowButtonBackground" + type + "/WindowButton" + type + "Border/WindowButtonText" + type);
+            textField.Text = label;
+            textField.SetParam("char_height", "" + textSize);
+            var background = (OverlayElement)OverlayManager.Instance.Elements.GetElement(instanceName + "/WindowButtonBackground" + type);
+            background.Width = width;
+            background.Height = height;
+            var border = (OverlayElement)OverlayManager.Instance.Elements.GetElement(instanceName + "/WindowButtonBackground" + type + "/WindowButton" + type + "Border");
+            border.Width = width;
+            border.Height = height;
+            return buttonBase;
+        }
+
+        public void DestroyButton(string instanceName)
+        {
+            var buttonBase = (OverlayElementContainer)OverlayManager.Instance.Elements.GetElement(instanceName);
+            var type = buttonBase.SourceTemplate.Name.Contains("Blue") ? "Blue" : "Green";
+            OverlayManager.Instance.Elements.DestroyElement(instanceName + "/WindowButtonBackground" + type + "/WindowButton" + type + "Border/WindowButtonText" + type);
+            OverlayManager.Instance.Elements.DestroyElement(instanceName + "/WindowButtonBackground" + type + "/WindowButton" + type + "Border");
+            OverlayManager.Instance.Elements.DestroyElement(instanceName + "/WindowButtonBackground" + type);
+            OverlayManager.Instance.Elements.DestroyElement(instanceName);
+        }
+
+        public OverlayElementContainer CreateProperty(string instanceName, string header, string content, int width, int height, int headerWidth, int textSize)
+        {
+            var property = (OverlayElementContainer)OverlayManager.Instance.Elements.CreateElementFromTemplate("Overlays/Templates/Property", null, instanceName);
+            property.Width = width;
+            property.Height = height;
+            var headerText = property.GetChild(instanceName + "/PropertyHeader");
+            headerText.Text = header;
+            headerText.Left = -(width - headerWidth);
+            headerText.SetParam("char_height", "" + textSize);
+            var contentText = property.GetChild(instanceName + "/PropertyContent");
+            contentText.Text = content;
+            contentText.Left = headerWidth + 4;
+            contentText.SetParam("char_height", "" + textSize);
+            return property;
+        }
+
+        public void DestroyProperty(string instanceName)
+        {
+            OverlayManager.Instance.Elements.DestroyElement(instanceName + "/PropertyHeader");
+            OverlayManager.Instance.Elements.DestroyElement(instanceName + "/PropertyContent");
             OverlayManager.Instance.Elements.DestroyElement(instanceName);
         }
     }
