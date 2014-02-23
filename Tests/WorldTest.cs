@@ -39,12 +39,22 @@ namespace Tests
         }
 
         [Test]
+        public void CloneIsEqual()
+        {
+            AddItemsTo(_world);
+            Assertions.WorldsEqual(_world, _world.Clone());
+        }
+
+        [Test]
+        public void CloneIsNotSelf()
+        {
+            Assert.AreNotSame(_world, _world.Clone());
+        }
+
+        [Test]
         public void AddItems()
         {
-            _world.AddPlanet(_planet);
-            _world.AddStation(_station);
-            _world.AddShip(_ship);
-            _world.AddInventory(_inventory);
+            AddItemsTo(_world);
             CollectionAssert.AreEquivalent(new[] { _planet }, _world.Planets.Values);
             CollectionAssert.AreEquivalent(new[] { _station }, _world.Stations.Values);
             CollectionAssert.AreEquivalent(new[] { _ship }, _world.Ships.Values);
@@ -97,6 +107,14 @@ namespace Tests
             Assert.AreEqual(_station, _world.GetStation(_station.ID));
             Assert.AreEqual(_ship, _world.GetShip(_ship.ID));
             Assert.AreEqual(_inventory, _world.GetInventory(_inventory.ID));
+        }
+
+        private void AddItemsTo(World world)
+        {
+            world.AddPlanet(_planet);
+            world.AddStation(_station);
+            world.AddShip(_ship);
+            world.AddInventory(_inventory);
         }
     }
 }

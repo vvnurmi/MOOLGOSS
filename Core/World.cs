@@ -106,5 +106,12 @@ namespace Core
             foreach (var x in diff.Inventories.Added.Values) AddInventory(x);
             return this;
         }
+
+        public World Clone()
+        {
+            var clone = new World();
+            clone.Patch(new WorldDiff(clone, this));
+            return clone;
+        }
     }
 }
