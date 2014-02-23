@@ -44,7 +44,7 @@ namespace Tests
             Assert.True(new WorldDiff(_world2, _world2).IsEmpty);
             var diff = new WorldDiff(_world, _world2);
             Assert.False(diff.IsEmpty);
-            AssertWorldsEqual(_world2, _world.Patch(diff));
+            Assertions.WorldsEqual(_world2, _world.Patch(diff));
         }
 
         [Test]
@@ -137,22 +137,6 @@ namespace Tests
                 });
         }
 
-        private void AppendSeqDiff<T>(StringBuilder str, string name, Diff<T> seqDiff) where T : IEquatable<T>
-        {
-            str.AppendFormat("{0} +{1} -{2}", name, seqDiff.Added.Count, seqDiff.Removed.Count);
-        }
-
-        private void AssertWorldsEqual(World expected, World actual)
-        {
-            var diff = new WorldDiff(expected, actual);
-            var message = new StringBuilder("Worlds differ");
-            AppendSeqDiff(message, ", Planets", diff.Planets);
-            AppendSeqDiff(message, ", Stations", diff.Stations);
-            AppendSeqDiff(message, ", Ships", diff.Ships);
-            AppendSeqDiff(message, ", Inventories", diff.Inventories);
-            Assert.True(diff.IsEmpty, message.ToString());
-        }
-
         private void AssertDiffAndPatch(Action<World> buildWorld, Action<WorldDiff> assertDiff)
         {
             AssertDiffAndPatch(w => { }, buildWorld, assertDiff);
@@ -164,7 +148,7 @@ namespace Tests
             buildWorld2(_world2);
             var diff = new WorldDiff(_world, _world2);
             assertDiff(diff);
-            AssertWorldsEqual(_world2, _world.Patch(diff));
+            Assertions.WorldsEqual(_world2, _world.Patch(diff));
         }
     }
 }
