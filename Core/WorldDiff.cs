@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace Core
 {
+    [Serializable]
     public class Diff<T> where T : IEquatable<T>
     {
         private class Comparer : IEqualityComparer<KeyValuePair<Guid, T>>
@@ -34,6 +35,7 @@ namespace Core
         }
     }
 
+    [Serializable]
     public class WorldDiff
     {
         public bool IsEmpty { get { return Planets.IsEmpty && Stations.IsEmpty && Ships.IsEmpty && Inventories.IsEmpty; } }

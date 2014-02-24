@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace Core.Items
 {
+    [Serializable]
     public class ItemStack : IEquatable<ItemStack>
     {
         public Guid ID { get; private set; }
