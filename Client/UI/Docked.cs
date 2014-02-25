@@ -10,7 +10,8 @@ using System.Threading.Tasks;
 using TopBarView = Client.Views.TopBar;
 using InteractionView = Client.Views.List;
 using DialogueView = Client.Views.Dialogue;
-using TradingView = Client.Views.List;
+using TradeView = Client.Views.Trade;
+using VendorList = Client.Views.Trade;
 
 namespace Client.UI
 {
@@ -20,7 +21,8 @@ namespace Client.UI
         private TopBarView _topBarView;
         private InteractionView _interactionView;
         private DialogueView _dialogueView;
-        private TradingView _tradingView;
+        private VendorList _vendorList;
+        private TradeView _tradeView;
         private string _baseName = "First Space Station";
         private string _currentLocation;
         private OverlayElementContainer _leftVerticalBarElement;
@@ -160,7 +162,7 @@ namespace Client.UI
                 var dialogueView = new DialogueView("DockedDialogue", 310, 600);
                 dialogueView.AddButton("history", "Blue", "History (Event log)", DialogueViewOptionClicked);
                 dialogueView.AddOption("quit", "Bye Bye!", DialogueViewOptionClicked);
-                dialogueView.AddOption("buy", "Can I buy something?", ShowTrading);
+                dialogueView.AddOption("buy", "Can I buy something?", ShowVendorList);
                 dialogueView.AddOption("chape", "Tell me about Chapelier!", DialogueViewOptionClicked);
                 dialogueView.AddProperty("name", "NAME:", "Gom", DialogueViewOptionClicked);
                 dialogueView.AddProperty("faction", "FACTION:", "Reilu Kerho [RK]", DialogueViewOptionClicked);
@@ -176,7 +178,8 @@ namespace Client.UI
         {
             if (_dialogueView != null)
             {
-                DestroyTradingView();
+                DestroyVendorList();
+                DestroyTradeView();
 
                 _leftVerticalBarElement.RemoveChild(_dialogueView.DialogueElement.Name);
                 _dialogueView.RemoveButton("history");
@@ -196,31 +199,67 @@ namespace Client.UI
             DestroyDialogueView();
         }
 
-        private void ShowTrading()
+        private void ShowVendorList()
         {
-            DestroyTradingView();
-            _tradingView = CreateTradingView();
-            _tradingView.ListElement.Left = _dialogueView.DialogueElement.Left + _dialogueView.DialogueElement.Width;
-            _tradingView.ListElement.VerticalAlignment = VerticalAlignment.Center;
-            _tradingView.ListElement.Top = -(float)Math.Round(_tradingView.ListElement.Height / 2);
-            _leftVerticalBarElement.AddChildElement(_tradingView.ListElement);
+            DestroyVendorList();
+            _vendorList = CreateVendorList();
+            _vendorList.TradeElement.Left = _dialogueView.DialogueElement.Left + _dialogueView.DialogueElement.Width;
+            _vendorList.TradeElement.VerticalAlignment = VerticalAlignment.Center;
+            _vendorList.TradeElement.Top = -(float)Math.Round(_vendorList.TradeElement.Height / 2);
+            _leftVerticalBarElement.AddChildElement(_vendorList.TradeElement);
         }
 
-        private TradingView CreateTradingView()
+        private VendorList CreateVendorList()
         {
-            var tradingView = new TradingView("trading", 310, 600);
-            tradingView.AddItem("trade1", "Material", "Iron ore", "It's always needed...", "Solid", "IronOre", "", InteractionListElementClicked);
-            return tradingView;
+            var vendorList = new VendorList("trading", 310, 600);
+            vendorList.AddItem("trade1", "Material", "Iron ore", "It's always needed...", "Solid", "IronOre", "40", VendorListElementClicked);
+            return vendorList;
         }
 
-        private void DestroyTradingView()
+        private void DestroyVendorList()
         {
-            if (_tradingView != null)
+            if (_vendorList != null)
             {
-                _leftVerticalBarElement.RemoveChild(_tradingView.ListElement.Name);
-                _tradingView.RemoveItem("trade1");
-                _tradingView.Destroy();
-                _tradingView = null;
+                _leftVerticalBarElement.RemoveChild(_vendorList.TradeElement.Name);
+                _vendorList.RemoveItem("trade1");
+                _vendorList.Destroy();
+                _vendorList = null;
+            }
+        }
+
+        private void VendorListElementClicked()
+        {
+            ShowTradeView();
+        }
+
+        private void ShowTradeView()
+        {
+            DestroyTradeView();
+            _tradeView = CreateTradeView();
+            _tradeView.TradeElement.Left = _vendorList.TradeElement.Left + _vendorList.TradeElement.Width;
+            _tradeView.TradeElement.VerticalAlignment = VerticalAlignment.Center;
+            _tradeView.TradeElement.Top = -(float)Math.Round(_vendorList.TradeElement.Height / 2);
+            _leftVerticalBarElement.AddChildElement(_tradeView.TradeElement);
+        }
+
+        private TradeView CreateTradeView()
+        {
+            var trade = new TradeView("buyitem", 310, 600);
+            trade.ResizeByItemCount = true;
+            trade.AddItem("trade1-1", "Material", "Hydrogen", "Lucky you don't fart helium..", "Gas", "Hydrogen", "10", VendorListElementClicked);
+            trade.AddItem("trade1-2", "Material", "Dilithium Crystals", "Wow, Such Power", "Energy", "Dilithium", "2", VendorListElementClicked);
+            return trade;
+        }
+
+        private void DestroyTradeView()
+        {
+            if (_tradeView != null)
+            {
+                _leftVerticalBarElement.RemoveChild(_tradeView.TradeElement.Name);
+                _tradeView.RemoveItem("trade1-1");
+                _tradeView.RemoveItem("trade1-2");
+                _tradeView.Destroy();
+                _tradeView = null;
             }
         }
     }

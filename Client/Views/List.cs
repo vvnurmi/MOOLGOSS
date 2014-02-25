@@ -11,6 +11,7 @@ namespace Client.Views
     class List
     {
         private string InstanceName { get { return "Overlays/Elements/List/" + _name; } }
+        public OverlayElement ListItemTemplate { get { return OverlayManager.Instance.Elements.GetElement("Overlays/Templates/ListItem", true); } }
         private OverlayElementContainer _listElement;
         private string _name;
         private int _listItemCount = 0;
@@ -19,17 +20,19 @@ namespace Client.Views
         private int _listHeight = 0;
 
         public OverlayElementContainer ListElement { get { return _listElement; } }
+        public int ItemCount { get { return _listItemCount; } }
 
         public List(string name, int width, int height)
         {
             _name = name;
             _listWidth = width;
-            _listHeight = height;
-            _listElement = CreateListElement(_listWidth, _listHeight);
+            //_listHeight = height;
+            _listElement = CreateListElement(_listWidth, 50);
         }
 
-        public void Destroy()
+        public virtual void Destroy()
         {
+            /*
             OverlayManager.Instance.Elements.DestroyElement(InstanceName + "/ListContent/BorderTL");
             OverlayManager.Instance.Elements.DestroyElement(InstanceName + "/ListContent/BorderTR");
             OverlayManager.Instance.Elements.DestroyElement(InstanceName + "/ListContent/BorderBL");
@@ -37,27 +40,30 @@ namespace Client.Views
             OverlayManager.Instance.Elements.DestroyElement(InstanceName + "/ListContent");
             OverlayManager.Instance.Elements.DestroyElement(InstanceName + "/TechTR");
             OverlayManager.Instance.Elements.DestroyElement(InstanceName + "/TechBR");
+            */
             OverlayManager.Instance.Elements.DestroyElement(InstanceName);
         }
 
-        public void AddItem(string instanceName, string type, string header, string description, string iconCategory, string iconName, string iconLabel, Action action)
+        public virtual void AddItem(string instanceName, string type, string header, string description, string iconCategory, string iconName, string iconLabel, Action action)
         {
             var listItemBase = CreateListItem(instanceName, type, header, description, iconCategory, iconName, iconLabel);
-            ((OverlayElementContainer)_listElement.GetChild(InstanceName + "/ListContent")).AddChildElement(listItemBase);
+            //((OverlayElementContainer)_listElement.GetChild(InstanceName + "/ListContent")).AddChildElement(listItemBase);
+            _listElement.AddChild(listItemBase);
             listItemBase.UserData = action;
             Globals.UI.AddButton(listItemBase);
             _listItemCount++;
+            ResizeListElement();
         }
 
-        public void RemoveItem(string instanceName)
+        public virtual void RemoveItem(string instanceName)
         {
             var listItemName = InstanceName + "/Item/" + instanceName;
-            var listContent = (OverlayElementContainer)_listElement.GetChild(InstanceName + "/ListContent");
-            var listItem = (OverlayElementContainer)listContent.GetChild(listItemName);
+            //var listContent = (OverlayElementContainer)_listElement.GetChild(InstanceName + "/ListContent");
+            var listItem = (OverlayElementContainer)_listElement.GetChild(listItemName);
             var iconInstanceName = listItemName + "/Icon";
 
             Globals.UI.RemoveButton(listItem);
-            listContent.RemoveChild(listItemName);
+            _listElement.RemoveChild(listItemName);
             listItem.RemoveChild(iconInstanceName);
 
             var iconInstance = OverlayManager.Instance.Elements.GetElement(iconInstanceName);
@@ -76,12 +82,18 @@ namespace Client.Views
 
         private OverlayElementContainer CreateListElement(int width, int height)
         {
-            var simpleListElement = (OverlayElementContainer)OverlayManager.Instance.Elements.CreateElementFromTemplate("Overlays/Templates/List", null, InstanceName);
-            simpleListElement.Width = width;
-            simpleListElement.Height = height;
-            ((OverlayElementContainer)simpleListElement.GetChild(InstanceName + "/ListContent")).Width = width - 8;
-            ((OverlayElementContainer)simpleListElement.GetChild(InstanceName + "/ListContent")).Height = height - 8;
-            return simpleListElement;
+            var listElement = (OverlayElementContainer)OverlayManager.Instance.Elements.CreateElementFromTemplate("Overlays/Templates/List", null, InstanceName);
+            listElement.Width = width;
+            listElement.Height = height;
+            //((OverlayElementContainer)listElement.GetChild(InstanceName + "/ListContent")).Width = width - 8;
+            //((OverlayElementContainer)listElement.GetChild(InstanceName + "/ListContent")).Height = height - 8;
+            return listElement;
+        }
+
+        private void ResizeListElement()
+        {
+            _listElement.Width = _listWidth;
+            _listElement.Height = _listItemCount * (ListItemTemplate.Height + _listItemVerticalMargin);
         }
 
         private OverlayElementContainer CreateListItem(string instanceName, string type, string header, string description, string iconCategory, string iconName, string iconLabel)
@@ -94,9 +106,9 @@ namespace Client.Views
             var iconBase = CreateIcon(listItemName, type, iconCategory, iconName, iconLabel);
             iconBase.Top = 3;
             iconBase.Left = 3;
-            listItemBase.Left = 7;
-            listItemBase.Top = _listItemCount * (listItemBase.Height + _listItemVerticalMargin) + 7;
-            listItemBase.Width = _listWidth - 22;
+            //listItemBase.Left = 7;
+            listItemBase.Top = _listItemCount * (listItemBase.Height + _listItemVerticalMargin);
+            listItemBase.Width = _listWidth;
             ((OverlayElementContainer)listItemBase.GetChild(listItemName + "/ListItemContent")).Width = listItemBase.Width - 4;
             listItemBase.AddChildElement(iconBase);
             return listItemBase;
