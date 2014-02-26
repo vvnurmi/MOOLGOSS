@@ -201,6 +201,7 @@ namespace Client.UI
 
         private void ShowVendorList()
         {
+            DestroyTradeView();
             DestroyVendorList();
             _vendorList = CreateVendorList();
             _vendorList.TradeElement.Left = _dialogueView.DialogueElement.Left + _dialogueView.DialogueElement.Width;
@@ -236,9 +237,9 @@ namespace Client.UI
         {
             DestroyTradeView();
             _tradeView = CreateTradeView();
-            _tradeView.TradeElement.Left = _vendorList.TradeElement.Left + _vendorList.TradeElement.Width;
+            _tradeView.TradeElement.Left = _vendorList.TradeElement.Left + _vendorList.TradeElement.Width + 6;
             _tradeView.TradeElement.VerticalAlignment = VerticalAlignment.Center;
-            _tradeView.TradeElement.Top = -(float)Math.Round(_vendorList.TradeElement.Height / 2);
+            _tradeView.TradeElement.Top = -((float)Math.Round(_vendorList.TradeElement.Height / 2) + 26);
             _leftVerticalBarElement.AddChildElement(_tradeView.TradeElement);
         }
 
@@ -248,6 +249,9 @@ namespace Client.UI
             trade.ResizeByItemCount = true;
             trade.AddItem("trade1-1", "Material", "Hydrogen", "Lucky you don't fart helium..", "Gas", "Hydrogen", "10", VendorListElementClicked);
             trade.AddItem("trade1-2", "Material", "Dilithium Crystals", "Wow, Such Power", "Energy", "Dilithium", "2", VendorListElementClicked);
+            trade.ShowButtons();
+            trade.SetCloseButtonAction(DestroyTradeView);
+            trade.SetConfirmButtonAction(DestroyTradeView);
             return trade;
         }
 
