@@ -14,6 +14,17 @@ namespace Client
 {
     public class SpaceVisualization
     {
+        private class IDComparer<T> : IEqualityComparer<KeyValuePair<Guid, T>>
+        {
+            public bool Equals(KeyValuePair<Guid, T> x, KeyValuePair<Guid, T> y)
+            {
+                return x.Key == y.Key;
+            }
+
+            public int GetHashCode(KeyValuePair<Guid, T> obj) { return obj.GetHashCode(); }
+        }
+        private static IDComparer<Ship> g_shipComparer = new IDComparer<Ship>();
+
         private struct NodeState
         {
             public Vector3 Pos;
@@ -51,14 +62,19 @@ namespace Client
             }
         }
 
-        public void Update(WorldDiff diff)
+        public void Update(WorldDiff diff, float updateInterval)
         {
-            foreach (var planet in diff.Planets.Added) CreatePlanet(planet.Value);
             foreach (var planet in diff.Planets.Removed) RemovePlanet(planet.Value);
-            foreach (var station in diff.Stations.Added) CreateStation(station.Value);
+            foreach (var planet in diff.Planets.Added) CreatePlanet(planet.Value);
             foreach (var station in diff.Stations.Removed) RemoveStation(station.Value);
-            foreach (var ship in diff.Ships.Added) CreateShip(ship.Value);
-            foreach (var ship in diff.Ships.Removed) RemoveShip(ship.Value);
+            foreach (var station in diff.Stations.Added) CreateStation(station.Value);
+            var shipsChanged = diff.Ships.Added.Intersect(diff.Ships.Removed, g_shipComparer);
+            foreach (var ship in shipsChanged)
+                if (ship.Key != Globals.PlayerShip.ID) UpdateShip(ship.Value, 1);
+            foreach (var ship in diff.Ships.Removed.Except(shipsChanged, g_shipComparer))
+                if (ship.Key != Globals.PlayerShip.ID) RemoveShip(ship.Value);
+            foreach (var ship in diff.Ships.Added.Except(shipsChanged, g_shipComparer))
+                if (ship.Key != Globals.PlayerShip.ID) CreateShip(ship.Value);
         }
 
         public void CreateStaticThings()

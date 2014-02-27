@@ -180,10 +180,10 @@ namespace Client.UI
                 Thread.Sleep(TimeSpan.FromSeconds(updateInterval));
                 var diffOut = new WorldDiff(_worldShadow, _world);
                 _worldShadow.Patch(diffOut);
-                _visualization.Update(diffOut);
+                _visualization.Update(diffOut, updateInterval);
                 _service.SendWorldPatch(_clientID, diffOut);
                 var diffIn = _service.ReceiveWorldPatch(_clientID);
-                _visualization.Update(diffIn);
+                _visualization.Update(diffIn, updateInterval);
                 _worldShadow.Patch(diffIn);
                 _world.Patch(diffIn);
                 if (_mission == null)
