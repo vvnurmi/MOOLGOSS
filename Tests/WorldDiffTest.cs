@@ -25,7 +25,7 @@ namespace Tests
             _world = new World();
             _world2 = new World();
             _planet = new Planet(Guid.NewGuid(), "Earth");
-            _station = new Station(Guid.NewGuid());
+            _station = new Station(Guid.NewGuid(), new Vector3(10, 0, 20));
             _ship = new Ship(Guid.NewGuid(), new Vector3(5, 6, 7), Vector3.UnitX, Vector3.UnitY);
             _inventory = new Inventory(Guid.NewGuid());
         }
@@ -39,7 +39,7 @@ namespace Tests
         [Test]
         public void EmptyForIdenticals()
         {
-            _world2.AddPlanet(_planet);
+            _world2.SetPlanet(_planet);
             Assert.True(new WorldDiff(_world, _world).IsEmpty);
             Assert.True(new WorldDiff(_world2, _world2).IsEmpty);
             var diff = new WorldDiff(_world, _world2);
@@ -51,8 +51,8 @@ namespace Tests
         public void ItemsMatchedByID()
         {
             var planetClone = new Planet(_planet.ID, _planet.Name);
-            _world.AddPlanet(_planet);
-            _world2.AddPlanet(planetClone);
+            _world.SetPlanet(_planet);
+            _world2.SetPlanet(planetClone);
             Assert.True(new WorldDiff(_world, _world2).IsEmpty);
         }
 
@@ -60,7 +60,7 @@ namespace Tests
         public void Added_Planet()
         {
             AssertDiffAndPatch(
-                w => w.AddPlanet(_planet),
+                w => w.SetPlanet(_planet),
                 d => CollectionAssert.AreEquivalent(new[] { _planet }, d.Planets.Added.Values));
         }
 
@@ -68,7 +68,7 @@ namespace Tests
         public void Added_Station()
         {
             AssertDiffAndPatch(
-                w => w.AddStation(_station),
+                w => w.SetStation(_station),
                 d => CollectionAssert.AreEquivalent(new[] { _station }, d.Stations.Added.Values));
         }
 
@@ -76,7 +76,7 @@ namespace Tests
         public void Added_Ship()
         {
             AssertDiffAndPatch(
-                w => w.AddShip(_ship),
+                w => w.SetShip(_ship),
                 d => CollectionAssert.AreEquivalent(new[] { _ship }, d.Ships.Added.Values));
         }
 
@@ -84,7 +84,7 @@ namespace Tests
         public void Added_Inventory()
         {
             AssertDiffAndPatch(
-                w => w.AddInventory(_inventory),
+                w => w.SetInventory(_inventory),
                 d => CollectionAssert.AreEquivalent(new[] { _inventory }, d.Inventories.Added.Values));
         }
 
@@ -92,7 +92,7 @@ namespace Tests
         public void Removed_Planet()
         {
             AssertDiffAndPatch(
-                w => w.AddPlanet(_planet),
+                w => w.SetPlanet(_planet),
                 w2 => { },
                 d => CollectionAssert.AreEquivalent(new[] { _planet }, d.Planets.Removed.Values));
         }
@@ -101,7 +101,7 @@ namespace Tests
         public void Removed_Station()
         {
             AssertDiffAndPatch(
-                w => w.AddStation(_station),
+                w => w.SetStation(_station),
                 w2 => { },
                 d => CollectionAssert.AreEquivalent(new[] { _station }, d.Stations.Removed.Values));
         }
@@ -110,7 +110,7 @@ namespace Tests
         public void Removed_Ship()
         {
             AssertDiffAndPatch(
-                w => w.AddShip(_ship),
+                w => w.SetShip(_ship),
                 w2 => { },
                 d => CollectionAssert.AreEquivalent(new[] { _ship }, d.Ships.Removed.Values));
         }
@@ -119,7 +119,7 @@ namespace Tests
         public void Removed_Inventory()
         {
             AssertDiffAndPatch(
-                w => w.AddInventory(_inventory),
+                w => w.SetInventory(_inventory),
                 w2 => { },
                 d => CollectionAssert.AreEquivalent(new[] { _inventory }, d.Inventories.Removed.Values));
         }
@@ -129,8 +129,8 @@ namespace Tests
         {
             var planet2 = new Planet(_planet.ID, "Jupiter");
             AssertDiffAndPatch(
-                w => w.AddPlanet(_planet),
-                w2 => w2.AddPlanet(planet2),
+                w => w.SetPlanet(_planet),
+                w2 => w2.SetPlanet(planet2),
                 d =>
                 {
                     CollectionAssert.AreEquivalent(new[] { _planet }, d.Planets.Removed.Values);
@@ -143,8 +143,8 @@ namespace Tests
         {
             var ship2 = new Ship(_ship.ID, _ship.Pos + new Vector3(50, 0, 0), _ship.Front, _ship.Up);
             AssertDiffAndPatch(
-                w => w.AddShip(_ship),
-                w2 => w2.AddShip(ship2),
+                w => w.SetShip(_ship),
+                w2 => w2.SetShip(ship2),
                 d =>
                 {
                     CollectionAssert.AreEquivalent(new[] { _ship }, d.Ships.Removed.Values);

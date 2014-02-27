@@ -47,28 +47,28 @@ namespace Core
             return inventory;
         }
 
-        public void AddPlanet(Planet planet)
+        public void SetPlanet(Planet planet)
         {
             if (planet == null) throw new ArgumentNullException();
-            _planets.Add(planet.ID, planet);
+            _planets[planet.ID] = planet;
         }
 
-        public void AddStation(Station station)
+        public void SetStation(Station station)
         {
             if (station == null) throw new ArgumentNullException();
-            _stations.Add(station.ID, station);
+            _stations[station.ID] = station;
         }
 
-        public void AddShip(Ship ship)
+        public void SetShip(Ship ship)
         {
             if (ship == null) throw new ArgumentNullException();
-            _ships.Add(ship.ID, ship);
+            _ships[ship.ID] = ship;
         }
 
-        public void AddInventory(Inventory inventory)
+        public void SetInventory(Inventory inventory)
         {
             if (inventory == null) throw new ArgumentNullException();
-            _inventories.Add(inventory.ID, inventory);
+            _inventories[inventory.ID] = inventory;
         }
 
         public bool RemovePlanet(Guid id)
@@ -97,13 +97,13 @@ namespace Core
         public World Patch(WorldDiff diff)
         {
             foreach (var id in diff.Planets.Removed.Keys) _planets.Remove(id);
-            foreach (var x in diff.Planets.Added.Values) AddPlanet(x);
+            foreach (var x in diff.Planets.Added.Values) SetPlanet(x);
             foreach (var id in diff.Stations.Removed.Keys) _stations.Remove(id);
-            foreach (var x in diff.Stations.Added.Values) AddStation(x);
+            foreach (var x in diff.Stations.Added.Values) SetStation(x);
             foreach (var id in diff.Ships.Removed.Keys) _ships.Remove(id);
-            foreach (var x in diff.Ships.Added.Values) AddShip(x);
+            foreach (var x in diff.Ships.Added.Values) SetShip(x);
             foreach (var id in diff.Inventories.Removed.Keys) _inventories.Remove(id);
-            foreach (var x in diff.Inventories.Added.Values) AddInventory(x);
+            foreach (var x in diff.Inventories.Added.Values) SetInventory(x);
             return this;
         }
 

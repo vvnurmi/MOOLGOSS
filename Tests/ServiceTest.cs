@@ -31,7 +31,7 @@ namespace Tests
         public void TestPatch()
         {
             var clientID = Guid.NewGuid();
-            _world2.AddPlanet(new Planet(Guid.NewGuid(), "Earth"));
+            _world2.SetPlanet(new Planet(Guid.NewGuid(), "Earth"));
             PublicService.SendWorldPatch(clientID, new WorldDiff(_world, _world2));
             Assertions.WorldsEqual(_world2, _world);
             var diffIn = PublicService.ReceiveWorldPatch(clientID);
@@ -44,7 +44,7 @@ namespace Tests
             var world3 = _world.Clone();
             var clientID = Guid.NewGuid();
             var clientID2 = Guid.NewGuid();
-            _world2.AddPlanet(new Planet(Guid.NewGuid(), "Earth"));
+            _world2.SetPlanet(new Planet(Guid.NewGuid(), "Earth"));
             PublicService.SendWorldPatch(clientID, new WorldDiff(_world, _world2));
             Assertions.WorldsEqual(_world2, _world);
             var diffIn2 = PublicService.ReceiveWorldPatch(clientID2);

@@ -19,9 +19,9 @@ namespace Server
             if (!TryStart(listener)) return;
             var world = new World();
             var service = new Service(world);
-            world.AddPlanet(new Planet(Guid.NewGuid(), "Earth"));
-            world.AddPlanet(new Planet(Guid.NewGuid(), "Jupiteroid"));
-            world.AddStation(new Station(Guid.NewGuid()) { Pos = new Vector3(200, 0, 100) });
+            world.SetPlanet(new Planet(Guid.NewGuid(), "Earth"));
+            world.SetPlanet(new Planet(Guid.NewGuid(), "Jupiteroid"));
+            world.SetStation(new Station(Guid.NewGuid(), new Vector3(200, 0, 100)));
             var marshalledService = Marshal.Get(service);
             while (true)
                 try

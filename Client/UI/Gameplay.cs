@@ -48,7 +48,7 @@ namespace Client.UI
             if (_inventory == null)
             {
                 _inventory = new InventoryModel(Guid.NewGuid());
-                _world.AddInventory(_inventory);
+                _world.SetInventory(_inventory);
                 _inventory.Add(new Core.Items.ItemStack(Guid.NewGuid(), Core.Items.ItemType.MiningDroid, 2)); // !!!
                 _inventoryView = new InventoryView("Player", 10, 10, 28, 5, _inventory);
             }
@@ -60,10 +60,10 @@ namespace Client.UI
 
             _topBarView.AddButton("dock", "DOCK (F1)", TryDocking);
 
-            if (Globals.PlayerShip == null)
+            if (Globals.PlayerShipID == Guid.Empty)
             {
-                Globals.PlayerShip = new Ship(Guid.NewGuid(), Vector3.Zero, Vector3.UnitX, Vector3.UnitY);
-                _world.AddShip(Globals.PlayerShip);
+                Globals.PlayerShipID = Guid.NewGuid();
+                _world.SetShip(new Ship(Globals.PlayerShipID, Vector3.Zero, Vector3.UnitX, Vector3.UnitY));
             }
 
             if (_shipUpdateHandle == null)
@@ -80,7 +80,7 @@ namespace Client.UI
 
         private void UpdateHandler(float secondsPassed)
         {
-            var ship = Globals.PlayerShip;
+            var ship = _world.GetShip(Globals.PlayerShipID);
             if (!_topBarView.IsVisible)
                 _topBarView.Show();
             if (Input.IsKeyDownEvent(KeyCodes.F1))
@@ -97,18 +97,19 @@ namespace Client.UI
                     Globals.UI.ShowMouse();
             if (!Globals.UI.IsMouseVisible)
             {
-                ship.Yaw(-0.3f * Input.RelativeMouseX);
-                ship.Pitch(-0.3f * Input.RelativeMouseY);
+                var yawDegrees = -0.3f * Input.RelativeMouseX;
+                var pitchDegrees = -0.3f * Input.RelativeMouseY;
                 var roll = 0f;
                 if (Input.IsKeyPressed(KeyCodes.Q)) roll--;
                 if (Input.IsKeyPressed(KeyCodes.E)) roll++;
-                ship.Roll(roll * 45 * secondsPassed);
+                var rollDegrees = roll * 45 * secondsPassed;
                 var move = Vector3.Zero;
                 if (Input.IsKeyPressed(KeyCodes.W)) move += ship.Front;
                 if (Input.IsKeyPressed(KeyCodes.S)) move -= ship.Front;
                 if (Input.IsKeyPressed(KeyCodes.A)) move -= ship.Right;
                 if (Input.IsKeyPressed(KeyCodes.D)) move += ship.Right;
-                ship.Move(move * 25 * secondsPassed);
+                var deltaPos = move * 25 * secondsPassed;
+                _world.SetShip(ship.Move(deltaPos, pitchDegrees, yawDegrees, rollDegrees));
             }
             UpdateCamera();
             UpdateMission();
@@ -133,7 +134,7 @@ namespace Client.UI
         private void UpdateCamera()
         {
             float SMOOTHNESS = 0.90f; // To be slightly below one.
-            var ship = Globals.PlayerShip;
+            var ship = _world.GetShip(Globals.PlayerShipID);
             var cameraTilt = Quaternion.FromAngleAxis(Utility.DegreesToRadians(-10), ship.Right);
             var targetOrientation = cameraTilt * ship.Orientation;
             Globals.Camera.Orientation = Quaternion.Nlerp(1 - SMOOTHNESS, Globals.Camera.Orientation, targetOrientation, true);
@@ -145,10 +146,11 @@ namespace Client.UI
         private void UpdateMission()
         {
             if (_mission == null) return;
+            var playerShip = _world.GetShip(Globals.PlayerShipID);
             switch (_mission.State)
             {
                 case MissionState.Open:
-                    if (_mission.AssignVolume.Intersects(Globals.PlayerShip.Pos))
+                    if (_mission.AssignVolume.Intersects(playerShip.Pos))
                     {
                         _mission.Offer();
                         Globals.UI.TryShowDialog(_mission.AssignMessage,
@@ -159,7 +161,7 @@ namespace Client.UI
                 case MissionState.Offering: break;
                 case MissionState.Suppressed: break;
                 case MissionState.Assigned:
-                    if (_mission.CompleteVolume.Intersects(Globals.PlayerShip.Pos))
+                    if (_mission.CompleteVolume.Intersects(playerShip.Pos))
                     {
                         _mission.Complete();
                         Globals.UI.TryShowDialog(_mission.CompleteMessage,

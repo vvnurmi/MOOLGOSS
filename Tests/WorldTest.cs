@@ -24,7 +24,7 @@ namespace Tests
         {
             _world = new World();
             _planet = new Planet(Guid.NewGuid(), "Earth");
-            _station = new Station(Guid.NewGuid());
+            _station = new Station(Guid.NewGuid(), new Vector3(10, 0, 20));
             _ship = new Ship(Guid.NewGuid(), new Vector3(5, 6, 7), Vector3.UnitX, Vector3.UnitY);
             _inventory = new Inventory(Guid.NewGuid());
         }
@@ -41,7 +41,7 @@ namespace Tests
         [Test]
         public void CloneIsEqual()
         {
-            AddItemsTo(_world);
+            SetItemsTo(_world);
             Assertions.WorldsEqual(_world, _world.Clone());
         }
 
@@ -52,9 +52,9 @@ namespace Tests
         }
 
         [Test]
-        public void AddItems()
+        public void SetItems()
         {
-            AddItemsTo(_world);
+            SetItemsTo(_world);
             CollectionAssert.AreEquivalent(new[] { _planet }, _world.Planets.Values);
             CollectionAssert.AreEquivalent(new[] { _station }, _world.Stations.Values);
             CollectionAssert.AreEquivalent(new[] { _ship }, _world.Ships.Values);
@@ -62,12 +62,12 @@ namespace Tests
         }
 
         [Test]
-        public void AddNull_Throws()
+        public void SetNull_Throws()
         {
-            Assert.Throws<ArgumentNullException>(() => _world.AddPlanet(null));
-            Assert.Throws<ArgumentNullException>(() => _world.AddStation(null));
-            Assert.Throws<ArgumentNullException>(() => _world.AddShip(null));
-            Assert.Throws<ArgumentNullException>(() => _world.AddInventory(null));
+            Assert.Throws<ArgumentNullException>(() => _world.SetPlanet(null));
+            Assert.Throws<ArgumentNullException>(() => _world.SetStation(null));
+            Assert.Throws<ArgumentNullException>(() => _world.SetShip(null));
+            Assert.Throws<ArgumentNullException>(() => _world.SetInventory(null));
         }
 
         [Test]
@@ -77,7 +77,7 @@ namespace Tests
             Assert.False(_world.RemoveStation(_station.ID));
             Assert.False(_world.RemoveShip(_ship.ID));
             Assert.False(_world.RemoveInventory(_inventory.ID));
-            AddItems();
+            SetItemsTo(_world);
             Assert.True(_world.RemovePlanet(_planet.ID));
             Assert.True(_world.RemoveStation(_station.ID));
             Assert.True(_world.RemoveShip(_ship.ID));
@@ -89,32 +89,25 @@ namespace Tests
         }
 
         [Test]
-        public void DoubleAdd_Throws()
-        {
-            _world.AddPlanet(_planet);
-            Assert.Throws<ArgumentException>(() => _world.AddPlanet(_planet));
-        }
-
-        [Test]
         public void GetItems()
         {
             Assert.IsNull(_world.GetPlanet(_planet.ID));
             Assert.IsNull(_world.GetStation(_station.ID));
             Assert.IsNull(_world.GetShip(_ship.ID));
             Assert.IsNull(_world.GetInventory(_inventory.ID));
-            AddItems();
+            SetItemsTo(_world);
             Assert.AreEqual(_planet, _world.GetPlanet(_planet.ID));
             Assert.AreEqual(_station, _world.GetStation(_station.ID));
             Assert.AreEqual(_ship, _world.GetShip(_ship.ID));
             Assert.AreEqual(_inventory, _world.GetInventory(_inventory.ID));
         }
 
-        private void AddItemsTo(World world)
+        private void SetItemsTo(World world)
         {
-            world.AddPlanet(_planet);
-            world.AddStation(_station);
-            world.AddShip(_ship);
-            world.AddInventory(_inventory);
+            world.SetPlanet(_planet);
+            world.SetStation(_station);
+            world.SetShip(_ship);
+            world.SetInventory(_inventory);
         }
     }
 }

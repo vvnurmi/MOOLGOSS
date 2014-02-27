@@ -10,17 +10,22 @@ namespace Core
     [Serializable]
     public class Ship : IEquatable<Ship>
     {
-        public Guid ID { get; private set; }
-        public Vector3 Pos { get; private set; }
-        public Vector3 Front { get; private set; }
-        public Vector3 Up { get; private set; }
+        private readonly Guid _id;
+        private readonly Vector3 _pos, _front, _up;
+
+        public Guid ID { get { return _id; } }
+        public Vector3 Pos { get { return _pos; } }
+        public Vector3 Front { get { return _front; } }
+        public Vector3 Up { get { return _up; } }
         public Vector3 Right { get { return Front.Cross(Up).ToNormalized(); } }
         public Quaternion Orientation { get { return Quaternion.FromAxes(Right, Up, -Front); } }
 
         public Ship(Guid id, Vector3 pos, Vector3 front, Vector3 up)
         {
-            ID = id;
-            Set(pos, front, up);
+            _id = id;
+            _pos = pos;
+            _front = front;
+            _up = up;
         }
 
         public bool Equals(Ship other)
@@ -29,35 +34,20 @@ namespace Core
                 && Front == other.Front && Up == other.Up && Right == other.Right;
         }
 
-        public void Set(Vector3 pos, Vector3 front, Vector3 up)
+        public Ship Set(Vector3 pos, Vector3 front, Vector3 up)
         {
-            Pos = pos;
-            Front = front;
-            Up = up;
+            return new Ship(ID, pos, front, up);
         }
 
-        public void Move(Vector3 delta)
+        public Ship Move(Vector3 deltaPos, float pitchDegrees, float yawDegrees, float rollDegrees)
         {
-            Pos += delta;
-        }
-
-        public void Pitch(float degrees)
-        {
-            var rotation = Quaternion.FromAngleAxis(Utility.DegreesToRadians(degrees), Right);
-            Front = rotation * Front;
-            Up = rotation * Up;
-        }
-
-        public void Yaw(float degrees)
-        {
-            var rotation = Quaternion.FromAngleAxis(Utility.DegreesToRadians(degrees), Up);
-            Front = rotation * Front;
-        }
-
-        public void Roll(float degrees)
-        {
-            var rotation = Quaternion.FromAngleAxis(Utility.DegreesToRadians(degrees), Front);
-            Up = rotation * Up;
+            var pos = Pos + deltaPos;
+            var pitchRotation = Quaternion.FromAngleAxis(Utility.DegreesToRadians(pitchDegrees), Right);
+            var yawRotation = Quaternion.FromAngleAxis(Utility.DegreesToRadians(yawDegrees), Up);
+            var rollRotation = Quaternion.FromAngleAxis(Utility.DegreesToRadians(rollDegrees), Front);
+            var front = yawRotation * pitchRotation * Front;
+            var up = rollRotation * pitchRotation * Up;
+            return Set(pos, front, up);
         }
     }
 }

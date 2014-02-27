@@ -70,11 +70,11 @@ namespace Client
             foreach (var station in diff.Stations.Added) CreateStation(station.Value);
             var shipsChanged = diff.Ships.Added.Intersect(diff.Ships.Removed, g_shipComparer);
             foreach (var ship in shipsChanged)
-                if (ship.Key != Globals.PlayerShip.ID) UpdateShip(ship.Value, 1);
+                if (ship.Key != Globals.PlayerShipID) UpdateShip(ship.Value, 1);
             foreach (var ship in diff.Ships.Removed.Except(shipsChanged, g_shipComparer))
-                if (ship.Key != Globals.PlayerShip.ID) RemoveShip(ship.Value);
+                if (ship.Key != Globals.PlayerShipID) RemoveShip(ship.Value);
             foreach (var ship in diff.Ships.Added.Except(shipsChanged, g_shipComparer))
-                if (ship.Key != Globals.PlayerShip.ID) CreateShip(ship.Value);
+                if (ship.Key != Globals.PlayerShipID) CreateShip(ship.Value);
         }
 
         public void CreateStaticThings()
