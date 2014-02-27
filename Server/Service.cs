@@ -19,10 +19,11 @@ namespace Server
             _world = world;
         }
 
-        public void SendWorldPatch(Guid clientID, WorldDiff diff)
+        public bool SendWorldPatch(Guid clientID, WorldDiff diff)
         {
             GetShadow(clientID).Patch(diff);
             _world.Patch(diff);
+            return true;
         }
 
         public WorldDiff ReceiveWorldPatch(Guid clientID)
