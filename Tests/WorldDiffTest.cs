@@ -131,9 +131,24 @@ namespace Tests
             AssertDiffAndPatch(
                 w => w.AddPlanet(_planet),
                 w2 => w2.AddPlanet(planet2),
-                d => {
+                d =>
+                {
                     CollectionAssert.AreEquivalent(new[] { _planet }, d.Planets.Removed.Values);
                     CollectionAssert.AreEquivalent(new[] { planet2 }, d.Planets.Added.Values);
+                });
+        }
+
+        [Test]
+        public void Modified_Ship()
+        {
+            var ship2 = new Ship(_ship.ID, _ship.Pos + new Vector3(50, 0, 0), _ship.Front, _ship.Up);
+            AssertDiffAndPatch(
+                w => w.AddShip(_ship),
+                w2 => w2.AddShip(ship2),
+                d =>
+                {
+                    CollectionAssert.AreEquivalent(new[] { _ship }, d.Ships.Removed.Values);
+                    CollectionAssert.AreEquivalent(new[] { ship2 }, d.Ships.Added.Values);
                 });
         }
 
