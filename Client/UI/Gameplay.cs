@@ -47,9 +47,9 @@ namespace Client.UI
 
             if (_inventory == null)
             {
-                _inventory = new InventoryModel(Guid.NewGuid());
+                _inventory = new InventoryModel(Guid.NewGuid())
+                    .Add(new Core.Items.ItemStack(Guid.NewGuid(), Core.Items.ItemType.MiningDroid, 2)); // !!!
                 _world.SetInventory(_inventory);
-                _inventory.Add(new Core.Items.ItemStack(Guid.NewGuid(), Core.Items.ItemType.MiningDroid, 2)); // !!!
                 _inventoryView = new InventoryView("Player", 10, 10, 28, 5, _inventory);
             }
 

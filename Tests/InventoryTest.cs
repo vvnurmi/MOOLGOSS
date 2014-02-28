@@ -30,7 +30,7 @@ namespace Tests
         {
             var stack = new ItemStack(Guid.NewGuid(), ItemType.MiningDroid, 1);
             Assert.AreEqual(Guid.Empty, stack.ContainerID);
-            _inventory.Add(stack);
+            _inventory = _inventory.Add(stack);
             Assert.AreEqual(_inventory.ID, stack.ContainerID);
             CollectionAssert.AreEqual(
                 new[] { Tuple.Create(ItemType.MiningDroid, 1) },
@@ -42,8 +42,8 @@ namespace Tests
         {
             var id = Guid.NewGuid();
             var stack = new ItemStack(id, ItemType.MiningDroid, 1);
-            _inventory.Add(stack);
-            _inventory.Remove(id);
+            _inventory = _inventory.Add(stack);
+            _inventory = _inventory.Remove(id);
             Assert.AreEqual(Guid.Empty, stack.ContainerID);
             Assert.IsEmpty(_inventory);
         }
@@ -51,7 +51,7 @@ namespace Tests
         [Test]
         public void TestRemove_NonexistentOk()
         {
-            _inventory.Remove(Guid.NewGuid());
+            _inventory = _inventory.Remove(Guid.NewGuid());
         }
     }
 }
