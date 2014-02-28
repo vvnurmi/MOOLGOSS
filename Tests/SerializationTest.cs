@@ -1,5 +1,6 @@
 ﻿using Axiom.Math;
 using Core;
+using Core.Items;
 using Core.Serial;
 using NUnit.Framework;
 using System;
@@ -49,6 +50,14 @@ namespace Tests
         {
             byte[] data = Serialization.Break(new Vector3(2, 3, 4));
             Assert.AreEqual(new Vector3(2, 3, 4), Serialization.Build<Vector3>(data));
+        }
+
+        [Test]
+        public void TestInventory()
+        {
+            var inventory = new Inventory(Guid.NewGuid()).Add(new ItemStack(Guid.NewGuid(), ItemType.MiningDroid, 42));
+            var inventory2 = Serialization.Build<Inventory>(Serialization.Break(inventory));
+            Assert.AreEqual(inventory, inventory2);
         }
 
         [Test, Timeout(1000)]

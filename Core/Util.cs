@@ -2,8 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Core
 {
@@ -39,6 +37,42 @@ namespace Core
                 inverse * start.x + opposite * end.x,
                 inverse * start.y + opposite * end.y,
                 inverse * start.z + opposite * end.z);
+        }
+
+        public static bool ValueEquals<K, V>(this IEnumerable<KeyValuePair<K, V>> a, IEnumerable<KeyValuePair<K, V>> b) where V : IEquatable<V>
+        {
+            // 3M keys, release build: 900 s
+            //return a.Count() == b.Count() && !a.Except(b).Any();
+            //return true;
+
+            // 3M keys, release build: 8.0 s
+            //var aSorted = a.OrderBy(x => x.Key);
+            //var bSorted = b.OrderBy(x => x.Key);
+            //if (aSorted.Count() != bSorted.Count()) return false;
+            //foreach (var pair in aSorted.Zip(bSorted, (q, w) => new KeyValuePair<KeyValuePair<K, V>, KeyValuePair<K, V>>(q, w)))
+            //    if (!pair.Key.Equals(pair.Value)) return false;
+            //return true;
+
+            // 3M keys, release build: 4.3 s
+            var aSorted = a.OrderBy(x => x.Key).ToArray();
+            var bSorted = b.OrderBy(x => x.Key).ToArray();
+            if (aSorted.Length != bSorted.Length) return false;
+            for (int i = 0; i < aSorted.Length; i++)
+                if (!aSorted[i].Equals(bSorted[i])) return false;
+            return true;
+        }
+
+        public static bool ValueEquals<K, V>(this IDictionary<K, V> a, IDictionary<K, V> b) where V : IEquatable<V>
+        {
+            // 3M keys, release build: 0.33 s
+            if (a.Count != b.Count) return false;
+            foreach (var x in a)
+            {
+                V bValue;
+                if (!b.TryGetValue(x.Key, out bValue)) return false;
+                if (!x.Value.Equals(bValue)) return false;
+            }
+            return true;
         }
     }
 }
