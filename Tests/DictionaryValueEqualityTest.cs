@@ -46,7 +46,7 @@ namespace Tests
         [Test]
         public void TimeLargeEquals()
         {
-            var size = 3000000;
+            var size = 1000000;
             // Note: Building the dictionary from an ordered sequence of ints takes .NET 4.5 a really long of time.
             var keysValues = Enumerable.Range(0, size * 2).Select(n => n * 479001599).ToArray();
             var a = BuildDictionary(keysValues);
