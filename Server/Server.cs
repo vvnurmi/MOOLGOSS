@@ -17,11 +17,11 @@ namespace Server
             var listener = new HttpListener();
             listener.Prefixes.Add("http://*:8080/moolgoss/");
             if (!TryStart(listener)) return;
-            var world = new World();
-            var service = new Service(world);
-            world.SetPlanet(new Planet(Guid.NewGuid(), "Earth"));
-            world.SetPlanet(new Planet(Guid.NewGuid(), "Jupiteroid"));
-            world.SetStation(new Station(Guid.NewGuid(), new Vector3(200, 0, 100)));
+            var world = World.Empty
+                .SetPlanet(new Planet(Guid.NewGuid(), "Earth"))
+                .SetPlanet(new Planet(Guid.NewGuid(), "Jupiteroid"))
+                .SetStation(new Station(Guid.NewGuid(), new Vector3(200, 0, 100)));
+            var service = new Service(() => world, f => world = f(world));
             var marshalledService = Marshal.Get(service);
             while (true)
                 try

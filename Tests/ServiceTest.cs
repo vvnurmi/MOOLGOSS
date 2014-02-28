@@ -14,26 +14,24 @@ namespace Tests
     [TestFixture]
     public class ServiceTest
     {
-        private World _world;
-        private World _world2;
+        private World _serverWorld;
         private Service _service;
         private IService PublicService { get { return _service; } }
 
         [SetUp]
         public void Setup()
         {
-            _world = new World();
-            _world2 = new World();
-            _service = new Service(_world);
+            _serverWorld = World.Empty;
+            _service = new Service(() => _serverWorld, f => _serverWorld = f(_serverWorld));
         }
 
         [Test]
         public void TestPatch()
         {
             var clientID = Guid.NewGuid();
-            _world2.SetPlanet(new Planet(Guid.NewGuid(), "Earth"));
-            PublicService.SendWorldPatch(clientID, new WorldDiff(_world, _world2));
-            Assertions.WorldsEqual(_world2, _world);
+            var clientWorld = World.Empty.SetPlanet(new Planet(Guid.NewGuid(), "Earth"));
+            PublicService.SendWorldPatch(clientID, new WorldDiff(_serverWorld, clientWorld));
+            Assertions.WorldsEqual(clientWorld, _serverWorld);
             var diffIn = PublicService.ReceiveWorldPatch(clientID);
             Assert.True(diffIn.IsEmpty);
         }
@@ -41,16 +39,16 @@ namespace Tests
         [Test]
         public void TestPatch_TwoClients()
         {
-            var world3 = _world.Clone();
-            var clientID = Guid.NewGuid();
-            var clientID2 = Guid.NewGuid();
-            _world2.SetPlanet(new Planet(Guid.NewGuid(), "Earth"));
-            PublicService.SendWorldPatch(clientID, new WorldDiff(_world, _world2));
-            Assertions.WorldsEqual(_world2, _world);
-            var diffIn2 = PublicService.ReceiveWorldPatch(clientID2);
-            world3.Patch(diffIn2);
-            Assertions.WorldsEqual(_world, world3);
-            var diffIn2b = PublicService.ReceiveWorldPatch(clientID2);
+            var client1ID = Guid.NewGuid();
+            var client2ID = Guid.NewGuid();
+            var client1World = World.Empty.SetPlanet(new Planet(Guid.NewGuid(), "Earth"));
+            var client2World = World.Empty;
+            PublicService.SendWorldPatch(client1ID, new WorldDiff(_serverWorld, client1World));
+            Assertions.WorldsEqual(client1World, _serverWorld);
+            var diffIn2 = PublicService.ReceiveWorldPatch(client2ID);
+            client2World = client2World.Patch(diffIn2);
+            Assertions.WorldsEqual(_serverWorld, client2World);
+            var diffIn2b = PublicService.ReceiveWorldPatch(client2ID);
             Assert.True(diffIn2b.IsEmpty);
         }
     }

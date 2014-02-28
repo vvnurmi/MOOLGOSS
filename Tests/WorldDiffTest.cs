@@ -13,7 +13,6 @@ namespace Tests
     [TestFixture]
     public class WorldDiffTest
     {
-        private World _world, _world2;
         private Planet _planet;
         private Station _station;
         private Ship _ship;
@@ -22,8 +21,6 @@ namespace Tests
         [SetUp]
         public void Setup()
         {
-            _world = new World();
-            _world2 = new World();
             _planet = new Planet(Guid.NewGuid(), "Earth");
             _station = new Station(Guid.NewGuid(), new Vector3(10, 0, 20));
             _ship = new Ship(Guid.NewGuid(), new Vector3(5, 6, 7), Vector3.UnitX, Vector3.UnitY);
@@ -31,36 +28,30 @@ namespace Tests
         }
 
         [Test]
-        public void PatchReturnsSelf()
-        {
-            Assert.AreSame(_world, _world.Patch(new WorldDiff(_world, _world)));
-        }
-
-        [Test]
         public void EmptyForIdenticals()
         {
-            _world2.SetPlanet(_planet);
-            Assert.True(new WorldDiff(_world, _world).IsEmpty);
-            Assert.True(new WorldDiff(_world2, _world2).IsEmpty);
-            var diff = new WorldDiff(_world, _world2);
+            var world2 = World.Empty.SetPlanet(_planet);
+            Assert.True(new WorldDiff(World.Empty, World.Empty).IsEmpty);
+            Assert.True(new WorldDiff(world2, world2).IsEmpty);
+            var diff = new WorldDiff(World.Empty, world2);
             Assert.False(diff.IsEmpty);
-            Assertions.WorldsEqual(_world2, _world.Patch(diff));
+            Assertions.WorldsEqual(world2, World.Empty.Patch(diff));
         }
 
         [Test]
         public void ItemsMatchedByID()
         {
             var planetClone = new Planet(_planet.ID, _planet.Name);
-            _world.SetPlanet(_planet);
-            _world2.SetPlanet(planetClone);
-            Assert.True(new WorldDiff(_world, _world2).IsEmpty);
+            var world = World.Empty.SetPlanet(_planet);
+            var world2 = World.Empty.SetPlanet(planetClone);
+            Assert.True(new WorldDiff(world, world2).IsEmpty);
         }
 
         [Test]
         public void Added_Planet()
         {
             AssertDiffAndPatch(
-                w => w.SetPlanet(_planet),
+                World.Empty.SetPlanet(_planet),
                 d => CollectionAssert.AreEquivalent(new[] { _planet }, d.Planets.Added.Values));
         }
 
@@ -68,7 +59,7 @@ namespace Tests
         public void Added_Station()
         {
             AssertDiffAndPatch(
-                w => w.SetStation(_station),
+                World.Empty.SetStation(_station),
                 d => CollectionAssert.AreEquivalent(new[] { _station }, d.Stations.Added.Values));
         }
 
@@ -76,7 +67,7 @@ namespace Tests
         public void Added_Ship()
         {
             AssertDiffAndPatch(
-                w => w.SetShip(_ship),
+                World.Empty.SetShip(_ship),
                 d => CollectionAssert.AreEquivalent(new[] { _ship }, d.Ships.Added.Values));
         }
 
@@ -84,7 +75,7 @@ namespace Tests
         public void Added_Inventory()
         {
             AssertDiffAndPatch(
-                w => w.SetInventory(_inventory),
+                World.Empty.SetInventory(_inventory),
                 d => CollectionAssert.AreEquivalent(new[] { _inventory }, d.Inventories.Added.Values));
         }
 
@@ -92,8 +83,8 @@ namespace Tests
         public void Removed_Planet()
         {
             AssertDiffAndPatch(
-                w => w.SetPlanet(_planet),
-                w2 => { },
+                World.Empty.SetPlanet(_planet),
+                World.Empty,
                 d => CollectionAssert.AreEquivalent(new[] { _planet }, d.Planets.Removed.Values));
         }
 
@@ -101,8 +92,8 @@ namespace Tests
         public void Removed_Station()
         {
             AssertDiffAndPatch(
-                w => w.SetStation(_station),
-                w2 => { },
+                World.Empty.SetStation(_station),
+                World.Empty,
                 d => CollectionAssert.AreEquivalent(new[] { _station }, d.Stations.Removed.Values));
         }
 
@@ -110,8 +101,8 @@ namespace Tests
         public void Removed_Ship()
         {
             AssertDiffAndPatch(
-                w => w.SetShip(_ship),
-                w2 => { },
+                World.Empty.SetShip(_ship),
+                World.Empty,
                 d => CollectionAssert.AreEquivalent(new[] { _ship }, d.Ships.Removed.Values));
         }
 
@@ -119,8 +110,8 @@ namespace Tests
         public void Removed_Inventory()
         {
             AssertDiffAndPatch(
-                w => w.SetInventory(_inventory),
-                w2 => { },
+                World.Empty.SetInventory(_inventory),
+                World.Empty,
                 d => CollectionAssert.AreEquivalent(new[] { _inventory }, d.Inventories.Removed.Values));
         }
 
@@ -129,8 +120,8 @@ namespace Tests
         {
             var planet2 = new Planet(_planet.ID, "Jupiter");
             AssertDiffAndPatch(
-                w => w.SetPlanet(_planet),
-                w2 => w2.SetPlanet(planet2),
+                World.Empty.SetPlanet(_planet),
+                World.Empty.SetPlanet(planet2),
                 d =>
                 {
                     CollectionAssert.AreEquivalent(new[] { _planet }, d.Planets.Removed.Values);
@@ -143,8 +134,8 @@ namespace Tests
         {
             var ship2 = new Ship(_ship.ID, _ship.Pos + new Vector3(50, 0, 0), _ship.Front, _ship.Up);
             AssertDiffAndPatch(
-                w => w.SetShip(_ship),
-                w2 => w2.SetShip(ship2),
+                World.Empty.SetShip(_ship),
+                World.Empty.SetShip(ship2),
                 d =>
                 {
                     CollectionAssert.AreEquivalent(new[] { _ship }, d.Ships.Removed.Values);
@@ -152,18 +143,16 @@ namespace Tests
                 });
         }
 
-        private void AssertDiffAndPatch(Action<World> buildWorld, Action<WorldDiff> assertDiff)
+        private void AssertDiffAndPatch(World world2, Action<WorldDiff> assertDiff)
         {
-            AssertDiffAndPatch(w => { }, buildWorld, assertDiff);
+            AssertDiffAndPatch(World.Empty, world2, assertDiff);
         }
 
-        private void AssertDiffAndPatch(Action<World> buildWorld1, Action<World> buildWorld2, Action<WorldDiff> assertDiff)
+        private void AssertDiffAndPatch(World world1, World world2, Action<WorldDiff> assertDiff)
         {
-            buildWorld1(_world);
-            buildWorld2(_world2);
-            var diff = new WorldDiff(_world, _world2);
+            var diff = new WorldDiff(world1, world2);
             assertDiff(diff);
-            Assertions.WorldsEqual(_world2, _world.Patch(diff));
+            Assertions.WorldsEqual(world2, world1.Patch(diff));
         }
     }
 }

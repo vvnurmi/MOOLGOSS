@@ -33,8 +33,8 @@ namespace Client.UI
             : base("Gameplay")
         {
             _clientID = Guid.NewGuid();
-            _world = new World();
-            _worldShadow = _world.Clone();
+            _world = World.Empty;
+            _worldShadow = World.Empty;
             _service = service;
             Enter = EnterHandler;
             Update = UpdateHandler;
@@ -49,7 +49,7 @@ namespace Client.UI
             {
                 _inventory = new InventoryModel(Guid.NewGuid())
                     .Add(new Core.Items.ItemStack(Guid.NewGuid(), Core.Items.ItemType.MiningDroid, 2)); // !!!
-                _world.SetInventory(_inventory);
+                _world = _world.SetInventory(_inventory);
                 _inventoryView = new InventoryView("Player", 10, 10, 28, 5, _inventory);
             }
 
@@ -63,7 +63,7 @@ namespace Client.UI
             if (Globals.PlayerShipID == Guid.Empty)
             {
                 Globals.PlayerShipID = Guid.NewGuid();
-                _world.SetShip(new Ship(Globals.PlayerShipID, Vector3.Zero, Vector3.UnitX, Vector3.UnitY));
+                _world = _world.SetShip(new Ship(Globals.PlayerShipID, Vector3.Zero, Vector3.UnitX, Vector3.UnitY));
             }
 
             if (_shipUpdateHandle == null)
@@ -109,7 +109,7 @@ namespace Client.UI
                 if (Input.IsKeyPressed(KeyCodes.A)) move -= ship.Right;
                 if (Input.IsKeyPressed(KeyCodes.D)) move += ship.Right;
                 var deltaPos = move * 25 * secondsPassed;
-                _world.SetShip(ship.Move(deltaPos, pitchDegrees, yawDegrees, rollDegrees));
+                _world = _world.SetShip(ship.Move(deltaPos, pitchDegrees, yawDegrees, rollDegrees));
             }
             UpdateCamera();
             UpdateMission();
@@ -181,13 +181,13 @@ namespace Client.UI
                 // TODO: Thread safety. Two threads modify _world and Axiom's scene graph.
                 Thread.Sleep(TimeSpan.FromSeconds(updateInterval));
                 var diffOut = new WorldDiff(_worldShadow, _world);
-                _worldShadow.Patch(diffOut);
+                _worldShadow = _worldShadow.Patch(diffOut);
                 _visualization.Update(diffOut, updateInterval);
                 _service.SendWorldPatch(_clientID, diffOut);
                 var diffIn = _service.ReceiveWorldPatch(_clientID);
                 _visualization.Update(diffIn, updateInterval);
-                _worldShadow.Patch(diffIn);
-                _world.Patch(diffIn);
+                _worldShadow = _worldShadow.Patch(diffIn);
+                _world = _world.Patch(diffIn);
                 if (_mission == null)
                     _mission = new Mission
                     {
