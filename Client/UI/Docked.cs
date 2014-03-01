@@ -50,8 +50,11 @@ namespace Client.UI
                 _interactionView = new InteractionView("Docked", 320, 500);
             }
 
-            _interactionView.AddItem("TestInstance", "Portrait", "[RK] Gom", "Guild Master", "Small", "Default", "DEAD", InteractionListElementClicked);
+            _interactionView.AddHeader("people", "PEOPLE");
+            _interactionView.AddItem("TestInstance", "Portrait", "[RK] Gom", "Guild Master", "Small", "Default", "", InteractionListElementClicked);
             _interactionView.AddItem("TestInstance2", "Portrait", "[RK] Chapelier", "Lord of The Code", "Small", "Default", "", InteractionListElementClicked);
+            _interactionView.AddHeader("ships", "SHIPS");
+            _interactionView.AddItem("TestShip", "Portrait", "Nautilus", "Small Fighter", "Small", "Default", "", InteractionListElementClicked);
 
             if (_leftVerticalBar == null)
             {
@@ -59,7 +62,7 @@ namespace Client.UI
                 _leftVerticalBarElement = CreateLeftVerticalBarElement();
                 _leftVerticalBarElement.AddChildElement(_interactionView.ListElement);
                 _interactionView.ListElement.VerticalAlignment = VerticalAlignment.Center;
-                _interactionView.ListElement.Top = -(float)Math.Round(_interactionView.ListElement.Height / 2);
+                _interactionView.ListElement.Top = -(_interactionView.AbsoluteContentHeight / 2);
                 _leftVerticalBar.AddElement(_leftVerticalBarElement);
             }
 
@@ -101,6 +104,8 @@ namespace Client.UI
             {
                 _interactionView.RemoveItem("TestInstance");
                 _interactionView.RemoveItem("TestInstance2");
+                _interactionView.RemoveHeader("people");
+                _interactionView.RemoveHeader("ships");
             }
 
             DestroyDialogueView();
