@@ -50,11 +50,11 @@ namespace Client.UI
                 _interactionView = new InteractionView("Docked", 320, 500);
             }
 
-            _interactionView.AddHeader("people", "PEOPLE");
-            _interactionView.AddItem("TestInstance", "Portrait", "[RK] Gom", "Guild Master", "Small", "Default", "", InteractionListElementClicked);
-            _interactionView.AddItem("TestInstance2", "Portrait", "[RK] Chapelier", "Lord of The Code", "Small", "Default", "", InteractionListElementClicked);
+            _interactionView.AddHeader("creatures", "CREATURES");
+            _interactionView.AddItem("TestInstance", "Portrait", "[RK] Gom", "Guild Master", "Small", "Default", "", () => { InteractionListElementClicked("Creature"); });
+            _interactionView.AddItem("TestInstance2", "Portrait", "[RK] Chapelier", "Lord of The Code", "Small", "Default", "", () => { InteractionListElementClicked("Creature"); });
             _interactionView.AddHeader("ships", "SHIPS");
-            _interactionView.AddItem("TestShip", "Portrait", "Nautilus", "Small Fighter", "Small", "Default", "", InteractionListElementClicked);
+            _interactionView.AddItem("TestShip", "Portrait", "Nautilus", "Small Fighter", "Small", "DefaultShip", "", () => { InteractionListElementClicked("Ship"); });
 
             if (_leftVerticalBar == null)
             {
@@ -105,7 +105,7 @@ namespace Client.UI
                 _interactionView.RemoveItem("TestInstance");
                 _interactionView.RemoveItem("TestInstance2");
                 _interactionView.RemoveItem("TestShip");
-                _interactionView.RemoveHeader("people");
+                _interactionView.RemoveHeader("creatures");
                 _interactionView.RemoveHeader("ships");
             }
 
@@ -145,14 +145,25 @@ namespace Client.UI
             Globals.UI.SetMode("Gameplay");
         }
 
-        private void InteractionListElementClicked()
+        private void InteractionListElementClicked(string type)
         {
             DestroyDialogueView();
-            _dialogueView = CreateDialogueView();
-            _dialogueView.DialogueElement.Left = _interactionView.ListElement.Width + 30;
-            _dialogueView.DialogueElement.VerticalAlignment = VerticalAlignment.Center;
-            _dialogueView.DialogueElement.Top = -(float)Math.Round(_dialogueView.DialogueElement.Height / 2);
-            _leftVerticalBarElement.AddChildElement(_dialogueView.DialogueElement);
+
+            if (type != null)
+            {
+                if (type.Equals("Creature"))
+                    _dialogueView = CreateCreatureDialogue();
+                else if (type.Equals("Ship"))
+                    _dialogueView = CreateShipDialogue();
+
+                if (_dialogueView != null)
+                {
+                    _dialogueView.DialogueElement.Left = _interactionView.ListElement.Width + 30;
+                    _dialogueView.DialogueElement.VerticalAlignment = VerticalAlignment.Center;
+                    _dialogueView.DialogueElement.Top = -(float)Math.Round(_dialogueView.DialogueElement.Height / 2);
+                    _leftVerticalBarElement.AddChildElement(_dialogueView.DialogueElement);
+                }
+            }
         }
 
         private OverlayElementContainer CreateLeftVerticalBarElement()
@@ -161,19 +172,11 @@ namespace Client.UI
             return leftVerticalBar;
         }
 
-        private DialogueView CreateDialogueView()
+        private DialogueView CreateDialogueView(string name)
         {
             if (_dialogueView == null)
             {
-                var dialogueView = new DialogueView("DockedDialogue", 310, 600);
-                dialogueView.AddButton("history", "Blue", "History (Event log)", DialogueViewOptionClicked);
-                dialogueView.AddOption("quit", "Bye Bye!", DialogueViewOptionClicked);
-                dialogueView.AddOption("buy", "Can I buy something?", ShowVendorList);
-                dialogueView.AddOption("chape", "Tell me about Chapelier!", DialogueViewOptionClicked);
-                dialogueView.AddProperty("name", "NAME:", "Gom", DialogueViewOptionClicked);
-                dialogueView.AddProperty("faction", "FACTION:", "Reilu Kerho [RK]", DialogueViewOptionClicked);
-                dialogueView.AddProperty("title", "TITLE:", "Guild Master", DialogueViewOptionClicked);
-                dialogueView.SetPortrait("Default");
+                var dialogueView = new DialogueView(name, 310, 600);
                 return dialogueView;
             }
 
@@ -186,8 +189,33 @@ namespace Client.UI
             {
                 DestroyVendorList();
                 DestroyTradeView();
+                DestroyShipDialogue();
+                DestroyCreatureDialogue();
 
                 _leftVerticalBarElement.RemoveChild(_dialogueView.DialogueElement.Name);
+                _dialogueView.Destroy();
+                _dialogueView = null;
+            }
+        }
+
+        private DialogueView CreateCreatureDialogue()
+        {
+            var dialogueView = CreateDialogueView("Creature");
+            dialogueView.AddButton("history", "Blue", "History (Event log)", DialogueViewOptionClicked);
+            dialogueView.AddOption("quit", "Bye bye!", DialogueViewOptionClicked);
+            dialogueView.AddOption("buy", "Can I buy something?", ShowVendorList);
+            dialogueView.AddOption("chape", "Tell me about Chapelier!", DialogueViewOptionClicked);
+            dialogueView.AddProperty("name", "NAME:", "Gom", DialogueViewOptionClicked);
+            dialogueView.AddProperty("faction", "FACTION:", "Reilu Kerho [RK]", DialogueViewOptionClicked);
+            dialogueView.AddProperty("title", "TITLE:", "Guild Master", DialogueViewOptionClicked);
+            dialogueView.SetPortrait("Default");
+            return dialogueView;
+        }
+
+        private void DestroyCreatureDialogue()
+        {
+            if (_dialogueView != null && _dialogueView.DialogueElement.Name.Contains("Creature"))
+            {
                 _dialogueView.RemoveButton("history");
                 _dialogueView.RemoveOption("buy");
                 _dialogueView.RemoveOption("quit");
@@ -195,10 +223,39 @@ namespace Client.UI
                 _dialogueView.RemoveProperty("name");
                 _dialogueView.RemoveProperty("faction");
                 _dialogueView.RemoveProperty("title");
-                _dialogueView.Destroy();
-                _dialogueView = null;
             }
         }
+
+        private DialogueView CreateShipDialogue()
+        {
+            var dialogueView = CreateDialogueView("Ship");
+            dialogueView.AddButton("history", "Blue", "History (Event log)", DialogueViewOptionClicked);
+            dialogueView.AddOption("leave", "Leave", DialogueViewOptionClicked);
+            dialogueView.AddOption("prepare_for_launch", "Prepare for launch", DialogueViewOptionClicked);
+            dialogueView.AddOption("cargo", "Check cargo", ShowVendorList);
+            dialogueView.AddProperty("name", "NAME:", "Nautilus", DialogueViewOptionClicked);
+            dialogueView.AddProperty("class", "CLASS:", "Small Fighter", DialogueViewOptionClicked);
+            dialogueView.AddProperty("builder", "BUILDER:", "Jules Verne", DialogueViewOptionClicked);
+            dialogueView.AddProperty("age", "AGE:", "20 days", DialogueViewOptionClicked);
+            dialogueView.SetPortrait("DefaultShip");
+            return dialogueView;
+        }
+
+        private void DestroyShipDialogue()
+        {
+            if (_dialogueView != null && _dialogueView.DialogueElement.Name.Contains("Ship"))
+            {
+                _dialogueView.RemoveButton("history");
+                _dialogueView.RemoveOption("leave");
+                _dialogueView.RemoveOption("prepare_for_launch");
+                _dialogueView.RemoveOption("cargo");
+                _dialogueView.RemoveProperty("name");
+                _dialogueView.RemoveProperty("class");
+                _dialogueView.RemoveProperty("builder");
+                _dialogueView.RemoveProperty("age");
+            }
+        }
+
 
         private void DialogueViewOptionClicked()
         {
