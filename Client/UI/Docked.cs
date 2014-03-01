@@ -104,6 +104,7 @@ namespace Client.UI
             {
                 _interactionView.RemoveItem("TestInstance");
                 _interactionView.RemoveItem("TestInstance2");
+                _interactionView.RemoveItem("TestShip");
                 _interactionView.RemoveHeader("people");
                 _interactionView.RemoveHeader("ships");
             }
