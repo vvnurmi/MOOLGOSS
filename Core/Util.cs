@@ -2,8 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Core
 {
@@ -39,6 +37,18 @@ namespace Core
                 inverse * start.x + opposite * end.x,
                 inverse * start.y + opposite * end.y,
                 inverse * start.z + opposite * end.z);
+        }
+
+        public static bool ValueEquals<K, V>(this IDictionary<K, V> a, IDictionary<K, V> b) where V : IEquatable<V>
+        {
+            if (a.Count != b.Count) return false;
+            foreach (var x in a)
+            {
+                V bValue;
+                if (!b.TryGetValue(x.Key, out bValue)) return false;
+                if (!x.Value.Equals(bValue)) return false;
+            }
+            return true;
         }
     }
 }

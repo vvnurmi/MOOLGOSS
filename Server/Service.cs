@@ -11,72 +11,34 @@ namespace Server
 {
     internal class Service : IService
     {
-        private World _world = new World();
+        private Func<World> _getWorld;
+        private Action<Func<World, World>> _modifyWorld;
+        private Dictionary<Guid, World> _worldShadows = new Dictionary<Guid, World>();
 
-        public Planet[] GetPlanets()
+        public Service(Func<World> getWorld, Action<Func<World, World>> modifyWorld)
         {
-            return new[] { new Planet("Earth") };
+            _getWorld = getWorld;
+            _modifyWorld = modifyWorld;
         }
 
-        public Station[] GetStations()
+        public bool SendWorldPatch(Guid clientID, WorldDiff diff)
         {
-            return _world.Stations.Values.ToArray();
+            ModifyShadow(clientID, w => w.Patch(diff));
+            _modifyWorld(w => w.Patch(diff));
+            return true;
         }
 
-        public Ship[] GetShips()
+        public WorldDiff ReceiveWorldPatch(Guid clientID)
         {
-            return _world.Ships.Values.ToArray();
+            WorldDiff diff = null;
+            ModifyShadow(clientID, shadow => shadow.Patch(diff = new WorldDiff(shadow, _getWorld())));
+            return diff;
         }
 
-        public Ship GetShip(Guid id)
+        private void ModifyShadow(Guid clientID, Func<World, World> f)
         {
-            Ship ship;
-            _world.Ships.TryGetValue(id, out ship);
-            return ship;
-        }
-
-        public void AddStation(Guid id, Vector3 pos)
-        {
-            _world.Stations[id] = new Station(id) { Pos = pos };
-        }
-
-        public void UpdateShip(Guid id, Vector3 pos, Vector3 front, Vector3 up)
-        {
-            var ship = GetOrAddShip(id);
-            ship.Set(pos, front, up);
-        }
-
-        public Inventory GetInventory(Guid id)
-        {
-            return GetOrAddInventory(id);
-        }
-
-        public void AddToInventory(Guid id, ItemStack stack)
-        {
-            var inventory = GetOrAddInventory(id);
-            try
-            {
-                inventory.Add(stack);
-            }
-            catch (InvalidOperationException)
-            {
-            }
-        }
-
-        private Ship GetOrAddShip(Guid id)
-        {
-            Ship ship;
-            if (!_world.Ships.TryGetValue(id, out ship))
-                _world.Ships.Add(id, ship = new Ship(id, Vector3.Zero, Vector3.UnitX, Vector3.UnitY));
-            return ship;
-        }
-
-        private Inventory GetOrAddInventory(Guid id)
-        {
-            Inventory inventory;
-            if (!_world.Inventories.TryGetValue(id, out inventory))
-                _world.Inventories.Add(id, inventory = new Inventory(id));
-            return inventory;
+            World shadow;
+            _worldShadows[clientID] = f(_worldShadows.TryGetValue(clientID, out shadow) ? shadow : World.Empty);
         }
     }
 }

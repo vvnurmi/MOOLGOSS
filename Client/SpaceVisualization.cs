@@ -14,6 +14,17 @@ namespace Client
 {
     public class SpaceVisualization
     {
+        private class IDComparer<T> : IEqualityComparer<KeyValuePair<Guid, T>>
+        {
+            public bool Equals(KeyValuePair<Guid, T> x, KeyValuePair<Guid, T> y)
+            {
+                return x.Key == y.Key;
+            }
+
+            public int GetHashCode(KeyValuePair<Guid, T> obj) { return obj.GetHashCode(); }
+        }
+        private static IDComparer<Ship> g_shipComparer = new IDComparer<Ship>();
+
         private struct NodeState
         {
             public Vector3 Pos;
@@ -51,7 +62,22 @@ namespace Client
             }
         }
 
-        public void Create(IEnumerable<Planet> planets, IEnumerable<Station> stations)
+        public void Update(WorldDiff diff, float updateInterval)
+        {
+            foreach (var planet in diff.Planets.Removed) RemovePlanet(planet.Value);
+            foreach (var planet in diff.Planets.Added) CreatePlanet(planet.Value);
+            foreach (var station in diff.Stations.Removed) RemoveStation(station.Value);
+            foreach (var station in diff.Stations.Added) CreateStation(station.Value);
+            var shipsChanged = diff.Ships.Added.Intersect(diff.Ships.Removed, g_shipComparer);
+            foreach (var ship in shipsChanged)
+                if (ship.Key != Globals.PlayerShipID) UpdateShip(ship.Value, 1);
+            foreach (var ship in diff.Ships.Removed.Except(shipsChanged, g_shipComparer))
+                if (ship.Key != Globals.PlayerShipID) RemoveShip(ship.Value);
+            foreach (var ship in diff.Ships.Added.Except(shipsChanged, g_shipComparer))
+                if (ship.Key != Globals.PlayerShipID) CreateShip(ship.Value);
+        }
+
+        public void CreateStaticThings()
         {
             Globals.Scene.AmbientLight = new ColorEx(0.1f, 0.1f, 0.1f);
             //Globals.Scene.ShadowTechnique = ShadowTechnique.StencilAdditive;
@@ -66,8 +92,6 @@ namespace Client
             light2.Diffuse = new ColorEx(0.2f, 0.2f, 0.2f);
 
             Globals.Scene.SetSkyBox(true, "Skybox/Space", 1000);
-            foreach (var planet in planets) CreatePlanet(planet.Pos);
-            foreach (var station in stations) CreateStation(station.Pos);
         }
 
         public void UpdateShip(Ship ship, float updateInterval)
@@ -76,9 +100,7 @@ namespace Client
             SceneNode node;
             if (!_nodes.TryGetValue(ship.ID, out node))
             {
-                _nodes.Add(ship.ID, node = CreateShip());
-                node.Position = ship.Pos;
-                node.Orientation = ship.Orientation;
+                _nodes.Add(ship.ID, node = CreateShip(ship));
             }
             _nodeUpdates[ship.ID] = new NodeUpdate
             {
@@ -97,28 +119,48 @@ namespace Client
             };
         }
 
-        private void CreatePlanet(Vector3 pos)
+        private void CreatePlanet(Planet planet)
         {
             var groundEnt = Globals.Scene.CreateEntity("ground entity " + _entityIndex++, "planet1.mesh");
             groundEnt.CastShadows = true;
-            var node = Globals.Scene.RootSceneNode.CreateChildSceneNode(pos);
+            var node = Globals.Scene.RootSceneNode.CreateChildSceneNode(planet.Pos);
             node.AttachObject(groundEnt);
         }
 
-        private void CreateStation(Vector3 pos)
+        private void RemovePlanet(Planet planet)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void CreateStation(Station station)
         {
             var stationEnt = Globals.Scene.CreateEntity("station entity " + _entityIndex++, "station1.mesh");
             stationEnt.CastShadows = true;
-            var node = Globals.Scene.RootSceneNode.CreateChildSceneNode(pos);
+            var node = Globals.Scene.RootSceneNode.CreateChildSceneNode(station.Pos);
             node.AttachObject(stationEnt);
         }
 
-        private SceneNode CreateShip()
+        private void RemoveStation(Station station)
+        {
+            throw new NotImplementedException();
+        }
+
+        private SceneNode CreateShip(Ship ship)
         {
             var shipEnt = Globals.Scene.CreateEntity("ship entity " + _entityIndex++, "ship1.mesh");
             var node = Globals.Scene.RootSceneNode.CreateChildSceneNode();
             node.AttachObject(shipEnt);
+            node.Position = ship.Pos;
+            node.Orientation = ship.Orientation;
             return node;
+        }
+
+        private void RemoveShip(Ship ship)
+        {
+            SceneNode node;
+            if (!_nodes.TryGetValue(ship.ID, out node)) return;
+            Globals.Scene.RootSceneNode.RemoveChild(node);
+            _nodes.Remove(ship.ID);
         }
     }
 }

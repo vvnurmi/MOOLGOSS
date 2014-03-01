@@ -32,11 +32,11 @@ namespace Tests
         [Test]
         public void TestMove()
         {
-            _ship.Move(_ship.Front);
+            _ship = _ship.Move(_ship.Front, 0, 0, 0);
             Assert.AreEqual(new Vector3(3, 3, 4), _ship.Pos);
-            _ship.Pitch(90);
+            _ship = _ship.Move(Vector3.Zero, 90, 0, 0);
             Assert.AreEqual(Tuple.Create(Vector3.UnitY, -Vector3.UnitX), Tuple.Create(_ship.Front, _ship.Up));
-            _ship.Yaw(90);
+            _ship = _ship.Move(Vector3.Zero, 0, 90, 0);
             Assert.AreEqual(Tuple.Create(-Vector3.UnitZ, -Vector3.UnitX), Tuple.Create(_ship.Front, _ship.Up));
         }
     }

@@ -14,61 +14,42 @@ namespace Tests
     [TestFixture]
     public class ServiceTest
     {
-        private Service _service = new Service();
+        private World _serverWorld;
+        private Service _service;
         private IService PublicService { get { return _service; } }
 
-        [Test]
-        public void TestGetPlanets()
+        [SetUp]
+        public void Setup()
         {
-            CollectionAssert.AreEqual(new[] { "Earth" }, PublicService.GetPlanets().Select(x => x.Name));
+            _serverWorld = World.Empty;
+            _service = new Service(() => _serverWorld, f => _serverWorld = f(_serverWorld));
         }
 
         [Test]
-        public void TestGetStations()
+        public void TestPatch()
         {
-            _service.AddStation(Guid.NewGuid(), new Vector3(100, 0, 200));
-            _service.AddStation(Guid.NewGuid(), new Vector3(300, 0, 100));
-            CollectionAssert.AreEqual(
-                new[] { new Vector3(100, 0, 200), new Vector3(300, 0, 100) },
-                PublicService.GetStations().Select(x => x.Pos));
+            var clientID = Guid.NewGuid();
+            var clientWorld = World.Empty.SetPlanet(new Planet(Guid.NewGuid(), "Earth"));
+            PublicService.SendWorldPatch(clientID, new WorldDiff(_serverWorld, clientWorld));
+            Assertions.WorldsEqual(clientWorld, _serverWorld);
+            var diffIn = PublicService.ReceiveWorldPatch(clientID);
+            Assert.True(diffIn.IsEmpty);
         }
 
         [Test]
-        public void TestShips()
+        public void TestPatch_TwoClients()
         {
-            CollectionAssert.IsEmpty(PublicService.GetShips());
-            var id = Guid.NewGuid();
-            Action<Vector3, Vector3, Vector3> setAndAssertShip = (pos, front, up) =>
-            {
-                PublicService.UpdateShip(id, pos, front, up);
-                Ship ship = PublicService.GetShips().SingleOrDefault();
-                Assert.IsNotNull(ship);
-                var expected = Tuple.Create(id, pos, front, up);
-                Assert.AreEqual(expected, Tuple.Create(ship.ID, ship.Pos, ship.Front, ship.Up));
-            };
-            setAndAssertShip(new Vector3(1, 2, 3), Vector3.UnitX, Vector3.UnitY);
-            setAndAssertShip(new Vector3(2, 2, 3), Vector3.UnitY, Vector3.UnitZ);
-        }
-
-        [Test]
-        public void TestInventoryAdd_Success()
-        {
-            var id = Guid.NewGuid();
-            Assert.IsEmpty(PublicService.GetInventory(id));
-            PublicService.AddToInventory(id, new ItemStack(Guid.NewGuid(), ItemType.MiningDroid, 1));
-        }
-
-        [Test]
-        public void TestInventoryAdd_DoubleAddFails()
-        {
-            var id1 = Guid.NewGuid();
-            var id2 = Guid.NewGuid();
-            var stack = new ItemStack(Guid.NewGuid(), ItemType.MiningDroid, 1);
-            PublicService.AddToInventory(id1, stack);
-            PublicService.AddToInventory(id1, stack); // Fails silently.
-            PublicService.AddToInventory(id2, stack); // Fails silently.
-            Assert.AreEqual(1, PublicService.GetInventory(id1).Count());
-            Assert.AreEqual(0, PublicService.GetInventory(id2).Count());
+            var client1ID = Guid.NewGuid();
+            var client2ID = Guid.NewGuid();
+            var client1World = World.Empty.SetPlanet(new Planet(Guid.NewGuid(), "Earth"));
+            var client2World = World.Empty;
+            PublicService.SendWorldPatch(client1ID, new WorldDiff(_serverWorld, client1World));
+            Assertions.WorldsEqual(client1World, _serverWorld);
+            var diffIn2 = PublicService.ReceiveWorldPatch(client2ID);
+            client2World = client2World.Patch(diffIn2);
+            Assertions.WorldsEqual(_serverWorld, client2World);
+            var diffIn2b = PublicService.ReceiveWorldPatch(client2ID);
+            Assert.True(diffIn2b.IsEmpty);
         }
     }
 }
