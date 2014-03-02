@@ -39,7 +39,7 @@ namespace Core
                 inverse * start.z + opposite * end.z);
         }
 
-        public static bool ValueEquals<K, V>(this IDictionary<K, V> a, IDictionary<K, V> b) where V : IEquatable<V>
+        public static bool ValueEquals<K, V>(this IReadOnlyDictionary<K, V> a, IReadOnlyDictionary<K, V> b) where V : IEquatable<V>
         {
             if (a.Count != b.Count) return false;
             foreach (var x in a)
