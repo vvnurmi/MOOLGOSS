@@ -27,7 +27,7 @@ namespace Client
 
             // HACK: Get assembly Axiom.Platforms.Win32.dll loaded before any dynamically created assembly.
             // This is to avoid an exception getting thrown from the Root constructor.
-            { var hack = typeof(Axiom.Platforms.Win32.Win32InputReader); }
+            System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(Axiom.Platforms.Win32.Win32InputReader).TypeHandle);
 
             var service = Connect(host);
             var configuration = ConfigurationManagerFactory.CreateDefault();
