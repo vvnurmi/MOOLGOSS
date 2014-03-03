@@ -1,11 +1,15 @@
-﻿namespace Client
+﻿using System.Linq;
+
+namespace Client
 {
     public static class Program
     {
         public static void Main(string[] args)
         {
             var client = new Client();
-            client.Start(args.Length > 0, "assaultwing.com");
+            client.Start("assaultwing.com",
+                userConfigure: args.Contains("--config"),
+                debugSettings: args.Contains("--debug"));
         }
     }
 }

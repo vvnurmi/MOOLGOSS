@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace Standalone
 {
@@ -9,7 +10,9 @@ namespace Standalone
             var server = new Server.Server();
             ((Action)server.Start).BeginInvoke(null, null);
             var client = new Client.Client();
-            client.Start(args.Length > 0, "localhost");
+            client.Start("localhost",
+                userConfigure: args.Contains("--config"),
+                debugSettings: args.Contains("--debug"));
         }
     }
 }

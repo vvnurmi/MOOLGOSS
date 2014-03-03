@@ -20,7 +20,7 @@ namespace Client
 {
     public class Client
     {
-        public void Start(bool userConfigure, string host)
+        public void Start(string host, bool userConfigure, bool debugSettings)
         {
             // HACK: Use an English culture so that Axiom.Overlays.Elements.BorderPanel works.
             System.Threading.Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
@@ -36,14 +36,20 @@ namespace Client
             {
                 root.RenderSystem = root.RenderSystems[0];
                 root.RenderSystem.ConfigOptions["VSync"].Value = "Yes";
+                root.RenderSystem.ConfigOptions["Full Screen"].Value = "Yes";
                 var bestMode =
                     root.RenderSystem.ConfigOptions["Video Mode"].PossibleValues
                     .Where(x => x.Value.Contains("32-bit color"))
                     .LastOrDefault().Value;
                 if (bestMode != null) root.RenderSystem.ConfigOptions["Video Mode"].Value = bestMode;
+                if (debugSettings)
+                {
+                    root.RenderSystem.ConfigOptions["Full Screen"].Value = "No";
+                    root.RenderSystem.ConfigOptions["Video Mode"].Value = "640 x 480 @ 32-bit color";
+                }
                 if (userConfigure && !configuration.ShowConfigDialog(root)) return;
-                var window = CreateRenderWindow();
-                Globals.Input.Initialize(window);
+                var window = CreateRenderWindow(root.RenderSystem.ConfigOptions["Video Mode"].Value == "Yes");
+                Globals.Input.Initialize(window, ownMouse: !debugSettings);
                 ResourceGroupManager.Instance.AddResourceLocation("Media", "Folder", true);
                 ResourceGroupManager.Instance.InitializeAllResourceGroups();
                 Globals.Scene = root.CreateSceneManager(SceneType.Generic);
@@ -75,11 +81,11 @@ namespace Client
             if (args.StopRendering) Globals.UI.SetMode(null);
         }
 
-        private RenderWindow CreateRenderWindow()
+        private RenderWindow CreateRenderWindow(bool fullscreen)
         {
             var renderWindow = Root.Instance.Initialize(true, "MOOLGOSS");
             var dx9RenderWindow = renderWindow as Axiom.RenderSystems.DirectX9.D3DRenderWindow;
-            if (dx9RenderWindow != null)
+            if (fullscreen && dx9RenderWindow != null)
             {
                 var handle = dx9RenderWindow.PresentationParameters.DeviceWindowHandle;
                 var window = System.Windows.Forms.Control.FromHandle(handle).FindForm();

@@ -38,9 +38,9 @@ namespace Client
             _currentMouseStates = new bool[maxMouseCode + 1];
         }
 
-        public void Initialize(RenderWindow window)
+        public void Initialize(RenderWindow window, bool ownMouse)
         {
-            _input.Initialize(window, true, true, false, true);
+            _input.Initialize(window, true, true, false, ownMouse);
         }
 
         public void Update()
