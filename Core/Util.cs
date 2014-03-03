@@ -1,6 +1,7 @@
 ﻿using Axiom.Math;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace Core
@@ -49,6 +50,20 @@ namespace Core
                 if (!x.Value.Equals(bValue)) return false;
             }
             return true;
+        }
+
+        /// <summary>
+        /// Reads bytes from the stream into the buffer until the buffer is full or the stream is exhausted.
+        /// </summary>
+        public static void ReadTo(this Stream inputStream, byte[] buffer)
+        {
+            var offset = 0;
+            while (true)
+            {
+                var readCount = inputStream.Read(buffer, offset, buffer.Length - offset);
+                if (readCount == 0) break;
+                offset += readCount;
+            }
         }
     }
 }

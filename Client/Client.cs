@@ -119,7 +119,7 @@ namespace Client
             {
                 if (response.ContentLength <= 0) return null;
                 var responseData = new byte[response.ContentLength];
-                response.GetResponseStream().Read(responseData, 0, responseData.Length);
+                response.GetResponseStream().ReadTo(responseData);
                 return Serialization.Build<object>(responseData);
             }
         }
