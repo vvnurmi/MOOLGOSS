@@ -149,20 +149,17 @@ namespace Client.UI
         {
             DestroyDialogueView();
 
-            if (type != null)
-            {
-                if (type.Equals("Creature"))
-                    _dialogueView = CreateCreatureDialogue();
-                else if (type.Equals("Ship"))
-                    _dialogueView = CreateShipDialogue();
+            if (type == "Creature")
+                _dialogueView = CreateCreatureDialogue();
+            else if (type == "Ship")
+                _dialogueView = CreateShipDialogue();
 
-                if (_dialogueView != null)
-                {
-                    _dialogueView.DialogueElement.Left = _interactionView.ListElement.Width + 30;
-                    _dialogueView.DialogueElement.VerticalAlignment = VerticalAlignment.Center;
-                    _dialogueView.DialogueElement.Top = -(float)Math.Round(_dialogueView.DialogueElement.Height / 2);
-                    _leftVerticalBarElement.AddChildElement(_dialogueView.DialogueElement);
-                }
+            if (_dialogueView != null)
+            {
+                _dialogueView.DialogueElement.Left = _interactionView.ListElement.Width + 30;
+                _dialogueView.DialogueElement.VerticalAlignment = VerticalAlignment.Center;
+                _dialogueView.DialogueElement.Top = -(float)Math.Round(_dialogueView.DialogueElement.Height / 2);
+                _leftVerticalBarElement.AddChildElement(_dialogueView.DialogueElement);
             }
         }
 

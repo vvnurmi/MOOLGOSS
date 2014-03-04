@@ -129,9 +129,9 @@ namespace Client.Views
             var instanceName = listItemName + "/Icon";
             OverlayElementContainer icon = null;
 
-            if (type.Equals("Portrait"))
+            if (type == "Portrait")
                 icon = Globals.UI.CreatePortrait(instanceName, category, name, label);
-            else if (type.Equals("Material"))
+            else if (type == "Material")
                 icon = Globals.UI.CreateIcon(instanceName, category, name, label);
 
             return icon;

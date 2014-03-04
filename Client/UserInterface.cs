@@ -181,7 +181,7 @@ namespace Client
             var portraitImage = (OverlayElementContainer)OverlayManager.Instance.Elements.CreateElementFromTemplate("Overlays/Templates/Portraits/" + type + "/" + name, null, instanceName + "/PortraitImage");            
             portraitBase.AddChildElement(portraitImage);
 
-            if (type.Equals("Small"))
+            if (type == "Small")
             {
                 var portraitOverlay = CreateIconOverlay(instanceName, label);
                 portraitBase.AddChildElement(portraitOverlay);
