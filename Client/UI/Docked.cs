@@ -264,7 +264,7 @@ namespace Client.UI
             DestroyTradeView();
             DestroyVendorList();
             _vendorList = CreateVendorList();
-            _vendorList.TradeElement.Left = _dialogueView.DialogueElement.Left + _dialogueView.DialogueElement.Width;
+            _vendorList.TradeElement.Left = _dialogueView.DialogueElement.Left + _dialogueView.DialogueElement.Width + 5;
             _vendorList.TradeElement.VerticalAlignment = VerticalAlignment.Center;
             _vendorList.TradeElement.Top = -(float)Math.Round(_vendorList.TradeElement.Height / 2);
             _leftVerticalBarElement.AddChildElement(_vendorList.TradeElement);
@@ -297,7 +297,7 @@ namespace Client.UI
         {
             DestroyTradeView();
             _tradeView = CreateTradeView();
-            _tradeView.TradeElement.Left = _vendorList.TradeElement.Left + _vendorList.TradeElement.Width + 6;
+            _tradeView.TradeElement.Left = _vendorList.TradeElement.Left + _vendorList.TradeElement.Width + 5;
             _tradeView.TradeElement.VerticalAlignment = VerticalAlignment.Center;
             _tradeView.TradeElement.Top = -((float)Math.Round(_vendorList.TradeElement.Height / 2) + 26);
             _leftVerticalBarElement.AddChildElement(_tradeView.TradeElement);
