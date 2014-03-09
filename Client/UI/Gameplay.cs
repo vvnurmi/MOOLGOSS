@@ -2,6 +2,7 @@
 using Axiom.Math;
 using Core;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,6 +16,8 @@ namespace Client.UI
 {
     internal class Gameplay : UIMode
     {
+        private const float ServerSyncInterval = 1;
+
         private Guid _clientID;
         private World _world;
         private World _worldShadow;
@@ -26,6 +29,7 @@ namespace Client.UI
         private TopBarView _topBarView;
         private IAsyncResult _shipUpdateHandle;
         private bool _exiting;
+        private ConcurrentQueue<WorldDiff> _visualizationUpdates = new ConcurrentQueue<WorldDiff>();
 
         private Input Input { get { return Globals.Input; } }
 
@@ -115,6 +119,9 @@ namespace Client.UI
             UpdateMission();
             _inventoryView.SyncWithModel();
             _visualization.UpdateShip(ship, 0);
+            WorldDiff visualizationDiff;
+            while (_visualizationUpdates.TryDequeue(out visualizationDiff))
+                _visualization.Update(visualizationDiff, ServerSyncInterval);
             _visualization.Update();
         }
 
@@ -175,17 +182,16 @@ namespace Client.UI
 
         private void SyncWithServerLoop()
         {
-            float updateInterval = 1;
             while (!_exiting)
             {
-                // TODO: Thread safety. Two threads modify _world and Axiom's scene graph.
-                Thread.Sleep(TimeSpan.FromSeconds(updateInterval));
+                // TODO: Thread safety. Two threads modify _world.
+                Thread.Sleep(TimeSpan.FromSeconds(ServerSyncInterval));
                 var diffOut = new WorldDiff(_worldShadow, _world);
                 _worldShadow = _worldShadow.Patch(diffOut);
-                _visualization.Update(diffOut, updateInterval);
+                if (!diffOut.IsEmpty) _visualizationUpdates.Enqueue(diffOut);
                 _service.SendWorldPatch(_clientID, diffOut);
                 var diffIn = _service.ReceiveWorldPatch(_clientID);
-                _visualization.Update(diffIn, updateInterval);
+                if (!diffIn.IsEmpty) _visualizationUpdates.Enqueue(diffIn);
                 _worldShadow = _worldShadow.Patch(diffIn);
                 _world = _world.Patch(diffIn);
                 if (_mission == null)
