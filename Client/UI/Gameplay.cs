@@ -45,6 +45,11 @@ namespace Client.UI
             Exit = ExitHandler;
         }
 
+        private void ModifyWorld(Func<World, World> modify)
+        {
+            lock (_world) _world = modify(_world);
+        }
+
         private void EnterHandler()
         {
             Globals.UI.HideMouse();
@@ -53,7 +58,7 @@ namespace Client.UI
             {
                 _inventory = new InventoryModel(Guid.NewGuid())
                     .Add(new Core.Items.ItemStack(Guid.NewGuid(), Core.Items.ItemType.MiningDroid, 2)); // !!!
-                _world = _world.SetInventory(_inventory);
+                ModifyWorld(w => w.SetInventory(_inventory));
                 _inventoryView = new InventoryView("Player", 10, 10, 28, 5, _inventory);
             }
 
@@ -67,7 +72,7 @@ namespace Client.UI
             if (Globals.PlayerShipID == Guid.Empty)
             {
                 Globals.PlayerShipID = Guid.NewGuid();
-                _world = _world.SetShip(new Ship(Globals.PlayerShipID, Vector3.Zero, Vector3.UnitX, Vector3.UnitY));
+                ModifyWorld(w => w.SetShip(new Ship(Globals.PlayerShipID, Vector3.Zero, Vector3.UnitX, Vector3.UnitY)));
             }
 
             if (_shipUpdateHandle == null)
@@ -113,7 +118,7 @@ namespace Client.UI
                 if (Input.IsKeyPressed(KeyCodes.A)) move -= ship.Right;
                 if (Input.IsKeyPressed(KeyCodes.D)) move += ship.Right;
                 var deltaPos = move * 25 * secondsPassed;
-                _world = _world.SetShip(ship.Move(deltaPos, pitchDegrees, yawDegrees, rollDegrees));
+                ModifyWorld(w => w.SetShip(ship.Move(deltaPos, pitchDegrees, yawDegrees, rollDegrees)));
             }
             UpdateCamera();
             UpdateMission();
@@ -193,7 +198,7 @@ namespace Client.UI
                 var diffIn = _service.ReceiveWorldPatch(_clientID);
                 if (!diffIn.IsEmpty) _visualizationUpdates.Enqueue(diffIn);
                 _worldShadow = _worldShadow.Patch(diffIn);
-                _world = _world.Patch(diffIn);
+                ModifyWorld(w => w.Patch(diffIn));
                 if (_mission == null)
                     _mission = new Mission
                     {
