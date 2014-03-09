@@ -52,7 +52,7 @@ namespace System.Collections.Immutable
 	 */
 	public class ImmutableDictionary<TKey, TValue> : IImmutableDictionary<TKey, TValue> where TKey : System.IComparable<TKey>
     {
-        internal static readonly ImmutableDictionary<TKey, TValue> Empty = new ImmutableDictionary<TKey, TValue>();
+        public static readonly ImmutableDictionary<TKey, TValue> Empty = new ImmutableDictionary<TKey, TValue>();
         AvlNode<KeyValuePair<TKey, TValue>> root = AvlNode<KeyValuePair<TKey, TValue>>.Empty;
         readonly IEqualityComparer<TKey> keyComparer;
         readonly IEqualityComparer<TValue> valueComparer;
@@ -135,9 +135,9 @@ namespace System.Collections.Immutable
             return Remove(key);
         }
 
-        public IImmutableDictionary<TKey, TValue> RemoveRange(IEnumerable<TKey> keys)
+        public ImmutableDictionary<TKey, TValue> RemoveRange(IEnumerable<TKey> keys)
         {
-            IImmutableDictionary<TKey, TValue> result = this;
+            var result = this;
             foreach (var key in keys)
             {
                 result = result.Remove(key);
@@ -163,7 +163,7 @@ namespace System.Collections.Immutable
             return SetItem(key, value);
         }
 
-        public IImmutableDictionary<TKey, TValue> SetItems(IEnumerable<KeyValuePair<TKey, TValue>> items)
+        public ImmutableDictionary<TKey, TValue> SetItems(IEnumerable<KeyValuePair<TKey, TValue>> items)
         {
             var result = this;
             foreach (var kv in items)
