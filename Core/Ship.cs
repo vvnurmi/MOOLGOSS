@@ -8,12 +8,10 @@ using System.Threading.Tasks;
 namespace Core
 {
     [Serializable]
-    public class Ship : IEquatable<Ship>
+    public class Ship : Wob, IEquatable<Ship>
     {
-        private readonly Guid _id;
         private readonly Vector3 _pos, _front, _up;
 
-        public Guid ID { get { return _id; } }
         public Vector3 Pos { get { return _pos; } }
         public Vector3 Front { get { return _front; } }
         public Vector3 Up { get { return _up; } }
@@ -21,8 +19,8 @@ namespace Core
         public Quaternion Orientation { get { return Quaternion.FromAxes(Right, Up, -Front); } }
 
         public Ship(Guid id, Vector3 pos, Vector3 front, Vector3 up)
+            : base(id)
         {
-            _id = id;
             _pos = pos;
             _front = front;
             _up = up;

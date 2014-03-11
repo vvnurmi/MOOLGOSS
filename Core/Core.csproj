@@ -71,6 +71,7 @@
     <Compile Include="Serial\Vector3Surrogate.cs" />
     <Compile Include="Ship.cs" />
     <Compile Include="Util.cs" />
+    <Compile Include="Wob.cs" />
     <Compile Include="World.cs" />
     <Compile Include="WorldDiff.cs" />
   </ItemGroup>

@@ -8,18 +8,16 @@ using System.Threading.Tasks;
 namespace Core
 {
     [Serializable]
-    public class Planet : IEquatable<Planet>
+    public class Planet : Wob, IEquatable<Planet>
     {
-        private readonly Guid _id;
         private readonly string _name;
 
-        public Guid ID { get { return _id; } }
         public string Name { get { return _name; } }
         public Vector3 Pos { get { return new Vector3(75 * Name.Length, 0, 75 * (Name[0] - 'A') ); } }
 
         public Planet(Guid id, string name)
+            : base(id)
         {
-            _id = id;
             _name = name;
         }
 

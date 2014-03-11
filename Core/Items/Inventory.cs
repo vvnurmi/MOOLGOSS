@@ -10,31 +10,29 @@ using System.Threading.Tasks;
 namespace Core.Items
 {
     [Serializable]
-    public class Inventory : IEnumerable<ItemStack>, IEquatable<Inventory>, ISerializable
+    public class Inventory : Wob, IEnumerable<ItemStack>, IEquatable<Inventory>, ISerializable
     {
         private readonly ImmutableDictionary<Guid, ItemStack> _stacks = ImmutableDictionary<Guid, ItemStack>.Empty;
-        private readonly Guid _id;
         private readonly int _changeTimestamp;
 
-        public Guid ID { get { return _id; } }
         public int ChangeTimestamp { get { return _changeTimestamp; } }
 
         public Inventory(Guid id)
+            : base(id)
         {
-            _id = id;
         }
 
         protected Inventory(SerializationInfo info, StreamingContext context)
+            : base((Guid)info.GetValue("ID", typeof(Guid)))
         {
-            _id = (Guid)info.GetValue("ID", typeof(Guid));
             _changeTimestamp = info.GetInt32("ChangeTimestamp");
             var stacks = (KeyValuePair<Guid, ItemStack>[])info.GetValue("Stacks", typeof(KeyValuePair<Guid, ItemStack>[]));
             _stacks = ImmutableDictionary<Guid, ItemStack>.Empty.AddRange(stacks);
         }
 
         private Inventory(Guid id, ImmutableDictionary<Guid, ItemStack> stacks, int changeTimestamp)
+            : base(id)
         {
-            _id = id;
             _stacks = stacks;
             _changeTimestamp = changeTimestamp;
         }
