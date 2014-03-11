@@ -15,6 +15,7 @@ namespace Client
         public static Camera Camera { get; set; }
         public static Input Input { get; set; }
         public static UserInterface UI { get; set; }
+        public static Atom<World> World { get; set; }
         public static Guid PlayerShipID { get; set; }
         public static float TotalTime { get; set; }
     }

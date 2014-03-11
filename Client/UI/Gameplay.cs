@@ -20,7 +20,6 @@ namespace Client.UI
         private const float ServerSyncInterval = 1;
 
         private Guid _clientID;
-        private Atom<World> _world;
         private World _worldShadow;
         private IService _service;
         private SpaceVisualization _visualization;
@@ -38,7 +37,7 @@ namespace Client.UI
             : base("Gameplay")
         {
             _clientID = Guid.NewGuid();
-            _world = new Atom<World>(World.Empty);
+            Globals.World = new Atom<World>(World.Empty);
             _worldShadow = World.Empty;
             _service = service;
             Enter = EnterHandler;
@@ -54,7 +53,7 @@ namespace Client.UI
             {
                 _inventory = new InventoryModel(Guid.NewGuid())
                     .Add(new Core.Items.ItemStack(Guid.NewGuid(), Core.Items.ItemType.MiningDroid, 2)); // !!!
-                _world.Set(w => w.SetWob(_inventory));
+                Globals.World.Set(w => w.SetWob(_inventory));
                 _inventoryView = new InventoryView("Player", 10, 10, 28, 5, _inventory);
             }
 
@@ -68,7 +67,7 @@ namespace Client.UI
             if (Globals.PlayerShipID == Guid.Empty)
             {
                 Globals.PlayerShipID = Guid.NewGuid();
-                _world.Set(w => w.SetWob(new Ship(Globals.PlayerShipID, Vector3.Zero, Vector3.UnitX, Vector3.UnitY)));
+                Globals.World.Set(w => w.SetWob(new Ship(Globals.PlayerShipID, Vector3.Zero, Vector3.UnitX, Vector3.UnitY)));
             }
 
             if (_shipUpdateHandle == null)
@@ -85,7 +84,7 @@ namespace Client.UI
 
         private void UpdateHandler(float secondsPassed)
         {
-            var ship = _world.Value.GetWob<Ship>(Globals.PlayerShipID);
+            var ship = Globals.World.Value.GetWob<Ship>(Globals.PlayerShipID);
             if (!_topBarView.IsVisible)
                 _topBarView.Show();
             if (Input.IsKeyDownEvent(KeyCodes.F1))
@@ -114,7 +113,7 @@ namespace Client.UI
                 if (Input.IsKeyPressed(KeyCodes.A)) move -= ship.Right;
                 if (Input.IsKeyPressed(KeyCodes.D)) move += ship.Right;
                 var deltaPos = move * 25 * secondsPassed;
-                _world.Set(w => w.SetWob(ship.Move(deltaPos, pitchDegrees, yawDegrees, rollDegrees)));
+                Globals.World.Set(w => w.SetWob(ship.Move(deltaPos, pitchDegrees, yawDegrees, rollDegrees)));
             }
             UpdateCamera();
             UpdateMission();
@@ -142,7 +141,7 @@ namespace Client.UI
         private void UpdateCamera()
         {
             float SMOOTHNESS = 0.90f; // To be slightly below one.
-            var ship = _world.Value.GetWob<Ship>(Globals.PlayerShipID);
+            var ship = Globals.World.Value.GetWob<Ship>(Globals.PlayerShipID);
             var cameraTilt = Quaternion.FromAngleAxis(Utility.DegreesToRadians(-10), ship.Right);
             var targetOrientation = cameraTilt * ship.Orientation;
             Globals.Camera.Orientation = Quaternion.Nlerp(1 - SMOOTHNESS, Globals.Camera.Orientation, targetOrientation, true);
@@ -154,7 +153,7 @@ namespace Client.UI
         private void UpdateMission()
         {
             if (_mission == null) return;
-            var playerShip = _world.Value.GetWob<Ship>(Globals.PlayerShipID);
+            var playerShip = Globals.World.Value.GetWob<Ship>(Globals.PlayerShipID);
             switch (_mission.State)
             {
                 case MissionState.Open:
@@ -185,23 +184,22 @@ namespace Client.UI
         {
             while (!_exiting)
             {
-                // TODO: Thread safety. Two threads modify _world.
                 Thread.Sleep(TimeSpan.FromSeconds(ServerSyncInterval));
-                var diffOut = new WorldDiff(_worldShadow, _world);
+                var diffOut = new WorldDiff(_worldShadow, Globals.World);
                 _worldShadow = _worldShadow.Patch(diffOut);
                 if (!diffOut.IsEmpty) _visualizationUpdates.Enqueue(diffOut);
                 _service.SendWorldPatch(_clientID, diffOut);
                 var diffIn = _service.ReceiveWorldPatch(_clientID);
                 if (!diffIn.IsEmpty) _visualizationUpdates.Enqueue(diffIn);
                 _worldShadow = _worldShadow.Patch(diffIn);
-                _world.Set(w => w.Patch(diffIn));
+                Globals.World.Set(w => w.Patch(diffIn));
                 if (_mission == null)
                     _mission = new Mission
                     {
                         AssignMessage = "Go and find The Planet!\nThere'll be no reward.",
-                        AssignVolume = new Sphere(_world.Value.Wobs.Values.OfType<Station>().First().Pos, 50),
+                        AssignVolume = new Sphere(Globals.World.Value.Wobs.Values.OfType<Station>().First().Pos, 50),
                         CompleteMessage = "You found the correct planet,\nnice!",
-                        CompleteVolume = new Sphere(_world.Value.Wobs.Values.OfType<Planet>().First().Pos, 80),
+                        CompleteVolume = new Sphere(Globals.World.Value.Wobs.Values.OfType<Planet>().First().Pos, 80),
                     };
             }
         }
