@@ -14,10 +14,7 @@ namespace Tests
         {
             var diff = new WorldDiff(expected, actual);
             var message = new StringBuilder("Worlds differ");
-            AppendSeqDiff(message, ", Planets", diff.Planets);
-            AppendSeqDiff(message, ", Stations", diff.Stations);
-            AppendSeqDiff(message, ", Ships", diff.Ships);
-            AppendSeqDiff(message, ", Inventories", diff.Inventories);
+            AppendSeqDiff(message, ", Wobs", diff.Wobs);
             Assert.True(diff.IsEmpty, message.ToString());
         }
 

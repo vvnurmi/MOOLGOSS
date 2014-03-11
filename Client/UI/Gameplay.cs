@@ -53,7 +53,7 @@ namespace Client.UI
             {
                 _inventory = new InventoryModel(Guid.NewGuid())
                     .Add(new Core.Items.ItemStack(Guid.NewGuid(), Core.Items.ItemType.MiningDroid, 2)); // !!!
-                _world.Set(w => w.SetInventory(_inventory));
+                _world.Set(w => w.SetWob(_inventory));
                 _inventoryView = new InventoryView("Player", 10, 10, 28, 5, _inventory);
             }
 
@@ -67,7 +67,7 @@ namespace Client.UI
             if (Globals.PlayerShipID == Guid.Empty)
             {
                 Globals.PlayerShipID = Guid.NewGuid();
-                _world.Set(w => w.SetShip(new Ship(Globals.PlayerShipID, Vector3.Zero, Vector3.UnitX, Vector3.UnitY)));
+                _world.Set(w => w.SetWob(new Ship(Globals.PlayerShipID, Vector3.Zero, Vector3.UnitX, Vector3.UnitY)));
             }
 
             if (_shipUpdateHandle == null)
@@ -84,7 +84,7 @@ namespace Client.UI
 
         private void UpdateHandler(float secondsPassed)
         {
-            var ship = _world.Value.GetShip(Globals.PlayerShipID);
+            var ship = _world.Value.GetWob<Ship>(Globals.PlayerShipID);
             if (!_topBarView.IsVisible)
                 _topBarView.Show();
             if (Input.IsKeyDownEvent(KeyCodes.F1))
@@ -113,7 +113,7 @@ namespace Client.UI
                 if (Input.IsKeyPressed(KeyCodes.A)) move -= ship.Right;
                 if (Input.IsKeyPressed(KeyCodes.D)) move += ship.Right;
                 var deltaPos = move * 25 * secondsPassed;
-                _world.Set(w => w.SetShip(ship.Move(deltaPos, pitchDegrees, yawDegrees, rollDegrees)));
+                _world.Set(w => w.SetWob(ship.Move(deltaPos, pitchDegrees, yawDegrees, rollDegrees)));
             }
             UpdateCamera();
             UpdateMission();
@@ -141,7 +141,7 @@ namespace Client.UI
         private void UpdateCamera()
         {
             float SMOOTHNESS = 0.90f; // To be slightly below one.
-            var ship = _world.Value.GetShip(Globals.PlayerShipID);
+            var ship = _world.Value.GetWob<Ship>(Globals.PlayerShipID);
             var cameraTilt = Quaternion.FromAngleAxis(Utility.DegreesToRadians(-10), ship.Right);
             var targetOrientation = cameraTilt * ship.Orientation;
             Globals.Camera.Orientation = Quaternion.Nlerp(1 - SMOOTHNESS, Globals.Camera.Orientation, targetOrientation, true);
@@ -153,7 +153,7 @@ namespace Client.UI
         private void UpdateMission()
         {
             if (_mission == null) return;
-            var playerShip = _world.Value.GetShip(Globals.PlayerShipID);
+            var playerShip = _world.Value.GetWob<Ship>(Globals.PlayerShipID);
             switch (_mission.State)
             {
                 case MissionState.Open:
@@ -198,9 +198,9 @@ namespace Client.UI
                     _mission = new Mission
                     {
                         AssignMessage = "Go and find The Planet!\nThere'll be no reward.",
-                        AssignVolume = new Sphere(_world.Value.Stations.First().Value.Pos, 50),
+                        AssignVolume = new Sphere(_world.Value.Wobs.Values.OfType<Station>().First().Pos, 50),
                         CompleteMessage = "You found the correct planet,\nnice!",
-                        CompleteVolume = new Sphere(_world.Value.Planets.First().Value.Pos, 80),
+                        CompleteVolume = new Sphere(_world.Value.Wobs.Values.OfType<Planet>().First().Pos, 80),
                     };
             }
         }

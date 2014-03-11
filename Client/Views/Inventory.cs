@@ -75,7 +75,7 @@ namespace Client.Views
             var icon = CreateIcon(ItemTypes.GetCategoryName(stack.Type), ItemTypes.GetIconName(stack.Type), stack.Count);
             icon.UserData = new Action(() =>
             {
-                var result = ItemTypes.Activate(stack.Type, Vector3.Zero/* TODO !!! Globals.World.GetShip(Globals.PlayerShipID).Pos */);
+                var result = ItemTypes.Activate(stack.Type, Vector3.Zero/* TODO !!! Globals.World.GetWob<Ship>(Globals.PlayerShipID).Pos */);
                 switch (result)
                 {
                     case ItemActivationResult.IsDepleted:

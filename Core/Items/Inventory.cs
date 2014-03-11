@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace Core.Items
 {
     [Serializable]
-    public class Inventory : Wob, IEnumerable<ItemStack>, IEquatable<Inventory>, ISerializable
+    public class Inventory : Wob, IEnumerable<ItemStack>, ISerializable
     {
         private readonly ImmutableDictionary<Guid, ItemStack> _stacks = ImmutableDictionary<Guid, ItemStack>.Empty;
         private readonly int _changeTimestamp;
@@ -37,9 +37,10 @@ namespace Core.Items
             _changeTimestamp = changeTimestamp;
         }
 
-        public bool Equals(Inventory other)
+        public override bool Equals(Wob other)
         {
-            return ID == other.ID && _stacks.ValueEquals(other._stacks);
+            var inventory = other as Inventory;
+            return inventory != null && ID == inventory.ID && _stacks.ValueEquals(inventory._stacks);
         }
 
         /// <summary>

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Core
 {
     [Serializable]
-    public class Ship : Wob, IEquatable<Ship>
+    public class Ship : Wob
     {
         private readonly Vector3 _pos, _front, _up;
 
@@ -26,10 +26,11 @@ namespace Core
             _up = up;
         }
 
-        public bool Equals(Ship other)
+        public override bool Equals(Wob other)
         {
-            return ID == other.ID && Pos == other.Pos
-                && Front == other.Front && Up == other.Up && Right == other.Right;
+            var ship = other as Ship;
+            return ship != null && ID == ship.ID && Pos == ship.Pos
+                && Front == ship.Front && Up == ship.Up && Right == ship.Right;
         }
 
         public Ship Set(Vector3 pos, Vector3 front, Vector3 up)

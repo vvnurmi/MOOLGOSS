@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Core
 {
     [Serializable]
-    public class Station : Wob, IEquatable<Station>
+    public class Station : Wob
     {
         private readonly Vector3 _pos;
 
@@ -20,9 +20,10 @@ namespace Core
             _pos = pos;
         }
 
-        public bool Equals(Station other)
+        public override bool Equals(Wob other)
         {
-            return ID == other.ID && Pos == other.Pos;
+            var station = other as Station;
+            return station != null && ID == station.ID && Pos == station.Pos;
         }
 
         public override string ToString()

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Core
 {
     [Serializable]
-    public class Planet : Wob, IEquatable<Planet>
+    public class Planet : Wob
     {
         private readonly string _name;
 
@@ -21,9 +21,10 @@ namespace Core
             _name = name;
         }
 
-        public bool Equals(Planet other)
+        public override bool Equals(Wob other)
         {
-            return ID == other.ID && Name == other.Name && Pos == other.Pos;
+            var planet = other as Planet;
+            return planet != null && ID == planet.ID && Name == planet.Name && Pos == planet.Pos;
         }
 
         public override string ToString()

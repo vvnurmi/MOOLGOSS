@@ -14,14 +14,14 @@ namespace Client
 {
     public class SpaceVisualization
     {
-        private class IDComparer<T> : IEqualityComparer<KeyValuePair<Guid, T>>
+        private class IDComparer<T> : IEqualityComparer<T> where T : Wob
         {
-            public bool Equals(KeyValuePair<Guid, T> x, KeyValuePair<Guid, T> y)
+            public bool Equals(T x, T y)
             {
-                return x.Key == y.Key;
+                return x.ID == y.ID;
             }
 
-            public int GetHashCode(KeyValuePair<Guid, T> obj) { return obj.GetHashCode(); }
+            public int GetHashCode(T obj) { return obj.GetHashCode(); }
         }
         private static IDComparer<Ship> g_shipComparer = new IDComparer<Ship>();
 
@@ -64,17 +64,19 @@ namespace Client
 
         public void Update(WorldDiff diff, float updateInterval)
         {
-            foreach (var planet in diff.Planets.Removed) RemovePlanet(planet.Value);
-            foreach (var planet in diff.Planets.Added) CreatePlanet(planet.Value);
-            foreach (var station in diff.Stations.Removed) RemoveStation(station.Value);
-            foreach (var station in diff.Stations.Added) CreateStation(station.Value);
-            var shipsChanged = diff.Ships.Added.Intersect(diff.Ships.Removed, g_shipComparer);
+            foreach (var planet in diff.Wobs.Removed.Values.OfType<Planet>()) RemovePlanet(planet);
+            foreach (var planet in diff.Wobs.Added.Values.OfType<Planet>()) CreatePlanet(planet);
+            foreach (var station in diff.Wobs.Removed.Values.OfType<Station>()) RemoveStation(station);
+            foreach (var station in diff.Wobs.Added.Values.OfType<Station>()) CreateStation(station);
+            var shipsAdded = diff.Wobs.Added.Values.OfType<Ship>().ToArray();
+            var shipsRemoved = diff.Wobs.Removed.Values.OfType<Ship>().ToArray();
+            var shipsChanged = shipsAdded.Intersect(shipsRemoved, g_shipComparer).ToArray();
             foreach (var ship in shipsChanged)
-                if (ship.Key != Globals.PlayerShipID) UpdateShip(ship.Value, 1);
-            foreach (var ship in diff.Ships.Removed.Except(shipsChanged, g_shipComparer))
-                if (ship.Key != Globals.PlayerShipID) RemoveShip(ship.Value);
-            foreach (var ship in diff.Ships.Added.Except(shipsChanged, g_shipComparer))
-                if (ship.Key != Globals.PlayerShipID) CreateShip(ship.Value);
+                if (ship.ID != Globals.PlayerShipID) UpdateShip(ship, 1);
+            foreach (var ship in shipsRemoved.Except(shipsChanged, g_shipComparer))
+                if (ship.ID != Globals.PlayerShipID) RemoveShip(ship);
+            foreach (var ship in shipsAdded.Except(shipsChanged, g_shipComparer))
+                if (ship.ID != Globals.PlayerShipID) CreateShip(ship);
         }
 
         public void CreateStaticThings()

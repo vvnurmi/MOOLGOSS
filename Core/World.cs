@@ -10,105 +10,38 @@ namespace Core
 {
     public class World
     {
-        private readonly ImmutableDictionary<Guid, Planet> _planets;
-        private readonly ImmutableDictionary<Guid, Station> _stations;
-        private readonly ImmutableDictionary<Guid, Ship> _ships;
-        private readonly ImmutableDictionary<Guid, Inventory> _inventories;
+        private readonly ImmutableDictionary<Guid, Wob> _wobs;
 
         public static readonly World Empty = new World();
 
-        public IReadOnlyDictionary<Guid, Planet> Planets { get { return _planets; } }
-        public IReadOnlyDictionary<Guid, Station> Stations { get { return _stations; } }
-        public IReadOnlyDictionary<Guid, Ship> Ships { get { return _ships; } }
-        public IReadOnlyDictionary<Guid, Inventory> Inventories { get { return _inventories; } }
+        public IReadOnlyDictionary<Guid, Wob> Wobs { get { return _wobs; } }
 
         private World()
         {
-            _planets = ImmutableDictionary<Guid, Planet>.Empty;
-            _stations = ImmutableDictionary<Guid, Station>.Empty;
-            _ships = ImmutableDictionary<Guid, Ship>.Empty;
-            _inventories = ImmutableDictionary<Guid, Inventory>.Empty;
+            _wobs = ImmutableDictionary<Guid, Wob>.Empty;
         }
 
-        private World(ImmutableDictionary<Guid, Planet> planets, ImmutableDictionary<Guid, Station> stations,
-            ImmutableDictionary<Guid, Ship> ships, ImmutableDictionary<Guid, Inventory> inventories)
+        private World(ImmutableDictionary<Guid, Wob> wobs)
         {
-            _planets = planets;
-            _stations = stations;
-            _ships = ships;
-            _inventories = inventories;
+            _wobs = wobs;
         }
 
-        public Planet GetPlanet(Guid id)
+        public T GetWob<T>(Guid id) where T : Wob
         {
-            Planet planet;
-            if (!_planets.TryGetValue(id, out planet)) return null;
-            return planet;
+            Wob wob;
+            if (!_wobs.TryGetValue(id, out wob)) return null;
+            return (T)wob;
         }
 
-        public Station GetStation(Guid id)
+        public World SetWob(Wob wob)
         {
-            Station station;
-            if (!_stations.TryGetValue(id, out station)) return null;
-            return station;
+            if (wob == null) throw new ArgumentNullException();
+            return new World(_wobs.SetItem(wob.ID, wob));
         }
 
-        public Ship GetShip(Guid id)
+        public World RemoveWob(Guid id)
         {
-            Ship ship;
-            if (!_ships.TryGetValue(id, out ship)) return null;
-            return ship;
-        }
-
-        public Inventory GetInventory(Guid id)
-        {
-            Inventory inventory;
-            if (!_inventories.TryGetValue(id, out inventory)) return null;
-            return inventory;
-        }
-
-        public World SetPlanet(Planet planet)
-        {
-            if (planet == null) throw new ArgumentNullException();
-            return new World(_planets.SetItem(planet.ID, planet), _stations, _ships, _inventories);
-        }
-
-        public World SetStation(Station station)
-        {
-            if (station == null) throw new ArgumentNullException();
-            return new World(_planets, _stations.SetItem(station.ID, station), _ships, _inventories);
-        }
-
-        public World SetShip(Ship ship)
-        {
-            if (ship == null) throw new ArgumentNullException();
-            return new World(_planets, _stations, _ships.SetItem(ship.ID, ship), _inventories);
-        }
-
-        public World SetInventory(Inventory inventory)
-        {
-            if (inventory == null) throw new ArgumentNullException();
-            return new World(_planets, _stations, _ships, _inventories.SetItem(inventory.ID, inventory));
-        }
-
-        public World RemovePlanet(Guid id)
-        {
-            return new World(_planets.Remove(id), _stations, _ships, _inventories);
-        }
-
-        public World RemoveStation(Guid id)
-        {
-            return new World(_planets, _stations.Remove(id), _ships, _inventories);
-        }
-
-        public World RemoveShip(Guid id)
-        {
-            return new World(_planets, _stations, _ships.Remove(id), _inventories);
-        }
-
-        public World RemoveInventory(Guid id)
-        {
-            return new World(_planets, _stations, _ships, _inventories.Remove(id));
+            return new World(_wobs.Remove(id));
         }
 
         /// <summary>
@@ -116,11 +49,8 @@ namespace Core
         /// </summary>
         public World Patch(WorldDiff diff)
         {
-            var planets = _planets.RemoveRange(diff.Planets.Removed.Keys).SetItems(diff.Planets.Added);
-            var stations = _stations.RemoveRange(diff.Stations.Removed.Keys).SetItems(diff.Stations.Added);
-            var ships = _ships.RemoveRange(diff.Ships.Removed.Keys).SetItems(diff.Ships.Added);
-            var inventories = _inventories.RemoveRange(diff.Inventories.Removed.Keys).SetItems(diff.Inventories.Added);
-            return new World(planets, stations, ships, inventories);
+            var wobs = _wobs.RemoveRange(diff.Wobs.Removed.Keys).SetItems(diff.Wobs.Added);
+            return new World(wobs);
         }
     }
 }

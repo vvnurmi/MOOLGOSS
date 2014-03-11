@@ -29,7 +29,7 @@ namespace Tests
         public void TestPatch()
         {
             var clientID = Guid.NewGuid();
-            var clientWorld = World.Empty.SetPlanet(new Planet(Guid.NewGuid(), "Earth"));
+            var clientWorld = World.Empty.SetWob(new Planet(Guid.NewGuid(), "Earth"));
             PublicService.SendWorldPatch(clientID, new WorldDiff(_serverWorld, clientWorld));
             Assertions.WorldsEqual(clientWorld, _serverWorld);
             var diffIn = PublicService.ReceiveWorldPatch(clientID);
@@ -41,7 +41,7 @@ namespace Tests
         {
             var client1ID = Guid.NewGuid();
             var client2ID = Guid.NewGuid();
-            var client1World = World.Empty.SetPlanet(new Planet(Guid.NewGuid(), "Earth"));
+            var client1World = World.Empty.SetWob(new Planet(Guid.NewGuid(), "Earth"));
             var client2World = World.Empty;
             PublicService.SendWorldPatch(client1ID, new WorldDiff(_serverWorld, client1World));
             Assertions.WorldsEqual(client1World, _serverWorld);

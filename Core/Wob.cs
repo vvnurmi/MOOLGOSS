@@ -11,7 +11,7 @@ namespace Core
     /// Subclasses must implement <see cref="IEquatable<T>"/>.
     /// </summary>
     [Serializable]
-    public class Wob
+    public abstract class Wob : IEquatable<Wob>
     {
         private readonly Guid _id;
 
@@ -21,5 +21,7 @@ namespace Core
         {
             _id = id;
         }
+
+        public abstract bool Equals(Wob other);
     }
 }

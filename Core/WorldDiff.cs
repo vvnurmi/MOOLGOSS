@@ -38,18 +38,12 @@ namespace Core
     [Serializable]
     public class WorldDiff
     {
-        public bool IsEmpty { get { return Planets.IsEmpty && Stations.IsEmpty && Ships.IsEmpty && Inventories.IsEmpty; } }
-        public Diff<Planet> Planets { get; private set; }
-        public Diff<Station> Stations { get; private set; }
-        public Diff<Ship> Ships { get; private set; }
-        public Diff<Inventory> Inventories { get; private set; }
+        public bool IsEmpty { get { return Wobs.IsEmpty; } }
+        public Diff<Wob> Wobs { get; private set; }
 
         public WorldDiff(World before, World after)
         {
-            Planets = new Diff<Planet>(before.Planets, after.Planets);
-            Stations = new Diff<Station>(before.Stations, after.Stations);
-            Ships = new Diff<Ship>(before.Ships, after.Ships);
-            Inventories = new Diff<Inventory>(before.Inventories, after.Inventories);
+            Wobs = new Diff<Wob>(before.Wobs, after.Wobs);
         }
     }
 }
