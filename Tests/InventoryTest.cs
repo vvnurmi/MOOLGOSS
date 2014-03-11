@@ -1,4 +1,5 @@
 ﻿using Core.Items;
+using Core.Wobs;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;

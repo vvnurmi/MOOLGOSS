@@ -7,7 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using InventoryModel = Core.Items.Inventory;
+using InventoryModel = Core.Wobs.Inventory;
 
 namespace Client.Views
 {

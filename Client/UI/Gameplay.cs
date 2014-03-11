@@ -1,6 +1,8 @@
 ﻿using Axiom.Input;
 using Axiom.Math;
+using Client.Views;
 using Core;
+using Core.Wobs;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -9,8 +11,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using InventoryView = Client.Views.Inventory;
-using TopBarView = Client.Views.TopBar;
-using InventoryModel = Core.Items.Inventory;
+using InventoryModel = Core.Wobs.Inventory;
 
 namespace Client.UI
 {
@@ -26,7 +27,7 @@ namespace Client.UI
         private Mission _mission;
         private InventoryModel _inventory;
         private InventoryView _inventoryView;
-        private TopBarView _topBarView;
+        private TopBar _topBarView;
         private IAsyncResult _shipUpdateHandle;
         private bool _exiting;
         private ConcurrentQueue<WorldDiff> _visualizationUpdates = new ConcurrentQueue<WorldDiff>();
@@ -59,7 +60,7 @@ namespace Client.UI
 
             if (_topBarView == null)
             {
-                _topBarView = new TopBarView("Space", "The Ancient Sector : First Space Station");
+                _topBarView = new TopBar("Space", "The Ancient Sector : First Space Station");
             }
 
             _topBarView.AddButton("dock", "DOCK (F1)", TryDocking);

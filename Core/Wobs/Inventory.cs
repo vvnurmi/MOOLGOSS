@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Core.Items;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
@@ -7,7 +8,7 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Core.Items
+namespace Core.Wobs
 {
     [Serializable]
     public class Inventory : Wob, IEnumerable<ItemStack>, ISerializable

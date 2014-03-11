@@ -2,6 +2,7 @@
 using Core;
 using Core.Items;
 using Core.Serial;
+using Core.Wobs;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;

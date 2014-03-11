@@ -59,17 +59,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Items\Inventory.cs" />
+    <Compile Include="Wobs\Inventory.cs" />
     <Compile Include="Items\ItemStack.cs" />
     <Compile Include="Items\ItemType.cs" />
-    <Compile Include="Station.cs" />
+    <Compile Include="Wobs\Station.cs" />
     <Compile Include="IService.cs" />
     <Compile Include="Marshal.cs" />
-    <Compile Include="Planet.cs" />
+    <Compile Include="Wobs\Planet.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Serial\Serialization.cs" />
     <Compile Include="Serial\Vector3Surrogate.cs" />
-    <Compile Include="Ship.cs" />
+    <Compile Include="Wobs\Ship.cs" />
     <Compile Include="Util.cs" />
     <Compile Include="Wob.cs" />
     <Compile Include="World.cs" />
