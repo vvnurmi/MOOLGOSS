@@ -59,6 +59,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Wobs\Droid.cs" />
     <Compile Include="Wobs\Inventory.cs" />
     <Compile Include="Items\ItemStack.cs" />
     <Compile Include="Items\ItemType.cs" />

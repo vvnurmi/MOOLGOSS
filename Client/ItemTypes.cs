@@ -1,5 +1,6 @@
 ﻿using Axiom.Math;
 using Core.Items;
+using Core.Wobs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -41,7 +42,7 @@ namespace Client
             switch (type)
             {
                 case ItemType.MiningDroid:
-                    //!!! Globals.World.Droids.Add(pos);
+                    Globals.World.Set(w => w.SetWob(new Droid(Guid.NewGuid(), pos, Vector3.UnitX, Vector3.UnitY)));
                     return ItemActivationResult.IsDepleted;
                 default: throw new NotImplementedException("Activate for " + type);
             }

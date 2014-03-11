@@ -1,6 +1,7 @@
 ﻿using Axiom.Math;
 using Axiom.Overlays;
 using Core.Items;
+using Core.Wobs;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -75,7 +76,8 @@ namespace Client.Views
             var icon = CreateIcon(ItemTypes.GetCategoryName(stack.Type), ItemTypes.GetIconName(stack.Type), stack.Count);
             icon.UserData = new Action(() =>
             {
-                var result = ItemTypes.Activate(stack.Type, Vector3.Zero/* TODO !!! Globals.World.GetWob<Ship>(Globals.PlayerShipID).Pos */);
+                var playerShip = Globals.World.Value.GetWob<Ship>(Globals.PlayerShipID);
+                var result = ItemTypes.Activate(stack.Type, playerShip.Pos + playerShip.Front * 5);
                 switch (result)
                 {
                     case ItemActivationResult.IsDepleted:
