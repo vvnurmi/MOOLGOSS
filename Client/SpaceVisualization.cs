@@ -72,12 +72,13 @@ namespace Client
             var shipsAdded = diff.Wobs.Added.Values.OfType<Ship>().ToArray();
             var shipsRemoved = diff.Wobs.Removed.Values.OfType<Ship>().ToArray();
             var shipsChanged = shipsAdded.Intersect(shipsRemoved, g_shipComparer).ToArray();
+            var playerShipID = Globals.World.Value.GetPlayerShipID(Globals.PlayerID);
             foreach (var ship in shipsChanged)
-                if (ship.ID != Globals.PlayerShipID) UpdateShip(ship, 1);
+                if (ship.ID != playerShipID) UpdateShip(ship, 1);
             foreach (var ship in shipsRemoved.Except(shipsChanged, g_shipComparer))
-                if (ship.ID != Globals.PlayerShipID) RemoveShip(ship);
+                if (ship.ID != playerShipID) RemoveShip(ship);
             foreach (var ship in shipsAdded.Except(shipsChanged, g_shipComparer))
-                if (ship.ID != Globals.PlayerShipID) CreateShip(ship);
+                if (ship.ID != playerShipID) CreateShip(ship);
         }
 
         public void CreateStaticThings()

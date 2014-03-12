@@ -55,7 +55,7 @@ namespace Client
             var result =
                 type == ItemType.MiningDroid ? new ItemActivation(ItemActivationResult.IsDepleted, w =>
                 {
-                    var playerShip = w.GetWob<Ship>(Globals.PlayerShipID);
+                    var playerShip = w.GetWob<Ship>(w.GetPlayerShipID(Globals.PlayerID));
                     var pos = playerShip.Pos + playerShip.Front * 5;
                     return w.SetWob(new Droid(Guid.NewGuid(), pos, playerShip.Front, playerShip.Up));
                 }) :

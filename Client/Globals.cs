@@ -16,8 +16,7 @@ namespace Client
         public static Input Input { get; set; }
         public static UserInterface UI { get; set; }
         public static Atom<World> World { get; set; }
-        [Obsolete("Replace PlayerShipID by a Dictionary of playerID -> shipID in class World")]
-        public static Guid PlayerShipID { get; set; }
+        public static Guid PlayerID { get; set; }
         public static float TotalTime { get; set; }
     }
 }

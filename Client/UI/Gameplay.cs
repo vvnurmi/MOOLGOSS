@@ -64,10 +64,13 @@ namespace Client.UI
 
             _topBarView.AddButton("dock", "DOCK (F1)", TryDocking);
 
-            if (Globals.PlayerShipID == Guid.Empty)
+            if (Globals.PlayerID == Guid.Empty)
             {
-                Globals.PlayerShipID = Guid.NewGuid();
-                Globals.World.Set(w => w.SetWob(new Ship(Globals.PlayerShipID, Vector3.Zero, Vector3.UnitX, Vector3.UnitY)));
+                Globals.PlayerID = Guid.NewGuid();
+                var shipID = Guid.NewGuid();
+                Globals.World.Set(w => w
+                    .SetPlayerShipID(Globals.PlayerID, shipID)
+                    .SetWob(new Ship(shipID, Vector3.Zero, Vector3.UnitX, Vector3.UnitY)));
             }
 
             if (_shipUpdateHandle == null)
@@ -84,7 +87,8 @@ namespace Client.UI
 
         private void UpdateHandler(float secondsPassed)
         {
-            var ship = Globals.World.Value.GetWob<Ship>(Globals.PlayerShipID);
+            var world = Globals.World.Value;
+            var ship = world.GetWob<Ship>(world.GetPlayerShipID(Globals.PlayerID));
             if (!_topBarView.IsVisible)
                 _topBarView.Show();
             if (Input.IsKeyDownEvent(KeyCodes.F1))
@@ -141,7 +145,8 @@ namespace Client.UI
         private void UpdateCamera()
         {
             float SMOOTHNESS = 0.90f; // To be slightly below one.
-            var ship = Globals.World.Value.GetWob<Ship>(Globals.PlayerShipID);
+            var world = Globals.World.Value;
+            var ship = world.GetWob<Ship>(world.GetPlayerShipID(Globals.PlayerID));
             var cameraTilt = Quaternion.FromAngleAxis(Utility.DegreesToRadians(-10), ship.Right);
             var targetOrientation = cameraTilt * ship.Orientation;
             Globals.Camera.Orientation = Quaternion.Nlerp(1 - SMOOTHNESS, Globals.Camera.Orientation, targetOrientation, true);
@@ -153,7 +158,8 @@ namespace Client.UI
         private void UpdateMission()
         {
             if (_mission == null) return;
-            var playerShip = Globals.World.Value.GetWob<Ship>(Globals.PlayerShipID);
+            var world = Globals.World.Value;
+            var playerShip = world.GetWob<Ship>(world.GetPlayerShipID(Globals.PlayerID));
             switch (_mission.State)
             {
                 case MissionState.Open:
