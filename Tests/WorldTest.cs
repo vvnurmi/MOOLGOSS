@@ -17,6 +17,8 @@ namespace Tests
         private Station _station;
         private Ship _ship;
         private Inventory _inventory;
+        private Guid _playerID;
+        private Guid _shipID;
 
         [SetUp]
         public void Setup()
@@ -25,12 +27,20 @@ namespace Tests
             _station = new Station(Guid.NewGuid(), new Vector3(10, 0, 20));
             _ship = new Ship(Guid.NewGuid(), new Vector3(5, 6, 7), Vector3.UnitX, Vector3.UnitY);
             _inventory = new Inventory(Guid.NewGuid());
+            _playerID = Guid.NewGuid();
+            _shipID = Guid.NewGuid();
         }
 
         [Test]
-        public void IsEmptyAfterCreation()
+        public void AfterCreation_IsEmpty()
         {
             CollectionAssert.IsEmpty(World.Empty.Wobs);
+        }
+
+        [Test]
+        public void AfterCreation_NoPlayerShips()
+        {
+            CollectionAssert.IsEmpty(World.Empty.PlayerShipIDs);
         }
 
         [Test]
@@ -78,6 +88,41 @@ namespace Tests
             Assert.AreEqual(_station, world.GetWob<Station>(_station.ID));
             Assert.AreEqual(_ship, world.GetWob<Ship>(_ship.ID));
             Assert.AreEqual(_inventory, world.GetWob<Inventory>(_inventory.ID));
+        }
+
+        [Test]
+        public void GetPlayerShipID_InvalidThrows()
+        {
+            Assert.Throws<KeyNotFoundException>(() => World.Empty.GetPlayerShipID(Guid.NewGuid()));
+        }
+
+        [Test]
+        public void GetPlayerShipID()
+        {
+            var world = World.Empty.SetPlayerShipID(_playerID, _shipID);
+            Assert.AreEqual(_shipID, world.GetPlayerShipID(_playerID));
+        }
+
+        [Test]
+        public void SetPlayerShipID_TwiceThrows()
+        {
+            var world = World.Empty.SetPlayerShipID(_playerID, _shipID);
+            Assert.Throws<ArgumentException>(() => world.SetPlayerShipID(_playerID, Guid.NewGuid()));
+        }
+
+        [Test]
+        public void RemovePlayerShipID_NonExistent_DoesntThrow()
+        {
+            World.Empty.RemovePlayerShipID(Guid.NewGuid());
+        }
+
+        [Test]
+        public void RemovePlayerShipID()
+        {
+            var world = World.Empty
+                .SetPlayerShipID(_playerID, _shipID)
+                .RemovePlayerShipID(_playerID);
+            Assert.Throws<KeyNotFoundException>(() => world.GetPlayerShipID(_playerID));
         }
 
         private World GetWorldWithItems()
