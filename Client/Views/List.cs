@@ -18,7 +18,6 @@ namespace Client.Views
         private int _headerCount = 0;
         private int _headerTopMargin = 4;
         private int _listWidth = 0;
-        private int _listHeight = 0;
 
         public OverlayElementContainer ListElement { get { return _listElement; } }
         public int ItemCount { get { return _listItemCount; } }
