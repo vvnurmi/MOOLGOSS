@@ -76,16 +76,16 @@ namespace Client.Views
             var icon = CreateIcon(ItemTypes.GetCategoryName(stack.Type), ItemTypes.GetIconName(stack.Type), stack.Count);
             icon.UserData = new Action(() =>
             {
-                var activation = ItemTypes.Activate(stack.Type);
-                Globals.World.Set(activation.Effect);
-                switch (activation.Result)
+                var result = ItemTypes.Activate(stack.Type, Globals.World);
+                switch (result)
                 {
+                    case ItemActivationResult.Nothing: break;
                     case ItemActivationResult.IsDepleted:
                         // TODO: Only use one item off the stack.
                         // TODO: What if the item has been moved to another slot?
                         ClearSlot(slot);
                         break;
-                    default: throw new NotImplementedException("Activation result " + activation.Result);
+                    default: throw new NotImplementedException("Activation result " + result);
                 }
             });
             Globals.UI.AddButton(icon);

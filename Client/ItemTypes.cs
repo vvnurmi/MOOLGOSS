@@ -4,6 +4,7 @@ using Core.Items;
 using Core.Wobs;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,21 +14,14 @@ namespace Client
     internal enum ItemActivationResult
     {
         /// <summary>
+        /// Nothing needs to be done.
+        /// </summary>
+        Nothing,
+
+        /// <summary>
         /// The item was depleted and should be erased from its container.
         /// </summary>
         IsDepleted,
-    }
-
-    internal struct ItemActivation
-    {
-        public readonly ItemActivationResult Result;
-        public readonly Func<World, World> Effect;
-
-        public ItemActivation(ItemActivationResult result, Func<World, World> effect)
-        {
-            Result = result;
-            Effect = effect;
-        }
     }
 
     internal static class ItemTypes
@@ -50,18 +44,32 @@ namespace Client
             }
         }
 
-        public static ItemActivation Activate(ItemType type)
+        public static ItemActivationResult Activate(ItemType type, Atom<World> world)
         {
-            var result =
-                type == ItemType.MiningDroid ? new ItemActivation(ItemActivationResult.IsDepleted, w =>
-                {
-                    var playerShip = w.GetWob<Ship>(w.GetPlayerShipID(Globals.PlayerID));
-                    var pos = playerShip.Pos + playerShip.Front * 5;
-                    return w.SetWob(new Droid(Guid.NewGuid(), pos, playerShip.Front, playerShip.Up));
-                }) :
-                (ItemActivation?)null;
-            if (!result.HasValue) throw new NotImplementedException("Activate for " + type);
+            var result = (ItemActivationResult?)null;
+            switch (type)
+            {
+                case ItemType.MiningDroid:
+                    world.Set(w =>
+                    {
+                        var playerShip = w.GetWob<Ship>(w.GetPlayerShipID(Globals.PlayerID));
+                        var planet = w.Wobs.Values.OfType<Planet>()
+                            .FirstOrDefault(p => IsCloseAhead(playerShip.Pos, playerShip.Front, p.Pos));
+                        result = planet == null ? ItemActivationResult.Nothing : ItemActivationResult.IsDepleted;
+                        if (planet == null) return w;
+                        return w.SetWob(new Droid(Guid.NewGuid(), playerShip.Pos, playerShip.Front, playerShip.Up));
+                    });
+                    break;
+                default: throw new NotImplementedException("Activate for " + type);
+            }
+            Debug.Assert(result.HasValue, "Bug: Forgot to set activation result for " + type);
             return result.Value;
+        }
+
+        private static bool IsCloseAhead(Vector3 pos, Vector3 front, Vector3 target)
+        {
+            if (pos.DistanceSquared(target) > 150 * 150) return false;
+            return (target - pos).ToNormalized().DifferenceLessThan(front, 0.7f);
         }
     }
 }
