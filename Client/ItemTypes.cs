@@ -1,4 +1,5 @@
 ﻿using Axiom.Math;
+using Core;
 using Core.Items;
 using Core.Wobs;
 using System;
@@ -15,6 +16,18 @@ namespace Client
         /// The item was depleted and should be erased from its container.
         /// </summary>
         IsDepleted,
+    }
+
+    internal struct ItemActivation
+    {
+        public readonly ItemActivationResult Result;
+        public readonly Func<World, World> Effect;
+
+        public ItemActivation(ItemActivationResult result, Func<World, World> effect)
+        {
+            Result = result;
+            Effect = effect;
+        }
     }
 
     internal static class ItemTypes
@@ -37,15 +50,18 @@ namespace Client
             }
         }
 
-        public static ItemActivationResult Activate(ItemType type, Vector3 pos)
+        public static ItemActivation Activate(ItemType type)
         {
-            switch (type)
-            {
-                case ItemType.MiningDroid:
-                    Globals.World.Set(w => w.SetWob(new Droid(Guid.NewGuid(), pos, Vector3.UnitX, Vector3.UnitY)));
-                    return ItemActivationResult.IsDepleted;
-                default: throw new NotImplementedException("Activate for " + type);
-            }
+            var result =
+                type == ItemType.MiningDroid ? new ItemActivation(ItemActivationResult.IsDepleted, w =>
+                {
+                    var playerShip = w.GetWob<Ship>(Globals.PlayerShipID);
+                    var pos = playerShip.Pos + playerShip.Front * 5;
+                    return w.SetWob(new Droid(Guid.NewGuid(), pos, playerShip.Front, playerShip.Up));
+                }) :
+                (ItemActivation?)null;
+            if (!result.HasValue) throw new NotImplementedException("Activate for " + type);
+            return result.Value;
         }
     }
 }
