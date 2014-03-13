@@ -11,27 +11,25 @@ namespace Server
 {
     internal class Service : IService
     {
-        private Func<World> _getWorld;
-        private Action<Func<World, World>> _modifyWorld;
+        private Atom<World> _world;
         private Dictionary<Guid, World> _worldShadows = new Dictionary<Guid, World>();
 
-        public Service(Func<World> getWorld, Action<Func<World, World>> modifyWorld)
+        public Service(Atom<World> world)
         {
-            _getWorld = getWorld;
-            _modifyWorld = modifyWorld;
+            _world = world;
         }
 
         public bool SendWorldPatch(Guid clientID, WorldDiff diff)
         {
             ModifyShadow(clientID, w => w.Patch(diff));
-            _modifyWorld(w => w.Patch(diff));
+            _world.Set(w => w.Patch(diff));
             return true;
         }
 
         public WorldDiff ReceiveWorldPatch(Guid clientID)
         {
             WorldDiff diff = null;
-            ModifyShadow(clientID, shadow => shadow.Patch(diff = new WorldDiff(shadow, _getWorld())));
+            ModifyShadow(clientID, shadow => shadow.Patch(diff = new WorldDiff(shadow, _world)));
             return diff;
         }
 

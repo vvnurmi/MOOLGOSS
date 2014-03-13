@@ -79,7 +79,6 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Atom.cs" />
     <Compile Include="Client.cs" />
     <Compile Include="Globals.cs" />
     <Compile Include="Input.cs" />

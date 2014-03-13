@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace Client
+namespace Core
 {
-    internal class Atom<T>
+    public class Atom<T>
     {
         public static implicit operator T(Atom<T> x) { return x.Value; }
         public Atom(T value) { Value = value; }

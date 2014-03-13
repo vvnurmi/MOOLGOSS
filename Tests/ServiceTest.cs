@@ -14,15 +14,15 @@ namespace Tests
     [TestFixture]
     public class ServiceTest
     {
-        private World _serverWorld;
+        private Atom<World> _serverWorld;
         private Service _service;
         private IService PublicService { get { return _service; } }
 
         [SetUp]
         public void Setup()
         {
-            _serverWorld = World.Empty;
-            _service = new Service(() => _serverWorld, f => _serverWorld = f(_serverWorld));
+            _serverWorld = new Atom<World>(World.Empty);
+            _service = new Service(_serverWorld);
         }
 
         [Test]
