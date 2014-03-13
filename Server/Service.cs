@@ -1,18 +1,13 @@
-﻿using Axiom.Math;
-using Core;
-using Core.Items;
+﻿using Core;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Collections.Concurrent;
 
 namespace Server
 {
     internal class Service : IService
     {
         private Atom<World> _world;
-        private Dictionary<Guid, World> _worldShadows = new Dictionary<Guid, World>();
+        private ConcurrentDictionary<Guid, Atom<World>> _worldShadows = new ConcurrentDictionary<Guid, Atom<World>>();
 
         public Service(Atom<World> world)
         {
@@ -21,7 +16,7 @@ namespace Server
 
         public bool SendWorldPatch(Guid clientID, WorldDiff diff)
         {
-            ModifyShadow(clientID, w => w.Patch(diff));
+            SetShadow(clientID, w => w.Patch(diff));
             _world.Set(w => w.Patch(diff));
             return true;
         }
@@ -29,14 +24,13 @@ namespace Server
         public WorldDiff ReceiveWorldPatch(Guid clientID)
         {
             WorldDiff diff = null;
-            ModifyShadow(clientID, shadow => shadow.Patch(diff = new WorldDiff(shadow, _world)));
+            SetShadow(clientID, shadow => shadow.Patch(diff = new WorldDiff(shadow, _world)));
             return diff;
         }
 
-        private void ModifyShadow(Guid clientID, Func<World, World> f)
+        private void SetShadow(Guid clientID, Func<World, World> f)
         {
-            World shadow;
-            _worldShadows[clientID] = f(_worldShadows.TryGetValue(clientID, out shadow) ? shadow : World.Empty);
+            _worldShadows.GetOrAdd(clientID, id => new Atom<World>(World.Empty)).Set(f);
         }
     }
 }
