@@ -23,5 +23,7 @@ namespace Core
         }
 
         public abstract bool Equals(Wob other);
+
+        public virtual Wob Update() { return this; }
     }
 }

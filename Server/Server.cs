@@ -3,16 +3,19 @@ using Core;
 using Core.Serial;
 using Core.Wobs;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Server
 {
     public class Server
     {
+        private const int WindowsError_AccessDenied = 5;
+        private const int WindowsError_OperationAborted = 995;
+
+        private bool _exiting;
+
         public void Start()
         {
             var listener = new HttpListener();
@@ -24,26 +27,32 @@ namespace Server
                 .SetWob(new Station(Guid.NewGuid(), new Vector3(200, 0, 100))));
             var service = new Service(world);
             var marshalledService = Marshal.Get(service);
-            while (true)
-                try
-                {
-                    var context = listener.GetContext();
-                    var data = new byte[context.Request.ContentLength64];
-                    context.Request.InputStream.ReadTo(data);
-                    var callspec = Serialization.Build<MarshalledCall>(data);
-                    var result = marshalledService.Invoke(callspec.Name, callspec.Args);
-                    if (result != null)
-                        context.Response.Close(Serialization.Break(result), true);
-                    else
-                        context.Response.Close();
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine("[{0:u}] Exception: {1}", DateTime.Now, e);
-                }
+            var handleRequests = RunRepeatedly(() => HandleRequest(listener, marshalledService));
+            var updateWorld = RunRepeatedly(() => UpdateWorld(world));
+            Console.WriteLine("Enter 'exit' to stop the server.");
+            while (true) if (Console.ReadLine() == "exit") break;
+            Stop(listener, handleRequests, updateWorld);
         }
 
-        private bool TryStart(HttpListener listener)
+        public void Stop(HttpListener listener, Task handleRequests, Task updateWorld)
+        {
+            _exiting = true;
+            listener.Stop();
+            updateWorld.Wait(TimeSpan.FromSeconds(2));
+            handleRequests.Wait(TimeSpan.FromSeconds(2));
+        }
+
+        private Task RunRepeatedly(Action action)
+        {
+            return Task.Factory.StartNew(new Action(() =>
+            {
+                while (!_exiting)
+                    try { action(); }
+                    catch (Exception e) { Console.WriteLine("[{0:u}] Exception: {1}", DateTime.Now, e); }
+            }), TaskCreationOptions.LongRunning);
+        }
+
+        private static bool TryStart(HttpListener listener)
         {
             var prefixes = listener.Prefixes;
             try
@@ -53,7 +62,7 @@ namespace Server
             }
             catch (HttpListenerException ex)
             {
-                if (ex.ErrorCode != 5) throw;
+                if (ex.ErrorCode != WindowsError_AccessDenied) throw;
                 var username = Environment.GetEnvironmentVariable("USERNAME");
                 var userdomain = Environment.GetEnvironmentVariable("USERDOMAIN");
                 Console.WriteLine("Access limitation. If you're on Windows, you need to run this as Administrator:");
@@ -62,6 +71,40 @@ namespace Server
                         prefix, userdomain, username);
                 return false;
             }
+        }
+
+        private static void HandleRequest(HttpListener listener, IMarshalled marshalledService)
+        {
+            try
+            {
+                var context = listener.GetContext();
+                var data = new byte[context.Request.ContentLength64];
+                context.Request.InputStream.ReadTo(data);
+                var callspec = Serialization.Build<MarshalledCall>(data);
+                var result = marshalledService.Invoke(callspec.Name, callspec.Args);
+                if (result != null)
+                    context.Response.Close(Serialization.Break(result), true);
+                else
+                    context.Response.Close();
+            }
+            catch (HttpListenerException ex)
+            {
+                if (ex.ErrorCode != WindowsError_OperationAborted) throw;
+                // Terminate peacefully by request.
+            }
+        }
+
+        private static void UpdateWorld(Atom<World> world)
+        {
+            Thread.Sleep(TimeSpan.FromSeconds(1));
+            var ids = world.Value.Wobs.Keys;
+            foreach (var id in ids) world.Set(w => TryUpdateWob(w, id));
+        }
+
+        private static World TryUpdateWob(World world, Guid id)
+        {
+            var wob = world.GetWob<Wob>(id);
+            return wob == null ? world : world.SetWob(wob.Update());
         }
     }
 }
