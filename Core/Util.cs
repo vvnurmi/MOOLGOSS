@@ -65,5 +65,13 @@ namespace Core
                 offset += readCount;
             }
         }
+
+        /// <summary>
+        /// Returns the element for which <paramref name="valuator"/> returns the smallest value.
+        /// </summary>
+        public static T MinBy<T, V>(this IEnumerable<T> seq, Func<T, V> valuator) where V : IComparable
+        {
+            return seq.Aggregate((best, x) => best == null || valuator(best).CompareTo(valuator(x)) > 0 ? x : best);
+        }
     }
 }
