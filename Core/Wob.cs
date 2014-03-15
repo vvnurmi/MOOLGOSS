@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -22,7 +23,17 @@ namespace Core
             _id = id;
         }
 
+        protected Wob(SerializationInfo info, StreamingContext context)
+        {
+            _id = info.GetGuid("ID");
+        }
+
         public abstract bool Equals(Wob other);
+
+        public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            info.AddGuid("ID", ID);
+        }
 
         public virtual Wob Update() { return this; }
     }

@@ -24,7 +24,7 @@ namespace Core.Wobs
         }
 
         protected Inventory(SerializationInfo info, StreamingContext context)
-            : base((Guid)info.GetValue("ID", typeof(Guid)))
+            : base(info, context)
         {
             _changeTimestamp = info.GetInt32("ChangeTimestamp");
             var stacks = (KeyValuePair<Guid, ItemStack>[])info.GetValue("Stacks", typeof(KeyValuePair<Guid, ItemStack>[]));
@@ -73,9 +73,9 @@ namespace Core.Wobs
             return _stacks.Values.GetEnumerator();
         }
 
-        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            info.AddValue("ID", ID, typeof(Guid));
+            base.GetObjectData(info, context);
             info.AddValue("ChangeTimestamp", ChangeTimestamp);
             info.AddValue("Stacks", _stacks.ToArray());
         }

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
 
 namespace Core
 {
@@ -72,6 +73,16 @@ namespace Core
         public static T MinBy<T, V>(this IEnumerable<T> seq, Func<T, V> valuator) where V : IComparable
         {
             return seq.Aggregate((best, x) => best == null || valuator(best).CompareTo(valuator(x)) > 0 ? x : best);
+        }
+
+        public static void AddGuid(this SerializationInfo info, string name, Guid value)
+        {
+            info.AddValue(name, value, typeof(Guid));
+        }
+
+        public static Guid GetGuid(this SerializationInfo info, string name)
+        {
+            return (Guid)info.GetValue(name, typeof(Guid));
         }
     }
 }
