@@ -151,7 +151,8 @@ namespace Client
 
         private SceneNode CreateShip(Ship ship)
         {
-            var shipEnt = Globals.Scene.CreateEntity("ship entity " + _entityIndex++, "ship1.mesh");
+            var mesh = ship is Droid ? "droid.mesh" : "ship1.mesh";
+            var shipEnt = Globals.Scene.CreateEntity("ship entity " + _entityIndex++, mesh);
             var node = Globals.Scene.RootSceneNode.CreateChildSceneNode();
             node.AttachObject(shipEnt);
             node.Position = ship.Pos;
