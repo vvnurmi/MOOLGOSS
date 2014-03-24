@@ -45,5 +45,16 @@ namespace Core
         {
             Wobs = new Diff<Wob>(before.Wobs, after.Wobs);
         }
+
+        public override string ToString()
+        {
+            return IsEmpty ? "<empty>" : FormatDictionary("-", Wobs.Removed) + FormatDictionary("+", Wobs.Added);
+        }
+
+        private string FormatDictionary<T>(string prefix, IReadOnlyDictionary<Guid, T> dic)
+        {
+            return string.Join("", dic.Select(
+                x => string.Format("\n{0} {1} ({2})", prefix, x.Key, x.Value.GetType())));
+        }
     }
 }
