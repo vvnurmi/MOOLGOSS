@@ -12,6 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using InventoryView = Client.Views.Inventory;
 using InventoryModel = Core.Wobs.Inventory;
+using MissionDialog = Client.Views.MessageDialog;
 
 namespace Client.UI
 {
@@ -24,6 +25,7 @@ namespace Client.UI
         private IService _service;
         private SpaceVisualization _visualization;
         private Mission _mission;
+        private MissionDialog _missionDialog;
         private InventoryModel _inventory;
         private InventoryView _inventoryView;
         private TopBar _topBarView;
@@ -166,9 +168,11 @@ namespace Client.UI
                     if (_mission.AssignVolume.Intersects(playerShip.Pos))
                     {
                         _mission.Offer();
-                        Globals.UI.TryShowDialog(_mission.AssignMessage,
-                            new ButtonDef { Name = "Refuse", Pressed = () => { Globals.UI.HideDialog(); _mission.Suppress(); } },
-                            new ButtonDef { Name = "Accept", Pressed = () => { Globals.UI.HideDialog(); _mission.Assign(); } });
+                        _missionDialog = new MissionDialog("MissionOfferDialog", 300);
+                        _missionDialog.SetMessage(_mission.AssignMessage);
+                        _missionDialog.ShowConfirmButton("Accept", () => { _missionDialog.Hide(); _missionDialog.Destroy(); _missionDialog = null; _mission.Assign(); });
+                        _missionDialog.ShowCancelButton("Refuse", () => { _missionDialog.Hide(); _missionDialog.Destroy(); _missionDialog = null; _mission.Suppress(); });
+                        _missionDialog.Show();
                     }
                     break;
                 case MissionState.Offering: break;
@@ -177,8 +181,10 @@ namespace Client.UI
                     if (_mission.CompleteVolume.Intersects(playerShip.Pos))
                     {
                         _mission.Complete();
-                        Globals.UI.TryShowDialog(_mission.CompleteMessage,
-                            new ButtonDef { Name = "OK", Pressed = Globals.UI.HideDialog });
+                        _missionDialog = new MissionDialog("MissionCompleteDialog", 300);
+                        _missionDialog.SetMessage(_mission.CompleteMessage);
+                        _missionDialog.ShowConfirmButton("OK", () => { _missionDialog.Hide(); _missionDialog.Destroy(); _missionDialog = null; });
+                        _missionDialog.Show();
                     }
                     break;
                 case MissionState.Completed: break;
