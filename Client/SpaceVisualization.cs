@@ -22,7 +22,7 @@ namespace Client
                 return x.ID == y.ID;
             }
 
-            public int GetHashCode(T obj) { return obj.GetHashCode(); }
+            public int GetHashCode(T obj) { return obj.ID.GetHashCode(); }
         }
         private static IDComparer<Ship> g_shipComparer = new IDComparer<Ship>();
 
