@@ -13,32 +13,14 @@ namespace Tests
     [TestFixture]
     public class ShipTest
     {
-        private Ship _ship;
-
-        [SetUp]
-        public void Setup()
-        {
-            _ship = new Ship(Guid.NewGuid(), new Vector3(2, 3, 4), Vector3.UnitX, Vector3.UnitY);
-        }
-
         [Test]
         public void TestCreation()
         {
-            Assert.AreEqual(new Vector3(2, 3, 4), _ship.Pos);
-            Assert.AreEqual(new Vector3(1, 0, 0), _ship.Front);
-            Assert.AreEqual(new Vector3(0, 1, 0), _ship.Up);
-            Assert.AreEqual(new Vector3(0, 0, 1), _ship.Right);
-        }
-
-        [Test]
-        public void TestMove()
-        {
-            _ship = _ship.Move(_ship.Front, 0, 0, 0);
-            Assert.AreEqual(new Vector3(3, 3, 4), _ship.Pos);
-            _ship = _ship.Move(Vector3.Zero, 90, 0, 0);
-            Assert.AreEqual(Tuple.Create(Vector3.UnitY, -Vector3.UnitX), Tuple.Create(_ship.Front, _ship.Up));
-            _ship = _ship.Move(Vector3.Zero, 0, 90, 0);
-            Assert.AreEqual(Tuple.Create(-Vector3.UnitZ, -Vector3.UnitX), Tuple.Create(_ship.Front, _ship.Up));
+            var ship = new Ship(Guid.NewGuid(), new Pose(new Vector3(2, 3, 4), Vector3.UnitX, Vector3.UnitY));
+            Assert.AreEqual(new Vector3(2, 3, 4), ship.Pose.Location);
+            Assert.AreEqual(new Vector3(1, 0, 0), ship.Pose.Front);
+            Assert.AreEqual(new Vector3(0, 1, 0), ship.Pose.Up);
+            Assert.AreEqual(new Vector3(0, 0, 1), ship.Pose.Right);
         }
     }
 }

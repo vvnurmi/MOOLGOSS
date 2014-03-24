@@ -59,6 +59,7 @@
     <Compile Include="Assertions.cs" />
     <Compile Include="DictionaryValueEqualityTest.cs" />
     <Compile Include="MissionTest.cs" />
+    <Compile Include="PoseTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="MarshallingTest.cs" />
     <Compile Include="QuaternionTest.cs" />

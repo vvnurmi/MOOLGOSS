@@ -61,6 +61,7 @@
   <ItemGroup>
     <Compile Include="Atom.cs" />
     <Compile Include="Globals.cs" />
+    <Compile Include="Pose.cs" />
     <Compile Include="Wobs\Droid.cs" />
     <Compile Include="Wobs\Inventory.cs" />
     <Compile Include="Items\ItemStack.cs" />

@@ -72,7 +72,7 @@ namespace Client.UI
                 var shipID = Guid.NewGuid();
                 Globals.World.Set(w => w
                     .SetPlayerShipID(Globals.PlayerID, shipID)
-                    .SetWob(new Ship(shipID, Vector3.Zero, Vector3.UnitX, Vector3.UnitY)));
+                    .SetWob(new Ship(shipID, new Pose(Vector3.Zero, Vector3.UnitX, Vector3.UnitY))));
             }
 
             if (_shipUpdateHandle == null)
@@ -114,17 +114,17 @@ namespace Client.UI
                 if (Input.IsKeyPressed(KeyCodes.E)) roll++;
                 var rollDegrees = roll * 45 * secondsPassed;
                 var move = Vector3.Zero;
-                if (Input.IsKeyPressed(KeyCodes.W)) move += ship.Front;
-                if (Input.IsKeyPressed(KeyCodes.S)) move -= ship.Front;
-                if (Input.IsKeyPressed(KeyCodes.A)) move -= ship.Right;
-                if (Input.IsKeyPressed(KeyCodes.D)) move += ship.Right;
+                if (Input.IsKeyPressed(KeyCodes.W)) move += ship.Pose.Front;
+                if (Input.IsKeyPressed(KeyCodes.S)) move -= ship.Pose.Front;
+                if (Input.IsKeyPressed(KeyCodes.A)) move -= ship.Pose.Right;
+                if (Input.IsKeyPressed(KeyCodes.D)) move += ship.Pose.Right;
                 var deltaPos = move * 25 * secondsPassed;
-                Globals.World.Set(w => w.SetWob(ship.Move(deltaPos, pitchDegrees, yawDegrees, rollDegrees)));
+                Globals.World.Set(w => w.SetWob(ship.SetPose(ship.Pose.Move(deltaPos, pitchDegrees, yawDegrees, rollDegrees))));
             }
             UpdateCamera();
             UpdateMission();
             _inventoryView.SyncWithModel();
-            _visualization.UpdateShip(ship, 0);
+            _visualization.UpdateVessel(ship, 0);
             WorldDiff visualizationDiff;
             while (_visualizationUpdates.TryDequeue(out visualizationDiff))
                 _visualization.Update(visualizationDiff, ServerSyncInterval);
@@ -149,12 +149,12 @@ namespace Client.UI
             float SMOOTHNESS = 0.90f; // To be slightly below one.
             var world = Globals.World.Value;
             var ship = world.GetWob<Ship>(world.GetPlayerShipID(Globals.PlayerID));
-            var cameraTilt = Quaternion.FromAngleAxis(Utility.DegreesToRadians(-10), ship.Right);
-            var targetOrientation = cameraTilt * ship.Orientation;
+            var cameraTilt = Quaternion.FromAngleAxis(Utility.DegreesToRadians(-10), ship.Pose.Right);
+            var targetOrientation = cameraTilt * ship.Pose.Orientation;
             Globals.Camera.Orientation = Quaternion.Nlerp(1 - SMOOTHNESS, Globals.Camera.Orientation, targetOrientation, true);
-            var cameraRelativeGoal = -6 * ship.Front + 1.7 * ship.Up;
-            var cameraRelative = Globals.Camera.Position - ship.Pos;
-            Globals.Camera.Position = ship.Pos + SMOOTHNESS * cameraRelative + (1 - SMOOTHNESS) * cameraRelativeGoal;
+            var cameraRelativeGoal = -6 * ship.Pose.Front + 1.7 * ship.Pose.Up;
+            var cameraRelative = Globals.Camera.Position - ship.Pose.Location;
+            Globals.Camera.Position = ship.Pose.Location + SMOOTHNESS * cameraRelative + (1 - SMOOTHNESS) * cameraRelativeGoal;
         }
 
         private void UpdateMission()
@@ -165,7 +165,7 @@ namespace Client.UI
             switch (_mission.State)
             {
                 case MissionState.Open:
-                    if (_mission.AssignVolume.Intersects(playerShip.Pos))
+                    if (_mission.AssignVolume.Intersects(playerShip.Pose.Location))
                     {
                         _mission.Offer();
                         _missionDialog = new MissionDialog("MissionOfferDialog", 300);
@@ -178,7 +178,7 @@ namespace Client.UI
                 case MissionState.Offering: break;
                 case MissionState.Suppressed: break;
                 case MissionState.Assigned:
-                    if (_mission.CompleteVolume.Intersects(playerShip.Pos))
+                    if (_mission.CompleteVolume.Intersects(playerShip.Pose.Location))
                     {
                         _mission.Complete();
                         _missionDialog = new MissionDialog("MissionCompleteDialog", 300);

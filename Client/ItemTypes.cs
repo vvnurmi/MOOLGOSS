@@ -54,10 +54,10 @@ namespace Client
                     {
                         var playerShip = w.GetWob<Ship>(w.GetPlayerShipID(Globals.PlayerID));
                         var planet = w.Wobs.Values.OfType<Planet>()
-                            .FirstOrDefault(p => IsCloseAhead(playerShip.Pos, playerShip.Front, p.Pos));
+                            .FirstOrDefault(p => IsCloseAhead(playerShip.Pose, p.Pos));
                         result = planet == null ? ItemActivationResult.Nothing : ItemActivationResult.IsDepleted;
                         if (planet == null) return w;
-                        return w.SetWob(new Droid(Guid.NewGuid(), playerShip.Pos, playerShip.Front, playerShip.Up));
+                        return w.SetWob(new Droid(Guid.NewGuid(), playerShip.Pose));
                     });
                     break;
                 default: throw new NotImplementedException("Activate for " + type);
@@ -66,10 +66,10 @@ namespace Client
             return result.Value;
         }
 
-        private static bool IsCloseAhead(Vector3 pos, Vector3 front, Vector3 target)
+        private static bool IsCloseAhead(Pose pose, Vector3 target)
         {
-            if (pos.DistanceSquared(target) > 150 * 150) return false;
-            return (target - pos).ToNormalized().DifferenceLessThan(front, 0.7f);
+            if (pose.Location.DistanceSquared(target) > 150 * 150) return false;
+            return (target - pose.Location).ToNormalized().DifferenceLessThan(pose.Front, 0.7f);
         }
     }
 }

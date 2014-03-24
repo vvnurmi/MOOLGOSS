@@ -15,16 +15,16 @@ namespace Client
 {
     public class SpaceVisualization
     {
-        private class IDComparer<T> : IEqualityComparer<T> where T : Wob
+        private class IDComparer : IEqualityComparer<Wob>
         {
-            public bool Equals(T x, T y)
+            public bool Equals(Wob x, Wob y)
             {
                 return x.ID == y.ID;
             }
 
-            public int GetHashCode(T obj) { return obj.ID.GetHashCode(); }
+            public int GetHashCode(Wob wob) { return wob.ID.GetHashCode(); }
         }
-        private static IDComparer<Ship> g_shipComparer = new IDComparer<Ship>();
+        private static IDComparer g_idComparer = new IDComparer();
 
         private struct NodeState
         {
@@ -69,16 +69,17 @@ namespace Client
             foreach (var planet in diff.Wobs.Added.Values.OfType<Planet>()) CreatePlanet(planet);
             foreach (var station in diff.Wobs.Removed.Values.OfType<Station>()) RemoveStation(station);
             foreach (var station in diff.Wobs.Added.Values.OfType<Station>()) CreateStation(station);
-            var shipsAdded = diff.Wobs.Added.Values.OfType<Ship>().ToArray();
-            var shipsRemoved = diff.Wobs.Removed.Values.OfType<Ship>().ToArray();
-            var shipsChanged = shipsAdded.Intersect(shipsRemoved, g_shipComparer).ToArray();
+            Func<Wob, bool> isVessel = w => w is Ship || w is Droid;
+            var shipsAdded = diff.Wobs.Added.Values.Where(isVessel).ToArray();
+            var shipsRemoved = diff.Wobs.Removed.Values.Where(isVessel).ToArray();
+            var shipsChanged = shipsAdded.Intersect(shipsRemoved, g_idComparer).ToArray();
             var playerShipID = Globals.World.Value.GetPlayerShipID(Globals.PlayerID);
             foreach (var ship in shipsChanged)
-                if (ship.ID != playerShipID) UpdateShip(ship, 1);
-            foreach (var ship in shipsRemoved.Except(shipsChanged, g_shipComparer))
-                if (ship.ID != playerShipID) RemoveShip(ship);
-            foreach (var ship in shipsAdded.Except(shipsChanged, g_shipComparer))
-                if (ship.ID != playerShipID) CreateShip(ship);
+                if (ship.ID != playerShipID) UpdateVessel(ship, 1);
+            foreach (var ship in shipsRemoved.Except(shipsChanged, g_idComparer))
+                if (ship.ID != playerShipID) RemoveVessel(ship);
+            foreach (var ship in shipsAdded.Except(shipsChanged, g_idComparer))
+                if (ship.ID != playerShipID) CreateVessel((IPosed)ship);
         }
 
         public void CreateStaticThings()
@@ -98,15 +99,16 @@ namespace Client
             Globals.Scene.SetSkyBox(true, "Skybox/Space", 1000);
         }
 
-        public void UpdateShip(Ship ship, float updateInterval)
+        public void UpdateVessel(Wob vessel, float updateInterval)
         {
             Debug.Assert(updateInterval >= 0);
+            var posed = (IPosed)vessel;
             SceneNode node;
-            if (!_nodes.TryGetValue(ship.ID, out node))
+            if (!_nodes.TryGetValue(vessel.ID, out node))
             {
-                _nodes.Add(ship.ID, node = CreateShip(ship));
+                _nodes.Add(vessel.ID, node = CreateVessel(posed));
             }
-            _nodeUpdates[ship.ID] = new NodeUpdate
+            _nodeUpdates[vessel.ID] = new NodeUpdate
             {
                 Start = new NodeState
                 {
@@ -116,8 +118,8 @@ namespace Client
                 },
                 End = new NodeState
                 {
-                    Pos = ship.Pos,
-                    Orientation = ship.Orientation,
+                    Pos = posed.Pose.Location,
+                    Orientation = posed.Pose.Orientation,
                     Time = Globals.TotalTime + updateInterval,
                 },
             };
@@ -149,23 +151,27 @@ namespace Client
             throw new NotImplementedException();
         }
 
-        private SceneNode CreateShip(Ship ship)
+        private SceneNode CreateVessel(IPosed wob)
         {
-            var mesh = ship is Droid ? "droid.mesh" : "ship1.mesh";
+            var mesh =
+                wob is Ship ? "ship1.mesh" :
+                wob is Droid ? "droid.mesh" :
+                null;
+            Debug.Assert(mesh != null);
             var shipEnt = Globals.Scene.CreateEntity("ship entity " + _entityIndex++, mesh);
             var node = Globals.Scene.RootSceneNode.CreateChildSceneNode();
             node.AttachObject(shipEnt);
-            node.Position = ship.Pos;
-            node.Orientation = ship.Orientation;
+            node.Position = wob.Pose.Location;
+            node.Orientation = wob.Pose.Orientation;
             return node;
         }
 
-        private void RemoveShip(Ship ship)
+        private void RemoveVessel(Wob vessel)
         {
             SceneNode node;
-            if (!_nodes.TryGetValue(ship.ID, out node)) return;
+            if (!_nodes.TryGetValue(vessel.ID, out node)) return;
             Globals.Scene.RootSceneNode.RemoveChild(node);
-            _nodes.Remove(ship.ID);
+            _nodes.Remove(vessel.ID);
         }
     }
 }

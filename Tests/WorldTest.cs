@@ -25,7 +25,7 @@ namespace Tests
         {
             _planet = new Planet(Guid.NewGuid(), "Earth");
             _station = new Station(Guid.NewGuid(), new Vector3(10, 0, 20));
-            _ship = new Ship(Guid.NewGuid(), new Vector3(5, 6, 7), Vector3.UnitX, Vector3.UnitY);
+            _ship = new Ship(Guid.NewGuid(), new Pose(new Vector3(5, 6, 7), Vector3.UnitX, Vector3.UnitY));
             _inventory = new Inventory(Guid.NewGuid());
             _playerID = Guid.NewGuid();
             _shipID = Guid.NewGuid();

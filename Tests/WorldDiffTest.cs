@@ -23,7 +23,7 @@ namespace Tests
         {
             _planet = new Planet(Guid.NewGuid(), "Earth");
             _station = new Station(Guid.NewGuid(), new Vector3(10, 0, 20));
-            _ship = new Ship(Guid.NewGuid(), new Vector3(5, 6, 7), Vector3.UnitX, Vector3.UnitY);
+            _ship = new Ship(Guid.NewGuid(), new Pose(new Vector3(5, 6, 7), Vector3.UnitX, Vector3.UnitY));
             _inventory = new Inventory(Guid.NewGuid());
         }
 
@@ -68,7 +68,7 @@ namespace Tests
         public void Modified_Wobs()
         {
             var planet2 = new Planet(_planet.ID, "Jupiter");
-            var ship2 = new Ship(_ship.ID, _ship.Pos + new Vector3(50, 0, 0), _ship.Front, _ship.Up);
+            var ship2 = new Ship(_ship.ID, _ship.Pose.Move(new Vector3(50, 0, 0), 0, 0, 0));
             AssertDiffAndPatch(
                 World.Empty.SetWob(_planet).SetWob(_ship),
                 World.Empty.SetWob(planet2).SetWob(ship2),
