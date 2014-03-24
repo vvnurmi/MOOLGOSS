@@ -35,6 +35,6 @@ namespace Core
             info.AddGuid("ID", ID);
         }
 
-        public virtual Wob Update() { return this; }
+        public virtual Wob Update(float secondsPassed) { return this; }
     }
 }

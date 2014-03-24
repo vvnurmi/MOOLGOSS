@@ -3,6 +3,7 @@ using Core;
 using Core.Serial;
 using Core.Wobs;
 using System;
+using System.Diagnostics;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,6 +16,8 @@ namespace Server
         private const int WindowsError_OperationAborted = 995;
 
         private bool _exiting;
+        private Stopwatch _updateStopwatch = new Stopwatch();
+        private TimeSpan _lastUpdate;
 
         public void Start()
         {
@@ -94,17 +97,28 @@ namespace Server
             }
         }
 
-        private static void UpdateWorld(Atom<World> world)
+        private void UpdateWorld(Atom<World> world)
         {
+            EnsureUpdateStopwatchInitialized();
             Thread.Sleep(TimeSpan.FromSeconds(1));
+            var elapsed = _updateStopwatch.Elapsed;
+            var secondsPassed = (float)(elapsed - _lastUpdate).TotalSeconds;
+            _lastUpdate = elapsed;
             var ids = world.Value.Wobs.Keys;
-            foreach (var id in ids) world.Set(w => TryUpdateWob(w, id));
+            foreach (var id in ids) world.Set(w => TryUpdateWob(w, id, secondsPassed));
         }
 
-        private static World TryUpdateWob(World world, Guid id)
+        private void EnsureUpdateStopwatchInitialized()
+        {
+            if (_updateStopwatch.IsRunning) return;
+            _lastUpdate = TimeSpan.Zero;
+            _updateStopwatch.Restart();
+        }
+
+        private static World TryUpdateWob(World world, Guid id, float secondsPassed)
         {
             var wob = world.GetWob<Wob>(id);
-            return wob == null ? world : world.SetWob(wob.Update());
+            return wob == null ? world : world.SetWob(wob.Update(secondsPassed));
         }
     }
 }
