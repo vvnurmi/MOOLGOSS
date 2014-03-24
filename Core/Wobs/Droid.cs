@@ -5,7 +5,7 @@ using System.Linq;
 namespace Core.Wobs
 {
     [Serializable]
-    public class Droid : Wob, IPosed
+    public sealed class Droid : Wob, IPosed
     {
         private enum State { Idle, FindPlanet, GoToPlanet };
 

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Core.Wobs
 {
     [Serializable]
-    public class Planet : Wob
+    public sealed class Planet : Wob
     {
         private readonly string _name;
 

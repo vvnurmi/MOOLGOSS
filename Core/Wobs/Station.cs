@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Core.Wobs
 {
     [Serializable]
-    public class Station : Wob
+    public sealed class Station : Wob
     {
         private readonly Vector3 _pos;
 

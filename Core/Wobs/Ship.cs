@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace Core.Wobs
 {
     [Serializable]
-    public class Ship : Wob, IPosed
+    public sealed class Ship : Wob, IPosed
     {
         private readonly Pose _pose;
         public Pose Pose { get { return _pose; } }

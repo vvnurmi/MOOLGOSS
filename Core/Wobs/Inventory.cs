@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace Core.Wobs
 {
     [Serializable]
-    public class Inventory : Wob, IEnumerable<ItemStack>, ISerializable
+    public sealed class Inventory : Wob, IEnumerable<ItemStack>, ISerializable
     {
         private readonly ImmutableDictionary<Guid, ItemStack> _stacks = ImmutableDictionary<Guid, ItemStack>.Empty;
         private readonly int _changeTimestamp;
@@ -23,7 +23,7 @@ namespace Core.Wobs
         {
         }
 
-        protected Inventory(SerializationInfo info, StreamingContext context)
+        private Inventory(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
             _changeTimestamp = info.GetInt32("ChangeTimestamp");
