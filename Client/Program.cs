@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 
 namespace Client
 {
@@ -7,7 +8,11 @@ namespace Client
         public static void Main(string[] args)
         {
             var client = new Client();
-            client.Start("assaultwing.com",
+            var hostIndex = Array.IndexOf(args, "--host");
+            var host = hostIndex != -1 && hostIndex + 1 < args.Length
+                ? args[hostIndex + 1]
+                : "assaultwing.com";
+            client.Start(host,
                 userConfigure: args.Contains("--config"),
                 debugSettings: args.Contains("--debug"));
         }
