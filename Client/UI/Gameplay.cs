@@ -169,8 +169,8 @@ namespace Client.UI
                         _mission.Offer();
                         var missionDialog = new MissionDialog("MissionOfferDialog", 300);
                         missionDialog.SetMessage(_mission.AssignMessage);
-                        missionDialog.ShowConfirmButton("Accept", () => { missionDialog.Hide(); missionDialog.Destroy(); missionDialog = null; _mission.Assign(); });
-                        missionDialog.ShowCancelButton("Refuse", () => { missionDialog.Hide(); missionDialog.Destroy(); missionDialog = null; _mission.Suppress(); });
+                        missionDialog.ShowConfirmButton("Accept", () => { missionDialog.Destroy(); _mission.Assign(); });
+                        missionDialog.ShowCancelButton("Refuse", () => { missionDialog.Destroy(); _mission.Suppress(); });
                         missionDialog.Show();
                     }
                     break;
