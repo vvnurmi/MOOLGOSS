@@ -7,22 +7,23 @@ namespace Core.Wobs
     [Serializable]
     public sealed class Droid : Wob, IPosed
     {
-        private enum State { Idle, FindPlanet, GoToPlanet };
+        private enum State { Idle, FindPlanet, GoToPlanet, OrbitPlanet };
 
         [Serializable]
         private struct Logic
         {
             public readonly State State;
-            public readonly Guid GoToPlanetID;
+            public readonly Guid PlanetID;
 
             public static Logic Idle() { return new Logic(State.Idle, Guid.Empty); }
             public static Logic FindPlanet() { return new Logic(State.FindPlanet, Guid.Empty); }
             public static Logic GoToPlanet(Guid planetID) { return new Logic(State.GoToPlanet, planetID); }
+            public static Logic OrbitPlanet(Guid planetID) { return new Logic(State.OrbitPlanet, planetID); }
 
-            private Logic(State state, Guid goToPlanetID)
+            private Logic(State state, Guid planetID)
             {
                 State = state;
-                GoToPlanetID = goToPlanetID;
+                PlanetID = planetID;
             }
         }
 
@@ -52,6 +53,7 @@ namespace Core.Wobs
 
         public override Wob Update(float secondsPassed)
         {
+            var speedStep = 5 * secondsPassed;
             switch (_logic.State)
             {
                 case State.Idle: return this;
@@ -65,10 +67,22 @@ namespace Core.Wobs
                     }
                 case State.GoToPlanet:
                     {
-                        var planet = Globals.World.Value.GetWob<Planet>(_logic.GoToPlanetID);
-                        if (planet == null || planet.Pos.DistanceSquared(_pose.Location) < 50 * 50)
-                            return SetLogic(Logic.Idle());
-                        return SetPose(_pose.Move(_pose.Front * 5 * secondsPassed, 0, 0, 0));
+                        var planet = Globals.World.Value.GetWob<Planet>(_logic.PlanetID);
+                        if (planet == null || planet.Pos.DistanceSquared(_pose.Location) < 70 * 70)
+                            return SetLogic(Logic.OrbitPlanet(_logic.PlanetID));
+                        var toPlanet = (planet.Pos - _pose.Location).ToNormalized();
+                        return SetPose(new Pose(_pose.Location + toPlanet * speedStep, toPlanet, _pose.Up));
+                    }
+                case State.OrbitPlanet:
+                    {
+                        var planet = Globals.World.Value.GetWob<Planet>(_logic.PlanetID);
+                        if (planet == null) return SetLogic(Logic.Idle());
+                        var orbitLocation = _pose.Location - planet.Pos;
+                        var altitude = orbitLocation.Length;
+                        var orbitAngle = speedStep / altitude;
+                        var move = Quaternion.FromAngleAxis(orbitAngle, _pose.Up);
+                        var location = planet.Pos + move * orbitLocation;
+                        return SetPose(new Pose(location, move * _pose.Front, move * _pose.Up));
                     }
                 default: throw new NotImplementedException();
             }
