@@ -42,10 +42,6 @@ namespace Client
         private bool IsInitialized { get { return Globals.UI != null; } }
         private Overlay Cursor { get { return OverlayManager.Instance.GetByName("Overlays/Cursor"); } }
         private OverlayElementContainer CursorPanel { get { return Cursor.GetChild("Overlays/Elements/CursorPanel"); } }
-        private Overlay Dialog { get { return OverlayManager.Instance.GetByName("Overlays/Dialog"); } }
-        private OverlayElementContainer DialogPanel { get { return Dialog.GetChild("Overlays/Elements/Dialog"); } }
-        private OverlayElement ButtonTemplate { get { return OverlayManager.Instance.Elements.GetElement("Overlays/Templates/DialogButton", true); } }
-        private IEnumerable<OverlayElement> DialogButtons { get { return DialogPanel.Children.Where(c => c.Key.Contains("/DialogButtons/")).Select(c => c.Value); } }
         private Overlay TitleScreen { get { return OverlayManager.Instance.GetByName("Overlays/TitleScreen"); } }
 
         public string Mode { get { return _mode == null ? "<none>" : _mode.Name; } }
@@ -68,36 +64,6 @@ namespace Client
         {
             var success = _buttons.Remove(button);
             Debug.Assert(success, "Button wasn't registered");
-        }
-
-        public bool TryShowDialog(string text, params ButtonDef[] buttonDefs)
-        {
-            if (Dialog.IsVisible) return false;
-            DialogPanel.GetChild("Overlays/Elements/DialogText").Text = text;
-            var space = (DialogPanel.Width - buttonDefs.Length * ButtonTemplate.Width) / (buttonDefs.Length + 1);
-            var buttonX = space;
-            var buttonY = DialogPanel.Height - 2 * ButtonTemplate.Height;
-            foreach (var def in buttonDefs)
-            {
-                var button = CreateDialogButton(def.Name, buttonX, buttonY);
-                button.UserData = def.Pressed;
-                DialogPanel.AddChild(button);
-                AddButton(button);
-                buttonX += space + ButtonTemplate.Width;
-            }
-            Dialog.Show();
-            return true;
-        }
-
-        public void HideDialog()
-        {
-            Dialog.Hide();
-            foreach (var button in DialogButtons.ToArray())
-            {
-                RemoveButton(button);
-                DialogPanel.RemoveChild(button.Name);
-                OverlayManager.Instance.Elements.DestroyElement(button.Name);
-            }
         }
 
         public void ShowTitleScreen()
