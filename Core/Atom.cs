@@ -2,7 +2,7 @@
 
 namespace Core
 {
-    public class Atom<T>
+    public class Atom<T> where T : class
     {
         public static implicit operator T(Atom<T> x) { return x.Value; }
         public Atom(T value) { Value = value; }
