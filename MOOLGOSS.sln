@@ -14,8 +14,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{0C2922
 		.nuget\packages.config = .nuget\packages.config
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Standalone", "Standalone\Standalone.csproj", "{C33A02A0-44C3-4D58-920B-D4D9A46A1A88}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Collections.Immutable", "System.Collections.Immutable\System.Collections.Immutable.csproj", "{024A2111-4B19-44D7-917E-8514CF632469}"
 EndProject
 Global
@@ -40,10 +38,6 @@ Global
 		{A76F3CAB-E0E6-4020-A063-C3EB0B9FDA1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A76F3CAB-E0E6-4020-A063-C3EB0B9FDA1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A76F3CAB-E0E6-4020-A063-C3EB0B9FDA1E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C33A02A0-44C3-4D58-920B-D4D9A46A1A88}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C33A02A0-44C3-4D58-920B-D4D9A46A1A88}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C33A02A0-44C3-4D58-920B-D4D9A46A1A88}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C33A02A0-44C3-4D58-920B-D4D9A46A1A88}.Release|Any CPU.Build.0 = Release|Any CPU
 		{024A2111-4B19-44D7-917E-8514CF632469}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{024A2111-4B19-44D7-917E-8514CF632469}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{024A2111-4B19-44D7-917E-8514CF632469}.Release|Any CPU.ActiveCfg = Release|Any CPU
