@@ -45,7 +45,7 @@ namespace Client
                 if (debugSettings)
                 {
                     root.RenderSystem.ConfigOptions["Full Screen"].Value = "No";
-                    root.RenderSystem.ConfigOptions["Video Mode"].Value = "640 x 480 @ 32-bit color";
+                    root.RenderSystem.ConfigOptions["Video Mode"].Value = "800 x 600 @ 32-bit color";
                 }
                 if (userConfigure && !configuration.ShowConfigDialog(root)) return;
                 var window = CreateRenderWindow(root.RenderSystem.ConfigOptions["Video Mode"].Value == "Yes");
