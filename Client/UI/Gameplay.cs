@@ -193,26 +193,38 @@ namespace Client.UI
 
         private void SyncWithServerLoop()
         {
-            while (!_exiting)
+            try
             {
-                Thread.Sleep(TimeSpan.FromSeconds(ServerSyncInterval));
-                var diffOut = new WorldDiff(_worldShadow, Globals.World);
-                _worldShadow = _worldShadow.Patch(diffOut);
-                if (!diffOut.IsEmpty) _visualizationUpdates.Enqueue(diffOut);
-                _service.SendWorldPatch(_clientID, diffOut);
-                var diffIn = _service.ReceiveWorldPatch(_clientID);
-                if (!diffIn.IsEmpty) _visualizationUpdates.Enqueue(diffIn);
-                _worldShadow = _worldShadow.Patch(diffIn);
-                Globals.World.Set(w => w.Patch(diffIn));
-                if (_mission == null)
-                    _mission = new Mission
-                    {
-                        AssignMessage = "Go and find The Planet!\nThere'll be no reward.",
-                        AssignVolume = new Sphere(Globals.World.Value.Wobs.Values.OfType<Station>().First().Pos, 50),
-                        CompleteMessage = "You found the correct planet,\nnice!",
-                        CompleteVolume = new Sphere(Globals.World.Value.Wobs.Values.OfType<Planet>().First().Pos, 80),
-                    };
+                while (!_exiting) SyncWithServer();
             }
+            catch (Exception e)
+            {
+                var errorDialog = new MessageDialog("Communication error", 600);
+                errorDialog.SetMessage("An error occurred when communicating with the server.\n" + e.Message);
+                errorDialog.ShowConfirmButton("OK, too bad!", errorDialog.Destroy);
+                errorDialog.Show();
+            }
+        }
+
+        private void SyncWithServer()
+        {
+            Thread.Sleep(TimeSpan.FromSeconds(ServerSyncInterval));
+            var diffOut = new WorldDiff(_worldShadow, Globals.World);
+            _worldShadow = _worldShadow.Patch(diffOut);
+            if (!diffOut.IsEmpty) _visualizationUpdates.Enqueue(diffOut);
+            _service.SendWorldPatch(_clientID, diffOut);
+            var diffIn = _service.ReceiveWorldPatch(_clientID);
+            if (!diffIn.IsEmpty) _visualizationUpdates.Enqueue(diffIn);
+            _worldShadow = _worldShadow.Patch(diffIn);
+            Globals.World.Set(w => w.Patch(diffIn));
+            if (_mission == null)
+                _mission = new Mission
+                {
+                    AssignMessage = "Go and find The Planet!\nThere'll be no reward.",
+                    AssignVolume = new Sphere(Globals.World.Value.Wobs.Values.OfType<Station>().First().Pos, 50),
+                    CompleteMessage = "You found the correct planet,\nnice!",
+                    CompleteVolume = new Sphere(Globals.World.Value.Wobs.Values.OfType<Planet>().First().Pos, 80),
+                };
         }
 
         private void TryDocking()
