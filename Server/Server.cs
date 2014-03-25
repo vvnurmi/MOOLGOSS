@@ -24,14 +24,14 @@ namespace Server
             var listener = new HttpListener();
             listener.Prefixes.Add("http://*:8080/moolgoss/");
             if (!TryStart(listener)) return;
-            var world = new Atom<World>(World.Empty
+            Globals.World = new Atom<World>(World.Empty
                 .SetWob(new Planet(Guid.NewGuid(), "Earth"))
                 .SetWob(new Planet(Guid.NewGuid(), "Jupiteroid"))
                 .SetWob(new Station(Guid.NewGuid(), new Vector3(200, 0, 100))));
-            var service = new Service(world);
+            var service = new Service(Globals.World);
             var marshalledService = Marshal.Get(service);
             var handleRequests = RunRepeatedly(() => HandleRequest(listener, marshalledService));
-            var updateWorld = RunRepeatedly(() => UpdateWorld(world));
+            var updateWorld = RunRepeatedly(UpdateWorld);
             Console.WriteLine("Enter 'exit' to stop the server.");
             while (true) if (Console.ReadLine() == "exit") break;
             Stop(listener, handleRequests, updateWorld);
@@ -97,15 +97,15 @@ namespace Server
             }
         }
 
-        private void UpdateWorld(Atom<World> world)
+        private void UpdateWorld()
         {
             EnsureUpdateStopwatchInitialized();
             Thread.Sleep(TimeSpan.FromSeconds(1));
             var elapsed = _updateStopwatch.Elapsed;
             var secondsPassed = (float)(elapsed - _lastUpdate).TotalSeconds;
             _lastUpdate = elapsed;
-            var ids = world.Value.Wobs.Keys;
-            foreach (var id in ids) world.Set(w => TryUpdateWob(w, id, secondsPassed));
+            var ids = Globals.World.Value.Wobs.Keys;
+            foreach (var id in ids) Globals.World.Set(w => TryUpdateWob(w, id, secondsPassed));
         }
 
         private void EnsureUpdateStopwatchInitialized()
