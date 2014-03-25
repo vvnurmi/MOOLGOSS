@@ -25,7 +25,6 @@ namespace Client.UI
         private IService _service;
         private SpaceVisualization _visualization;
         private Mission _mission;
-        private MissionDialog _missionDialog;
         private InventoryModel _inventory;
         private InventoryView _inventoryView;
         private TopBar _topBarView;
@@ -168,11 +167,11 @@ namespace Client.UI
                     if (_mission.AssignVolume.Intersects(playerShip.Pose.Location))
                     {
                         _mission.Offer();
-                        _missionDialog = new MissionDialog("MissionOfferDialog", 300);
-                        _missionDialog.SetMessage(_mission.AssignMessage);
-                        _missionDialog.ShowConfirmButton("Accept", () => { _missionDialog.Hide(); _missionDialog.Destroy(); _missionDialog = null; _mission.Assign(); });
-                        _missionDialog.ShowCancelButton("Refuse", () => { _missionDialog.Hide(); _missionDialog.Destroy(); _missionDialog = null; _mission.Suppress(); });
-                        _missionDialog.Show();
+                        var missionDialog = new MissionDialog("MissionOfferDialog", 300);
+                        missionDialog.SetMessage(_mission.AssignMessage);
+                        missionDialog.ShowConfirmButton("Accept", () => { missionDialog.Hide(); missionDialog.Destroy(); missionDialog = null; _mission.Assign(); });
+                        missionDialog.ShowCancelButton("Refuse", () => { missionDialog.Hide(); missionDialog.Destroy(); missionDialog = null; _mission.Suppress(); });
+                        missionDialog.Show();
                     }
                     break;
                 case MissionState.Offering: break;
@@ -181,10 +180,10 @@ namespace Client.UI
                     if (_mission.CompleteVolume.Intersects(playerShip.Pose.Location))
                     {
                         _mission.Complete();
-                        _missionDialog = new MissionDialog("MissionCompleteDialog", 300);
-                        _missionDialog.SetMessage(_mission.CompleteMessage);
-                        _missionDialog.ShowConfirmButton("OK", () => { _missionDialog.Hide(); _missionDialog.Destroy(); _missionDialog = null; });
-                        _missionDialog.Show();
+                        var missionDialog = new MissionDialog("MissionCompleteDialog", 300);
+                        missionDialog.SetMessage(_mission.CompleteMessage);
+                        missionDialog.ShowConfirmButton("OK", () => { missionDialog.Hide(); missionDialog.Destroy(); missionDialog = null; });
+                        missionDialog.Show();
                     }
                     break;
                 case MissionState.Completed: break;
