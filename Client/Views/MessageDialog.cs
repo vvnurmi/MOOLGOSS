@@ -22,6 +22,11 @@ namespace Client.Views
         private OverlayElementContainer _confirmButton;
 
         public bool IsVisible { get { return _dialog.IsVisible; } }
+
+        private OverlayElementContainer DialogContent
+        {
+            get { return (OverlayElementContainer)OverlayManager.Instance.Elements.GetElement(InstanceName + "/MessageDialogContent"); }
+        }
         
         public MessageDialog(string name, int width)
         {
@@ -35,18 +40,17 @@ namespace Client.Views
 
         public void Destroy()
         {
-            var dialogContent = (OverlayElementContainer)OverlayManager.Instance.Elements.GetElement(InstanceName + "/MessageDialogContent");
             if (_confirmButton != null)
             {
                 Globals.UI.RemoveButton(_confirmButton);
                 Globals.UI.DestroyButton(_confirmButton.Name);
-                dialogContent.RemoveChild(_confirmButton.Name);
+                DialogContent.RemoveChild(_confirmButton.Name);
             }
             if (_cancelButton != null)
             {
                 Globals.UI.RemoveButton(_cancelButton);
                 Globals.UI.DestroyButton(_cancelButton.Name);
-                dialogContent.RemoveChild(_cancelButton.Name);
+                DialogContent.RemoveChild(_cancelButton.Name);
             }
 
             _dialog.RemoveElement(_dialogElement);
@@ -73,9 +77,8 @@ namespace Client.Views
             _dialogElement.Width = _dialogWidth;
             _dialogElement.Height = height;
 
-            var dialogContent = (OverlayElementContainer)OverlayManager.Instance.Elements.GetElement(InstanceName + "/MessageDialogContent");
-            dialogContent.Width = _dialogElement.Width - (dialogContent.Left * 2);
-            dialogContent.Height = _dialogElement.Height - (dialogContent.Top * 2);
+            DialogContent.Width = _dialogElement.Width - (DialogContent.Left * 2);
+            DialogContent.Height = _dialogElement.Height - (DialogContent.Top * 2);
 
             var dialogBorder = (OverlayElementContainer)OverlayManager.Instance.Elements.GetElement(InstanceName + "/MessageDialogBorder");
             dialogBorder.Width = _dialogElement.Width;
@@ -138,7 +141,7 @@ namespace Client.Views
         public void SetMessage(string message)
         {
             _message = message;
-            var textField = (OverlayElement)OverlayManager.Instance.Elements.GetElement(InstanceName + "/MessageDialogContent/MessageDialogMessage");
+            var textField = OverlayManager.Instance.Elements.GetElement(InstanceName + "/MessageDialogContent/MessageDialogMessage");
             textField.Text = _message;
             ResizeElement();
         }
@@ -146,55 +149,31 @@ namespace Client.Views
         public void ShowConfirmButton(string label, Action action)
         {
             _confirmButton = CreateConfirmButton(label);
-            var dialogContent = (OverlayElementContainer)OverlayManager.Instance.Elements.GetElement(InstanceName + "/MessageDialogContent");
-            dialogContent.AddChildElement(_confirmButton);
-            _confirmButton.UserData = action;
-            Globals.UI.AddButton(_confirmButton);
-            ResizeElement();
+            ShowButton(_confirmButton, action);
         }
 
         private OverlayElementContainer CreateConfirmButton(string label)
         {
-            var confirmButton = Globals.UI.CreateButton(InstanceName + "/ConfirmButton", "Green", label, (int)_dialogElement.Width / 2 - 10, 25, 18);
-            return confirmButton;
-        }
-
-        private void DestroyConfirmButton()
-        {
-            if (_confirmButton != null)
-            {
-                _dialogElement.RemoveChild(_confirmButton.Name);
-                if (_confirmButton.UserData != null)
-                    Globals.UI.RemoveButton(_confirmButton);
-                Globals.UI.DestroyButton(_confirmButton.Name);
-            }
+            return Globals.UI.CreateButton(InstanceName + "/ConfirmButton", "Green", label, (int)_dialogElement.Width / 2 - 10, 25, 18);
         }
 
         public void ShowCancelButton(string label, Action action)
         {
             _cancelButton = CreateCancelButton(label);
-            var dialogContent = (OverlayElementContainer)OverlayManager.Instance.Elements.GetElement(InstanceName + "/MessageDialogContent");
-            dialogContent.AddChildElement(_cancelButton);
-            _cancelButton.UserData = action;
-            Globals.UI.AddButton(_cancelButton);
-            ResizeElement();
+            ShowButton(_cancelButton, action);
         }
 
         private OverlayElementContainer CreateCancelButton(string label)
         {
-            var cancelButton = Globals.UI.CreateButton(InstanceName + "/CancelButton", "Blue", label, (int)_dialogElement.Width / 2 - 10, 25, 18);
-            return cancelButton;
+            return Globals.UI.CreateButton(InstanceName + "/CancelButton", "Blue", label, (int)_dialogElement.Width / 2 - 10, 25, 18);
         }
 
-        private void DestroyCancelButton()
+        private void ShowButton(OverlayElementContainer button, Action action)
         {
-            if (_cancelButton != null)
-            {
-                _dialogElement.RemoveChild(_cancelButton.Name);
-                if (_cancelButton.UserData != null)
-                    Globals.UI.RemoveButton(_cancelButton);
-                Globals.UI.DestroyButton(_cancelButton.Name);
-            }
+            DialogContent.AddChildElement(button);
+            button.UserData = action + Destroy;
+            Globals.UI.AddButton(button);
+            ResizeElement();
         }
     }
 }

@@ -169,8 +169,8 @@ namespace Client.UI
                         _mission.Offer();
                         var missionDialog = new MissionDialog("MissionOfferDialog", 300);
                         missionDialog.SetMessage(_mission.AssignMessage);
-                        missionDialog.ShowConfirmButton("Accept", () => { missionDialog.Destroy(); _mission.Assign(); });
-                        missionDialog.ShowCancelButton("Refuse", () => { missionDialog.Destroy(); _mission.Suppress(); });
+                        missionDialog.ShowConfirmButton("Accept", _mission.Assign);
+                        missionDialog.ShowCancelButton("Refuse", _mission.Suppress);
                         missionDialog.Show();
                     }
                     break;
@@ -182,7 +182,7 @@ namespace Client.UI
                         _mission.Complete();
                         var missionDialog = new MissionDialog("MissionCompleteDialog", 300);
                         missionDialog.SetMessage(_mission.CompleteMessage);
-                        missionDialog.ShowConfirmButton("OK", () => { missionDialog.Hide(); missionDialog.Destroy(); missionDialog = null; });
+                        missionDialog.ShowConfirmButton("OK", () => { });
                         missionDialog.Show();
                     }
                     break;
@@ -201,7 +201,7 @@ namespace Client.UI
             {
                 var errorDialog = new MessageDialog("Communication error", 600);
                 errorDialog.SetMessage("An error occurred when communicating with the server.\n" + e.Message);
-                errorDialog.ShowConfirmButton("OK, too bad!", errorDialog.Destroy);
+                errorDialog.ShowConfirmButton("OK, too bad!", () => { });
                 errorDialog.Show();
             }
         }
