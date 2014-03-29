@@ -1,5 +1,6 @@
 ﻿using Axiom.Math;
 using System;
+using System.Globalization;
 using System.Runtime.Serialization;
 
 namespace Core
@@ -32,6 +33,11 @@ namespace Core
             Location = (Vector3)info.GetValue("Location", typeof(Vector3));
             Front = (Vector3)info.GetValue("Front", typeof(Vector3));
             Up = (Vector3)info.GetValue("Up", typeof(Vector3));
+        }
+
+        public override string ToString()
+        {
+            return string.Format(CultureInfo.InvariantCulture, "(loc {0}, front {1}, up {2})", Location, Front, Up);
         }
 
         public Pose Move(Vector3 deltaLocation, float pitchDegrees, float yawDegrees, float rollDegrees)

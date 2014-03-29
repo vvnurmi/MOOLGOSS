@@ -1,5 +1,6 @@
 ﻿using Axiom.Math;
 using System;
+using System.Globalization;
 using System.Linq;
 
 namespace Core.Wobs
@@ -25,6 +26,11 @@ namespace Core.Wobs
                 State = state;
                 PlanetID = planetID;
             }
+
+            public override string ToString()
+            {
+                return string.Format(CultureInfo.InvariantCulture, "{0} (planet {1})", State, PlanetID);
+            }
         }
 
         private readonly Pose _pose;
@@ -46,6 +52,11 @@ namespace Core.Wobs
         {
             var d = other as Droid;
             return d != null && _pose.Equals(d._pose) && _logic.Equals(d._logic);
+        }
+
+        public override string ToString()
+        {
+            return string.Format(CultureInfo.InvariantCulture, "Droid {0} doing {1} at {2}", ID, _logic, Pose);
         }
 
         public Droid SetPose(Pose pose) { return new Droid(ID, pose, _logic); }

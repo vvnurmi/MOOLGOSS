@@ -1,6 +1,7 @@
 ﻿using Axiom.Math;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
@@ -24,6 +25,11 @@ namespace Core.Wobs
         {
             var ship = other as Ship;
             return ship != null && ID == ship.ID && Pose.Equals(ship._pose);
+        }
+
+        public override string ToString()
+        {
+            return string.Format(CultureInfo.InvariantCulture, "Ship {0} at {1}", ID, Pose);
         }
 
         public Ship SetPose(Pose pose) { return new Ship(ID, pose); }

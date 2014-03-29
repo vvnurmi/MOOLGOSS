@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Text;
 
 namespace Core
 {
@@ -83,6 +84,11 @@ namespace Core
         public static Guid GetGuid(this SerializationInfo info, string name)
         {
             return (Guid)info.GetValue(name, typeof(Guid));
+        }
+
+        public static string ToPrettyString<T>(this IEnumerable<T> items)
+        {
+            return "[" + string.Join(", ", items) + "]";
         }
     }
 }
