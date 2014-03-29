@@ -44,6 +44,15 @@ namespace Core.Wobs
             return inventory != null && ID == inventory.ID && _stacks.ValueEquals(inventory._stacks);
         }
 
+        public override string ToString()
+        {
+            var str = new StringBuilder("Inventory [");
+            foreach (var stack in _stacks)
+                str.AppendFormat("\n  {0} ({1} x {2})", stack.Key, stack.Value.Count, stack.Value.Type);
+            str.Append("]");
+            return str.ToString();
+        }
+
         /// <summary>
         /// Throws <see cref="InvalidOperationException"/> if the stack is already contained in some inventory.
         /// </summary>
