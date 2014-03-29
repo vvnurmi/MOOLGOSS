@@ -63,9 +63,6 @@ namespace Core
             return new World(_wobs, _playerShipIDs.Remove(playerID));
         }
 
-        /// <summary>
-        /// Applies a patch to the world. Returns self.
-        /// </summary>
         public World Patch(WorldDiff diff)
         {
             var wobs = _wobs.RemoveRange(diff.Wobs.Removed.Keys).SetItems(diff.Wobs.Added);
