@@ -75,32 +75,32 @@ namespace Core.Wobs
         public Droid SetPose(Pose pose) { return new Droid(ID, pose, _inventoryID, _logic); }
         private Droid SetLogic(Logic logic) { return new Droid(ID, _pose, _inventoryID, logic); }
 
-        public override Wob Update(float secondsPassed)
+        public override World Update(float secondsPassed, World world)
         {
             var speedStep = 5 * secondsPassed;
             switch (_logic.State)
             {
-                case State.Idle: return this;
+                case State.Idle: return world;
                 case State.FindPlanet:
                     {
-                        var planet = Globals.World.Value.Wobs.Values.OfType<Planet>()
+                        var planet = world.Wobs.Values.OfType<Planet>()
                             .MinBy(p => (float)p.Pos.DistanceSquared(_pose.Location));
                         if (planet == null || planet.Pos.DistanceSquared(_pose.Location) > 300 * 300)
-                            return SetLogic(Logic.Idle());
-                        return SetLogic(Logic.GoToPlanet(planet.ID));
+                            return world.SetWob(SetLogic(Logic.Idle()));
+                        return world.SetWob(SetLogic(Logic.GoToPlanet(planet.ID)));
                     }
                 case State.GoToPlanet:
                     {
-                        var planet = Globals.World.Value.GetWob<Planet>(_logic.PlanetID);
+                        var planet = world.GetWob<Planet>(_logic.PlanetID);
                         if (planet == null || planet.Pos.DistanceSquared(_pose.Location) < 70 * 70)
-                            return SetLogic(Logic.OrbitPlanet(_logic.PlanetID));
+                            return world.SetWob(SetLogic(Logic.OrbitPlanet(_logic.PlanetID)));
                         var toPlanet = (planet.Pos - _pose.Location).ToNormalized();
-                        return SetPose(new Pose(_pose.Location + toPlanet * speedStep, toPlanet, _pose.Up));
+                        return world.SetWob(SetPose(new Pose(_pose.Location + toPlanet * speedStep, toPlanet, _pose.Up)));
                     }
                 case State.OrbitPlanet:
                     {
-                        var planet = Globals.World.Value.GetWob<Planet>(_logic.PlanetID);
-                        if (planet == null) return SetLogic(Logic.Idle());
+                        var planet = world.GetWob<Planet>(_logic.PlanetID);
+                        if (planet == null) return world.SetWob(SetLogic(Logic.Idle()));
                         var orbitLocation = _pose.Location - planet.Pos;
                         var altitude = orbitLocation.Length;
                         var orbitAngle = speedStep / altitude;
@@ -112,12 +112,12 @@ namespace Core.Wobs
                         if (gatheredAmount > 0)
                         {
                             var gatheredStack = new Items.ItemStack(Guid.NewGuid(), Items.ItemType.MiningDroid, gatheredAmount);
-                            // FIXME !!! Inventory change should be a return value that is effected by the caller.
-                            Globals.World.Set(w => w.SetWob(w.GetWob<Inventory>(_inventoryID).Add(gatheredStack)));
+                            world = world.SetWob(world.GetWob<Inventory>(_inventoryID).Add(gatheredStack));
                         }
                         gatheringSeconds -= gatheredAmount * gatheringInterval;
-                        return SetPose(new Pose(location, move * _pose.Front, move * _pose.Up))
-                            .SetLogic(_logic.SetGatheringSeconds(gatheringSeconds));
+                        return world.SetWob(
+                            SetPose(new Pose(location, move * _pose.Front, move * _pose.Up))
+                            .SetLogic(_logic.SetGatheringSeconds(gatheringSeconds)));
                     }
                 default: throw new NotImplementedException();
             }

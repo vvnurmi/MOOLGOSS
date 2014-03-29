@@ -35,6 +35,6 @@ namespace Core
             info.AddGuid("ID", ID);
         }
 
-        public virtual Wob Update(float secondsPassed) { return this; }
+        public virtual World Update(float secondsPassed, World world) { return world; }
     }
 }

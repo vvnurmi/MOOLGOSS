@@ -118,7 +118,7 @@ namespace Server
         private static World TryUpdateWob(World world, Guid id, float secondsPassed)
         {
             var wob = world.GetWob<Wob>(id);
-            return wob == null ? world : world.SetWob(wob.Update(secondsPassed));
+            return wob == null ? world : wob.Update(secondsPassed, world);
         }
     }
 }
