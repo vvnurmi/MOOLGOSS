@@ -57,7 +57,10 @@ namespace Client
                             .FirstOrDefault(p => IsCloseAhead(playerShip.Pose, p.Pos));
                         result = planet == null ? ItemActivationResult.Nothing : ItemActivationResult.IsDepleted;
                         if (planet == null) return w;
-                        return w.SetWob(new Droid(Guid.NewGuid(), playerShip.Pose));
+                        var droidInventoryID = Guid.NewGuid();
+                        return w
+                            .SetWob(new Inventory(droidInventoryID))
+                            .SetWob(new Droid(Guid.NewGuid(), playerShip.Pose, droidInventoryID));
                     });
                     break;
                 default: throw new NotImplementedException("Activate for " + type);
