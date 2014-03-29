@@ -70,16 +70,13 @@ namespace Client
             foreach (var station in diff.Wobs.Removed.Values.OfType<Station>()) RemoveStation(station);
             foreach (var station in diff.Wobs.Added.Values.OfType<Station>()) CreateStation(station);
             Func<Wob, bool> isVessel = w => w is Ship || w is Droid;
-            var shipsAdded = diff.Wobs.Added.Values.Where(isVessel).ToArray();
-            var shipsRemoved = diff.Wobs.Removed.Values.Where(isVessel).ToArray();
-            var shipsChanged = shipsAdded.Intersect(shipsRemoved, g_idComparer).ToArray();
+            var vesselsAdded = diff.Wobs.Added.Values.Where(isVessel).ToArray();
+            var vesselsRemoved = diff.Wobs.Removed.Values.Where(isVessel).ToArray();
             var playerShipID = Globals.World.Value.GetPlayerShipID(Globals.PlayerID);
-            foreach (var ship in shipsChanged)
-                if (ship.ID != playerShipID) UpdateVessel(ship, 1);
-            foreach (var ship in shipsRemoved.Except(shipsChanged, g_idComparer))
-                if (ship.ID != playerShipID) RemoveVessel(ship);
-            foreach (var ship in shipsAdded.Except(shipsChanged, g_idComparer))
-                if (ship.ID != playerShipID) CreateVessel((IPosed)ship);
+            foreach (var vessel in vesselsAdded)
+                if (vessel.ID != playerShipID) UpdateVessel(vessel, 1);
+            foreach (var vessel in vesselsRemoved.Except(vesselsAdded, g_idComparer))
+                if (vessel.ID != playerShipID) RemoveVessel(vessel);
         }
 
         public void CreateStaticThings()
